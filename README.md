@@ -8,3 +8,16 @@ In the long run, we could setup a workflow where a new production running docker
 
 - Helpful stack overflow: https://stackoverflow.com/a/49848507
 - Docker Action: https://github.com/marketplace/actions/build-and-push-docker-images
+
+The use of this docker image will be paired with a few bash aliases that will allow the user to run high level docker commands without needing to understand docker or change their workflow. Some expected aliases are:
+Command | Docker Synopsis | Description
+---|---|---
+`ldmx-env` | `docker start ...` | pull docker image, start up docker container, mount working diretory to docker container
+`ldmx-cmake` | `docker exec ... <insert-working-cmake-command-here>` | configures the build in the container
+`ldmx-make [args]` | `docker exec ... make [args]` | passes make and its arguments to the container
+`ldmx-remake` | combo | removes old build and install and rebuilds and reinstalls from scratch, uses all but one processor
+`ldmx-app [args]` | `docker exec ... ldmx-app [args]` | runs ldmx-app with its arguments in container
+`ldmx-val [args]` | `docker exec ... valgrind ldmx-app [args]` | **maybe** runs ldmx-app inside valgrind in container)
+`ldmx-close` | `docker stop ...` | **maybe** clean up and stop docker container
+
+The dots `...` represent some extra docker options that will be figured out to help the user.
