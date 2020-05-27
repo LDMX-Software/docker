@@ -21,3 +21,12 @@ Command | Docker Synopsis | Description
 `ldmx-close` | `docker stop ...` | **maybe** clean up and stop docker container
 
 The dots `...` represent some extra docker options that will be figured out to help the user.
+
+### Development
+
+Places to make the image smaller:
+ - More specific apt-get packages that are required (`--no-install-recommends`)
+ - More specific minimal root build
+ - Selective Geant4 data downloads
+   - Maybe mount Geant4 data from the host?
+ - Smaller base image (starting from full ubuntu 18.04 server right now)
