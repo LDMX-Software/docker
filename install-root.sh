@@ -13,7 +13,7 @@ mkdir build && cd build
 
 # configure the build
 #   TODO investigate ways to turn off more things
-cmake -DCMAKE_INSTALL_PREFIX=../install -Dminimal=ON -Dgdml=ON -Dcxx17=ON ../root
+cmake -DCMAKE_INSTALL_PREFIX=../install -Dgdml=ON -Dcxx17=ON ../root
 
 # build and install
 make install 
