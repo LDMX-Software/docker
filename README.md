@@ -5,9 +5,10 @@
 Docker build context for developing and running ldmx-sw.
 
 Docker has developed a [GitHub action](https://github.com/marketplace/actions/build-and-push-docker-images) that can automatically build docker images and push them to dockerhub. 
-I hope to use this action so that we can easily update any images that we wish.
+That action is used here to automatically build and propagate any changes to docker hub.
 
 In the long run, we could setup a workflow where a new production running docker image is generated with any commits or releases on the master branch.
+This would entail constructing another docker image that uses this one as a base image, but then includes the ldmx-sw source code.
 
 ### Use in ldmx-sw
 
