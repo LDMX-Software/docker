@@ -32,22 +32,21 @@ RUN apt-get update \
         libgl1-mesa-dev \
     && apt-get update
 
-RUN mkdir install-scripts
-COPY . /install-scripts
+COPY install-scripts/ /tmp/
 
 # Let's build and install our dependencies
-RUN /bin/bash install-scripts/install-root.sh
+RUN /bin/bash /tmp/install-root.sh
 
 ENV XercesC_DIR /xerces-c/install
-RUN /bin/bash install-scripts/install-xerces.sh
+RUN /bin/bash /tmp/install-xerces.sh
 
-RUN /bin/bash install-scripts/install-geant4.sh
+RUN /bin/bash /tmp/install-geant4.sh
 
 ENV ONNX_DIR /onnxruntime
-RUN /bin/bash install-scripts/install-onnxruntime.sh
+RUN /bin/bash /tmp/install-onnxruntime.sh
 
 # any extra cleanup
-RUN apt-get clean && apt-get autoremove && rm -rf /install-scripts
+RUN apt-get clean && apt-get autoremove && rm -rf /tmp/*
 
 # Make a non-super user and become them
 RUN useradd --user-group --system --create-home --no-log-init --shell /bin/bash ldmx-user
