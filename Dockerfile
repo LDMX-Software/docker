@@ -56,8 +56,6 @@ WORKDIR /home/ldmx-user
 
 # Add setup environment to their automatically loaded bashrc
 #   This will need to be changed if the install locations change
-RUN echo "
-source /cernroot/install/bin/thisroot.sh
-source /geant4/install/bin/geant4.sh
-export LD_LIBRARY_PATH=$ONNX_DIR/lib:$LD_LIBRARY_PATH
-" >> .bashrc
+RUN echo "source /cernroot/install/bin/thisroot.sh" >> .bashrc \
+    && echo "source /geant4/install/bin/geant4.sh"  >> .bashrc \
+    && echo "export LD_LIBRARY_PATH=$ONNX_DIR/lib:$LD_LIBRARY_PATH" >> .bashrc
