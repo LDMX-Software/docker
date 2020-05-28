@@ -20,10 +20,15 @@ Command | Docker Synopsis | Description
 `ldmx-make [args]` | `docker exec ... make [args]` | passes make and its arguments to the container
 `ldmx-remake` | combo | removes old build and install and rebuilds and reinstalls from scratch, uses all but one processor
 `ldmx-app [args]` | `docker exec ... ldmx-app [args]` | runs ldmx-app with its arguments in container
+`ldmx-ana-cmake` | `docker exec ... <cmake-command>` | configures the ldmx-analysis build in the container
+`ldmx-ana-make [args]` | `docker exec ... make [args]` | ldmx-analysis build and install in the container
 `ldmx-val [args]` | `docker exec ... valgrind ldmx-app [args]` | **maybe** runs ldmx-app inside valgrind in container)
 `ldmx-close` | `docker stop ...` | **maybe** clean up and stop docker container
 
 The dots `...` represent some extra docker options that will be figured out to help the user.
+
+Another option is to have a script (bash or python) that is called ldmx and has several arguments.
+This would be helpful as things get more complicated.
 
 ### Development
 

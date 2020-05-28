@@ -1,2 +1,5 @@
 # ignore the .git directory
 .git*
+
+# ignore README
+README*

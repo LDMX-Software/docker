@@ -35,11 +35,13 @@ RUN apt-get update \
 COPY install-scripts/ /tmp/
 
 # Let's build and install our dependencies
+ENV ROOTDIR /cernroot
 RUN /bin/bash /tmp/install-root.sh
 
-ENV XercesC_DIR /xerces-c/install
+ENV XercesC_DIR /xerces-c
 RUN /bin/bash /tmp/install-xerces.sh
 
+ENV G4DIR /geant4
 RUN /bin/bash /tmp/install-geant4.sh
 
 ENV ONNX_DIR /onnxruntime
@@ -59,9 +61,7 @@ ENV LDMX_SW_INSTALL /home/ldmx-user/ldmx-sw/install
 ENV LDMX_SW_BUILD   /home/ldmx-user/ldmx-sw/build
 ENV LDMX_ANA_INSTALL /home/ldmx-user/ldmx-analysis/install
 ENV LDMX_ANA_BUILD   /home/ldmx-user/ldmx-analysis/build
-RUN mkdir -p $LDMX_SW_INSTALL $LDMX_SW_BUILD $LDMX_ANA_INSTALL $LDMX_ANA_BUILD \ 
-    && echo "source /cernroot/install/bin/thisroot.sh" >> .bashrc \
-    && echo "source /geant4/install/bin/geant4.sh"  >> .bashrc \
-    && echo "export LD_LIBRARY_PATH=$ONNX_DIR/lib:$LDMX_SW_INSTALL/lib:$LD_LIBRARY_PATH" >> .bashrc \
-    && echo "export PYTHONPATH=$LDMX_SW_INSTALL/lib/python:$LDMX_ANA_INSTALL/lib/python:$PYTHONPATH" >> .bashrc \
-    && echo "export PATH=$LDMX_SW_INSTALL/bin:$PATH" >> .bashrc
+ENV CODE /home/ldmx-user/code
+
+COPY ldmx-env.sh .
+RUN echo "source $HOME/ldmx-env.sh" >> .bashrc
