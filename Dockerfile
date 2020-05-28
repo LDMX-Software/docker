@@ -55,6 +55,13 @@ WORKDIR /home/ldmx-user
 
 # Add setup environment to their automatically loaded bashrc
 #   This will need to be changed if the install locations change
-RUN echo "source /cernroot/install/bin/thisroot.sh" >> .bashrc \
+ENV LDMX_SW_INSTALL /home/ldmx-user/ldmx-sw/install
+ENV LDMX_SW_BUILD   /home/ldmx-user/ldmx-sw/build
+ENV LDMX_ANA_INSTALL /home/ldmx-user/ldmx-analysis/install
+ENV LDMX_ANA_BUILD   /home/ldmx-user/ldmx-analysis/build
+RUN mkdir -p $LDMX_SW_INSTALL $LDMX_SW_BUILD $LDMX_ANA_INSTALL $LDMX_ANA_BUILD \ 
+    && echo "source /cernroot/install/bin/thisroot.sh" >> .bashrc \
     && echo "source /geant4/install/bin/geant4.sh"  >> .bashrc \
-    && echo "export LD_LIBRARY_PATH=$ONNX_DIR/lib:$LD_LIBRARY_PATH" >> .bashrc
+    && echo "export LD_LIBRARY_PATH=$ONNX_DIR/lib:$LDMX_SW_INSTALL/lib:$LD_LIBRARY_PATH" >> .bashrc \
+    && echo "export PYTHONPATH=$LDMX_SW_INSTALL/lib/python:$LDMX_ANA_INSTALL/lib/python:$PYTHONPATH" >> .bashrc \
+    && echo "export PATH=$LDMX_SW_INSTALL/bin:$PATH" >> .bashrc
