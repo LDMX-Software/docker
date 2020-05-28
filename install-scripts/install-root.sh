@@ -2,7 +2,7 @@
 set -e
 
 # make a working directory for the build
-cd /tmp/ && mkdir cernroot && cd cernroot
+mkdir cernroot && cd cernroot
 
 # try to clone from the root-project github,
 #   but only the branch of the version we care about

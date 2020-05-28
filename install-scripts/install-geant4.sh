@@ -2,7 +2,7 @@
 set -e
 
 # make and enter working directory
-cd /tmp/ && mkdir geant4 && cd geant4
+mkdir geant4 && cd geant4
 
 # get the single branch we need from github
 git clone -b LDMX.10.2.3_v0.3 --single-branch https://github.com/LDMXAnalysis/geant4.git

@@ -2,7 +2,7 @@
 set -e
 
 # make working directory
-cd /tmp/ && mkdir -p $ONNX_DIR
+mkdir -p $ONNX_DIR
 
 # download pre-compiled binaries
 wget https://github.com/microsoft/onnxruntime/releases/download/v1.3.0/onnxruntime-linux-x64-1.3.0.tgz

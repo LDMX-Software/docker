@@ -32,22 +32,25 @@ RUN apt-get update \
         libgl1-mesa-dev \
     && apt-get update
 
-COPY install-scripts/ /tmp/
+# move to location to keep working files
+WORKDIR /tmp/
+
+COPY install-scripts/ .
 
 # Let's build and install our dependencies
-ENV ROOTDIR /cernroot
+ENV ROOTDIR /deps/cernroot
 RUN /bin/bash /tmp/install-root.sh
 
-ENV XercesC_DIR /xerces-c
+ENV XercesC_DIR /deps/xerces-c
 RUN /bin/bash /tmp/install-xerces.sh
 
-ENV G4DIR /geant4
+ENV G4DIR /deps/geant4
 RUN /bin/bash /tmp/install-geant4.sh
 
-ENV ONNX_DIR /onnxruntime
+ENV ONNX_DIR /deps/onnxruntime
 RUN /bin/bash /tmp/install-onnxruntime.sh
 
-# any extra cleanup
+# clean up source and build files
 RUN apt-get clean && apt-get autoremove && rm -rf /tmp/*
 
 # Make a non-super user and become them

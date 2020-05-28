@@ -2,7 +2,7 @@
 set -e
 
 # make working directory
-cd /tmp/ && mkdir xerces-c && cd xerces-c;
+mkdir xerces-c && cd xerces-c;
 
 # download sources
 wget https://downloads.apache.org//xerces/c/3/sources/xerces-c-3.2.3.tar.gz
