@@ -15,7 +15,6 @@ mkdir build && cd build
 #   TODO investigate ways to turn off more things
 cmake \
     -DCMAKE_INSTALL_PREFIX=$ROOTDIR \
-    -Dminimal=ON \
     -Dgdml=ON \
     -DCMAKE_CXX_STD=17 \
     ../root
