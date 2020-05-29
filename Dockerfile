@@ -35,6 +35,8 @@ RUN apt-get update \
 # move to location to keep working files
 WORKDIR /tmp/
 
+# Let's build and install our dependencies
+
 COPY install-scripts/ .
 
 # Let's build and install our dependencies
@@ -53,18 +55,12 @@ RUN /bin/bash /tmp/install-onnxruntime.sh
 # clean up source and build files
 RUN apt-get clean && apt-get autoremove && rm -rf /tmp/*
 
-# Make a non-super user and become them
-RUN useradd --user-group --system --create-home --no-log-init --shell /bin/bash ldmx-user
-USER ldmx-user
-WORKDIR /home/ldmx-user
+#copy over necessary running script
+WORKDIR /home/
+COPY ./ldmx.sh .
+RUN chmod 755 /home/ldmx.sh
 
-# Add setup environment to their automatically loaded bashrc
-#   This will need to be changed if the install locations change
-ENV LDMX_SW_INSTALL /home/ldmx-user/ldmx-sw/install
-ENV LDMX_SW_BUILD   /home/ldmx-user/ldmx-sw/build
-ENV LDMX_ANA_INSTALL /home/ldmx-user/ldmx-analysis/install
-ENV LDMX_ANA_BUILD   /home/ldmx-user/ldmx-analysis/build
-ENV CODE /home/ldmx-user/code
-
-COPY ldmx-env.sh .
-RUN echo "source $HOME/ldmx-env.sh" >> .bashrc
+#run environment setup when docker container is launched
+# and decide what to do from there
+#   will required the environment variable LDMX_BASE defined
+ENTRYPOINT ["/home/ldmx.sh"]
