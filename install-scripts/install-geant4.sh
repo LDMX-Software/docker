@@ -11,11 +11,13 @@ git clone -b LDMX.10.2.3_v0.3 --single-branch https://github.com/LDMXAnalysis/ge
 mkdir build && cd build
 
 # configure the build
-cmake -DGEANT4_INSTALL_DATA=ON -DGEANT4_USE_GDML=ON -DXERCESC_ROOT_DIR=$XercesC_DIR -DGEANT4_USE_OPENGL_X11=ON -DCMAKE_INSTALL_PREFIX=../install ../geant4
+cmake \
+    -DGEANT4_INSTALL_DATA=ON \
+    -DGEANT4_USE_GDML=ON \
+    -DXERCESC_ROOT_DIR=$XercesC_DIR \
+    -DGEANT4_USE_OPENGL_X11=ON \
+    -DCMAKE_INSTALL_PREFIX=$G4DIR \
+    ../geant4
 
 # build and install
 make install
-
-# clean up
-cd .. 
-rm -rf geant4 build

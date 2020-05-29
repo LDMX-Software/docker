@@ -2,7 +2,7 @@
 set -e
 
 # make a working directory for the build
-mkdir /cernroot && cd cernroot
+mkdir cernroot && cd cernroot
 
 # try to clone from the root-project github,
 #   but only the branch of the version we care about
@@ -13,11 +13,11 @@ mkdir build && cd build
 
 # configure the build
 #   TODO investigate ways to turn off more things
-cmake -DCMAKE_INSTALL_PREFIX=../install -Dminimal=ON -Dgdml=ON -DCMAKE_CXX_STD=17 ../root
+cmake \
+    -DCMAKE_INSTALL_PREFIX=$ROOTDIR \
+    -Dgdml=ON \
+    -DCMAKE_CXX_STD=17 \
+    ../root
 
 # build and install
 make install 
-
-# cleanup
-cd .. 
-rm -rf root build
