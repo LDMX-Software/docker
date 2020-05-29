@@ -22,3 +22,6 @@ cmake \
 # build and install
 make install 
 
+# clean up before saving this layer
+cd ..
+rm -rf build xerces-c-3.2.3

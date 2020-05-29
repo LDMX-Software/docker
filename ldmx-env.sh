@@ -28,7 +28,7 @@ export PATH=$LDMX_SW_INSTALL/bin:$PATH
 #   any arguments passed are assumed to be extra arguments for cmake (e.g. -DBUILD_TESTS=ON)
 function ldmx-cmake() {
     cd $LDMX_SW_BUILD &&
-    cmake -DCMAKE_INSTALL_PREFIX=$LDMX_SW_INTALL -DXercesC_DIR=$XercesC_DIR -DONNXRUNTIME_ROOT=$ONNX_DIR "$@" $CODE/ldmx-sw
+    cmake -DCMAKE_INSTALL_PREFIX=$LDMX_SW_INSTALL -DXercesC_DIR=$XercesC_DIR -DONNXRUNTIME_ROOT=$ONNX_DIR "$@" $CODE/ldmx-sw
 }
 
 # go to ldmx-sw build and make it
@@ -42,7 +42,7 @@ function ldmx-make() {
 #   any arguments passed are assumed to be extra arguments for cmake (e.g. -DBUILD_TESTS=ON)
 function ldmx-ana-cmake() {
     cd $LDMX_ANA_BUILD &&
-    cmake -DCMAKE_INSTALL_PREFIX=$LDMX_SW_INTALL -DLDMX_INSTALL_PREFIX=$LDMX_SW_INTALL "$@" $CODE/ldmx-analysis
+    cmake -DCMAKE_INSTALL_PREFIX=$LDMX_SW_INSTALL -DLDMX_INSTALL_PREFIX=$LDMX_SW_INTALL "$@" $CODE/ldmx-analysis
 }
 
 # go to ldmx-analysis build and make it

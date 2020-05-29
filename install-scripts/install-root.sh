@@ -21,3 +21,7 @@ cmake \
 
 # build and install
 make install 
+
+# clean up before this layer is saved
+cd ..
+rm -rf build root

@@ -21,3 +21,7 @@ cmake \
 
 # build and install
 make install
+
+# clean up before saving this layer
+cd ..
+rm -rf geant4 build
