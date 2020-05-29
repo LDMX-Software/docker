@@ -12,23 +12,28 @@ This would entail constructing another docker image that uses this one as a base
 
 ### Use in ldmx-sw
 
-The use of this docker image will be paired with a few bash aliases that will allow the user to run high level docker commands without needing to understand docker or change their workflow. Some expected aliases are:
-Command | Docker Synopsis | Description
----|---|---
-`ldmx-env` | `docker start ...` | pull docker image, start up docker container, mount working diretory to docker container
-`ldmx-cmake` | `docker exec ... <insert-working-cmake-command-here>` | configures the build in the container
-`ldmx-make [args]` | `docker exec ... make [args]` | passes make and its arguments to the container
-`ldmx-remake` | combo | removes old build and install and rebuilds and reinstalls from scratch, uses all but one processor
-`ldmx-app [args]` | `docker exec ... ldmx-app [args]` | runs ldmx-app with its arguments in container
-`ldmx-ana-cmake` | `docker exec ... <cmake-command>` | configures the ldmx-analysis build in the container
-`ldmx-ana-make [args]` | `docker exec ... make [args]` | ldmx-analysis build and install in the container
-`ldmx-val [args]` | `docker exec ... valgrind ldmx-app [args]` | **maybe** runs ldmx-app inside valgrind in container)
-`ldmx-close` | `docker stop ...` | **maybe** clean up and stop docker container
-
-The dots `...` represent some extra docker options that will be figured out to help the user.
-
-Another option is to have a script (bash or python) that is called ldmx and has several arguments.
-This would be helpful as things get more complicated.
+The use of this docker image will be paired with a few bash aliases that will allow the user to run high level docker commands without needing to understand docker or change their workflow. 
+The core alias hides the docker run action from everyone else:
+```bash
+alias ldmx='docker run --rm -it -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE tomeichlersmith/ldmx-os $(pwd)'
+```
+This launches the docker container, essentially putting the user into the ldmx environment, and then enters the directory that the user is running this alias from.
+Any commands passed to this alias are then run in the container on the mounted directory that the user is on.
+This means the user would have the following workflow:
+```bash
+$ export LDMX_BASE=<path-to-directory-containing-ldmx-sw>
+$ cd $LDMX_BASE/ldmx-sw
+$ mkdir build; cd build;
+$ ldmx cmake -DBUILD_EVE=OFF -DONNXRUNTIME_ROOT=/deps/onnxruntime -DCMAKE_INSTALL_PREFIX=../install ../
+...
+cmake output like normal
+...
+$ ldmx make install
+...
+make build output like normal
+...
+```
+Isn't that wonderful???
 
 ### Development
 
