@@ -16,7 +16,7 @@ mkdir build && cd build
 cmake \
     -DCMAKE_INSTALL_PREFIX=$ROOTDIR \
     -Dgdml=ON \
-    -DCMAKE_CXX_STD=17 \
+    -DCMAKE_CXX_STANDARD=17 \
     ../root
 
 # build and install
