@@ -47,3 +47,24 @@ Places to make the image smaller:
  - Selective Geant4 data downloads
    - Maybe mount Geant4 data from the host?
  - Smaller base image (starting from full ubuntu 18.04 server right now)
+ 
+ ## Singularity
+ 
+ You can convert both this image and the production image into singularity images using singularity itself.
+ For example, to convert the development image stored on docker-hub you would
+ ```
+ singularity build ldmx_dev_latest.sif docker://ldmx/dev:latest
+ ```
+ This command pulls down the layers for the development image from docker hub and builds it into the singularity `.sif` file.
+ Using the image with singularity can be done in the same way as with docker if you define the following function
+ ```
+ function ldmx() {
+     _current_working_dir=${PWD##"${LDMX_BASE}/"} #store current working directory relative to ldmx base
+     cd ${LDMX_BASE} # go to ldmx base directory outside container
+     # actually run the singularity image stored in the base directory going to working directory inside container
+     singularity run --no-home ${LDMX_SINGULARITY_IMG} ${_current_working_dir} "$@"
+     cd - &> /dev/null #go back outside the container
+ }
+ ```
+ Since singularity mounts the current working directory to the container automatically, we go back to `${LDMX_BASE}` and enter the container from there.
+ Then we can go back to the user's working directory inside of the container to run our command.
