@@ -28,7 +28,7 @@ This means the user would have the following workflow:
 $ export LDMX_BASE=<path-to-directory-containing-ldmx-sw>
 $ cd $LDMX_BASE/ldmx-sw
 $ mkdir build; cd build;
-$ ldmx cmake -DBUILD_EVE=OFF -DONNXRUNTIME_ROOT=/deps/onnxruntime -DCMAKE_INSTALL_PREFIX=../install ../
+$ ldmx cmake ..
 ...
 cmake output like normal
 ...
