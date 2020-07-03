@@ -22,6 +22,11 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
         repository: ldmx/dev
         tags: testing #TODO change to latest
+    - name: Tell Derivatives to Rebuild
+      uses: peter-evans/repository-dispatch@v1
+      with:
+        token: ${{ secrets.LDMX_ORG_TOKEN }}
+        event-type: rebuild-derivatives
 
   geant4:
     runs-on: ubuntu-latest
@@ -35,4 +40,3 @@ jobs:
         repository: ldmx/dev
         build-args: GEANT4=geant4-10.6-release
         tags: geant4.10.6
-
