@@ -1,46 +1,39 @@
 # This is a basic workflow to help you get started with Actions
 
-name: Build the docker image
+name: Builds
 
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the master branch
 on:
   push:
     branches: [ master ]
-  pull_request:
-    branches: [ master ]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
-  build:
+  regular:
     runs-on: ubuntu-latest
     steps:
-    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
-
-    # attach cache and name it based off of Dockerfile hash
-    - id: cache-docker
-      uses: actions/cache@v1
-      with:
-          path: /tmp/docker-registry
-          key: docker-registry-${{ hashFiles('Dockerfile') }}
-
-    # Start up a docker registry on the local host and pull the existing 'thing' from there (if it exists)
-    - run: docker run -d -p 5000:5000 --restart=always --name registry -v /tmp/docker-registry:/var/lib/registry registry:2 && npx wait-on tcp:5000
-    - run: docker pull localhost:5000/thing || true
-
-    # Build the docker image using the localhost cache as a cache_from
     - name: Build It!
       uses: docker/build-push-action@v1
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
-        repository: tomeichlersmith/ldmx-os
-        cache_froms: localhost:5000/thing
-        tags: latest
+        repository: ldmx/dev
+        tags: testing #TODO change to latest?
 
-    # Push the finished build to the cache if it is a new cache image (i.e. Dockerfile was changed)
-    - run: docker tag thing localhost:5000/thing && docker push localhost:5000/thing || true
-      if: steps.cache.outputs.cache-hit != 'true' #don't push to cache if a cache with the same Dockerfile already exists
+  geant4:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build It!
+      uses: docker/build-push-action@v1
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+        repository: ldmx/dev
+        build-args: GEANT4=geant4-10.6-release
+        tags: geant4.10.6
+
 

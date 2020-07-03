@@ -1,12 +1,24 @@
 
 FROM ubuntu:18.04
 
-LABEL ldmxsw.version="2.0.0" \
-      root.version="6.20.00" \
-      geant4.version="10.2.3.v0.3" \
-      ubuntu.version="18.04" \
-      xerces.version="3.2.3" \
-      onnx.version="1.3.0"
+# Geant4 and ROOT version arguments
+# are formatted as the branch/tag to 
+# pull from git
+ARG GEANT4=LDMX.10.2.3.v0.3
+ARG ROOT=v6-20-00
+
+# XercesC and ONNX version arguments
+# are formatted as they appear in
+# the download link provided by those
+# companies
+ARG XERCESC=3.2.3
+ARG ONNX=1.3.0
+
+LABEL ubuntu.version="18.04" \
+      root.version="${ROOT}" \
+      geant4.version="${GEANT4}" \
+      xerces.version="${XERCESC}" \
+      onnx.version="${ONNX}"
 
 MAINTAINER Tom Eichlersmith <eichl008@umn.edu>
 

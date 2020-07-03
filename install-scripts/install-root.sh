@@ -6,7 +6,7 @@ mkdir cernroot && cd cernroot
 
 # try to clone from the root-project github,
 #   but only the branch of the version we care about
-git clone -b v6-20-00 --single-branch https://github.com/root-project/root.git
+git clone -b ${ROOT} --single-branch https://github.com/root-project/root.git
 
 # make a build directory and go into it
 mkdir build && cd build

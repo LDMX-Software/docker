@@ -5,10 +5,10 @@ set -e
 mkdir xerces-c && cd xerces-c;
 
 # download sources
-wget http://archive.apache.org/dist/xerces/c/3/sources/xerces-c-3.2.3.tar.gz
+wget http://archive.apache.org/dist/xerces/c/3/sources/xerces-c-${XERCESC}.tar.gz
 
 # unpack the source
-tar -zxvf xerces-c-3.2.3.tar.gz
+tar -zxvf xerces-c-*.tar.gz
 
 # make and enter a build directory
 mkdir build && cd build 
@@ -17,11 +17,11 @@ mkdir build && cd build
 #   XercesC_DIR is set in ENV command
 cmake \
     -DCMAKE_INSTALL_PREFIX=$XercesC_DIR \
-    ../xerces-c-3.2.3 
+    ../xerces-c-${XERCESC} 
 
 # build and install
 make install 
 
 # clean up before saving this layer
 cd ..
-rm -rf build xerces-c-3.2.3
+rm -rf build xerces-c*
