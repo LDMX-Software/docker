@@ -1,3 +1,3 @@
 #basic dev container with uproot on top
-FROM ldmx/dev:latest as ldmx/dev:uproot
+FROM ldmx/dev:latest
 RUN apt-get update && apt-get install python-pip -y && pip install --no-cache-dir uproot
