@@ -4,10 +4,11 @@ name: Derivatives
 on:
   push:
     branches: [ master ]
-    paths: [ 'derivatives/**' ]
+    paths: [ '**/derivatives.yml' , 'derivatives/**' ]
 
 jobs:
   uproot:
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
     - run: cd derivatives
