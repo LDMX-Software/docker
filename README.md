@@ -1,5 +1,8 @@
 # docker
 
+<img src="https://github.com/LDMX-Software/docker/workflows/Builds/badge.svg" />
+
+
 Docker build context for developing and running ldmx-sw.
 
 Docker has developed a [GitHub action](https://github.com/marketplace/actions/build-and-push-docker-images) that can automatically build docker images and push them to dockerhub. 
