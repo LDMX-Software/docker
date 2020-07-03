@@ -4,8 +4,7 @@ name: Derivatives
 on:
   push:
     branches: [ master ]
-    paths: [ '**/derivatives.yml' , 'derivatives/**' ]
-    paths-ignore: [ 'derivatives/README*' ]
+    paths: [ '**/derivatives.yml' , 'derivatives/**' , '!**README**' ]
   repository_dispatch:
     types: [ 'rebuild-derivatives' ]
  
