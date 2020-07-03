@@ -5,10 +5,14 @@ on:
   push:
     branches: [ master ]
     paths: [ '**/derivatives.yml' , 'derivatives/**' ]
-
+ 
 jobs:
   uproot:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: derivatives
     steps:
     - uses: actions/checkout@v2
     - name: Build It!
