@@ -19,6 +19,7 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
         repository: ldmx/dev
+        path: derivatives
         dockerfile: derivatives/Dockerfile.uproot
         tags: uproot
 
