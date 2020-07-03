@@ -1,6 +1,7 @@
 # docker
 
 <img src="https://github.com/LDMX-Software/docker/workflows/Builds/badge.svg" />
+<img src="https://github.com/LDMX-Software/docker/workflows/Derivatives/badge.svg" />
 
 Docker build context for developing and running ldmx-sw: [Docker Hub](https://hub.docker.com/repository/docker/ldmx/dev)
 
@@ -40,24 +41,33 @@ Places to make the image smaller:
  - Selective Geant4 data downloads
    - Maybe mount Geant4 data from the host?
  - Smaller base image (starting from full ubuntu 18.04 server right now)
+
+### Derivatives
+The `derivatives` directory contains other docker files that modify the development container slightly.
+For example, the file `derivates/Dockerfile.uproot` can be used to build a container with uproot installed in it
+by running the following command inside the `derivates` directory.
+```
+docker build . -f Dockerfile.uproot -t ldmx/dev:uproot
+```
+These derivative containers are also built by a GitHub action.
  
- ## singularity
- 
- You can convert both this image and the production image into singularity images using singularity itself.
- For example, to convert the development image stored on docker-hub you would
- ```
- singularity build ldmx_dev_latest.sif docker://ldmx/dev:latest
- ```
- This command pulls down the layers for the development image from docker hub and builds it into the singularity `.sif` file.
- Using the image with singularity can be done in the same way as with docker if you define the following function
- ```
- function ldmx() {
-     _current_working_dir=${PWD##"${LDMX_BASE}/"} #store current working directory relative to ldmx base
-     cd ${LDMX_BASE} # go to ldmx base directory outside container
-     # actually run the singularity image stored in the base directory going to working directory inside container
-     singularity run --no-home ${LDMX_SINGULARITY_IMG} ${_current_working_dir} "$@"
-     cd - &> /dev/null #go back outside the container
- }
- ```
- Since singularity mounts the current working directory to the container automatically, we go back to `${LDMX_BASE}` and enter the container from there.
- Then we can go back to the user's working directory inside of the container to run our command.
+## singularity
+
+You can convert both this image and the production image into singularity images using singularity itself.
+For example, to convert the development image stored on docker-hub you would
+```
+singularity build ldmx_dev_latest.sif docker://ldmx/dev:latest
+```
+This command pulls down the layers for the development image from docker hub and builds it into the singularity `.sif` file.
+Using the image with singularity can be done in the same way as with docker if you define the following function
+```
+function ldmx() {
+    _current_working_dir=${PWD##"${LDMX_BASE}/"} #store current working directory relative to ldmx base
+    cd ${LDMX_BASE} # go to ldmx base directory outside container
+    # actually run the singularity image stored in the base directory going to working directory inside container
+    singularity run --no-home ${LDMX_SINGULARITY_IMG} ${_current_working_dir} "$@"
+    cd - &> /dev/null #go back outside the container
+}
+```
+Since singularity mounts the current working directory to the container automatically, we go back to `${LDMX_BASE}` and enter the container from there.
+Then we can go back to the user's working directory inside of the container to run our command.
