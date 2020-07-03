@@ -5,8 +5,12 @@ The first example of this is `uproot`.
 Several collaborators use `uproot` along with the libraries compiled inside the development container to do analyses.
 This means that those collaborators **need** to have `uproot` inside of the container.
 
-This is where the line is drawn.
-Derivative containers should only be made when there is a need for an extra package **at the same time** as using libraries compiled in ldmx-sw.
+### Current List of Derivatives and the Corresponding Tag
+To use a given derivative tag, you need to pass it to the ldmx-sw environment script:
+```bash
+source ldmx-sw/scripts/ldmx-env.sh . tag
+```
 
-### Current List of Derivatives
-- uproot
+| Tag | Extra Packages |
+|---|---|
+|`uproot`|uproot|
