@@ -44,13 +44,8 @@ Places to make the image smaller:
 
 ### Derivatives
 The `derivatives` directory contains other docker files that modify the development container slightly.
-For example, the file `derivates/Dockerfile.uproot` can be used to build a container with uproot installed in it
-by running the following command inside the `derivates` directory.
-```
-docker build . -f Dockerfile.uproot -t ldmx/dev:uproot
-```
-These derivative containers are also built by a GitHub action.
- 
+Please read that [README](derivatives/README.md) for more detail.
+
 ## singularity
 
 You can convert both this image and the production image into singularity images using singularity itself.
