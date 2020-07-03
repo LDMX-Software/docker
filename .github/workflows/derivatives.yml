@@ -9,10 +9,6 @@ on:
 jobs:
   uproot:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
-        working-directory: derivatives
     steps:
     - uses: actions/checkout@v2
     - name: Build It!
@@ -21,6 +17,6 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
         repository: ldmx/dev
-        dockerfile: Dockerfile.uproot
+        dockerfile: derivatives/Dockerfile.uproot
         tags: uproot
 
