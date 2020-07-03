@@ -2,7 +2,7 @@
 name: Derivative Request
 about: Suggest an derivative for the development container
 title: ''
-labels: 'request'
+labels: 'help wanted'
 assignees: ''
 
 ---
