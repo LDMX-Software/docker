@@ -5,6 +5,7 @@ on:
   push:
     branches: [ master ]
     paths: [ '**/derivatives.yml' , 'derivatives/**' ]
+    paths-ignore: [ 'derivatives/README*' ]
  
 jobs:
   uproot:
