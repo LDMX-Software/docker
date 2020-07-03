@@ -8,10 +8,9 @@ on:
 
 jobs:
   uproot:
-    needs: regular, geant4
     steps:
     - uses: actions/checkout@v2
-    - run: cd derivates
+    - run: cd derivatives
     - name: Build It!
       uses: docker/build-push-action@v1
       with:
