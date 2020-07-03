@@ -5,7 +5,7 @@ set -e
 mkdir xerces-c && cd xerces-c;
 
 # download sources
-wget https://downloads.apache.org//xerces/c/3/sources/xerces-c-3.2.3.tar.gz
+wget http://archive.apache.org/dist/xerces/c/3/sources/xerces-c-3.2.3.tar.gz
 
 # unpack the source
 tar -zxvf xerces-c-3.2.3.tar.gz
