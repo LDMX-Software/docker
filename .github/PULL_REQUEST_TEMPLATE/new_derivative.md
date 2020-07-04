@@ -1,3 +1,11 @@
+---
+name: New Derivative
+about: Add a new derivative development container to the list that are automatically updated
+title: ''
+labels: ''
+assignees: ''
+
+---
 
 ## Derivative Description
 ### What new packages does this derivative add to the development container?
