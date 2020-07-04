@@ -5,7 +5,7 @@ name: Builds
 on:
   push:
     branches: [ master ]
-    paths: [ 'Dockerfile' , 'install-scripts/**' , '**base.yml' ]
+    paths: [ 'ldmx.sh' , 'Dockerfile' , 'install-scripts/**' , '**base.yml' ]
 
 # build the two "base" images in parallel
 # one uses the default versions and the other uses a more recent version of Geant4
