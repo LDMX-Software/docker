@@ -6,6 +6,7 @@ FROM ubuntu:18.04
 # pull from git
 ARG GEANT4=LDMX.10.2.3_v0.3
 ARG ROOT=v6-20-00
+ARG MINIMAL=OFF
 
 # XercesC and ONNX version arguments
 # are formatted as they appear in
@@ -16,6 +17,7 @@ ARG ONNX=1.3.0
 
 LABEL ubuntu.version="18.04" \
       root.version="${ROOT}" \
+      minimal="${MINIMAL}" \
       geant4.version="${GEANT4}" \
       xerces.version="${XERCESC}" \
       onnx.version="${ONNX}"

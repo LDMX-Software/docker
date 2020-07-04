@@ -3,6 +3,7 @@
 <p align="center">
 <img src="https://github.com/LDMX-Software/docker/workflows/Base/badge.svg" />
 <img src="https://github.com/LDMX-Software/docker/workflows/Geant4.10.6/badge.svg" />
+<img src="https://github.com/LDMX-Software/docker/workflows/Minimal/badge.svg" />
 <img src="https://github.com/LDMX-Software/docker/workflows/Derivatives/badge.svg" />
 </p>
 

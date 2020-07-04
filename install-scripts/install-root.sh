@@ -12,12 +12,22 @@ git clone -b ${ROOT} --single-branch https://github.com/root-project/root.git
 mkdir build && cd build
 
 # configure the build
-#   TODO investigate ways to turn off more things
-cmake \
-    -DCMAKE_INSTALL_PREFIX=$ROOTDIR \
-    -Dgdml=ON \
-    -DCMAKE_CXX_STANDARD=17 \
-    ../root
+if [[ ${MINIMAL} == *"OFF"* ]]
+then
+    cmake \
+        -DCMAKE_INSTALL_PREFIX=$ROOTDIR \
+        -Dgdml=ON \
+        -DCMAKE_CXX_STANDARD=17 \
+        ../root
+else
+    cmake \
+        -DCMAKE_INSTALL_PREFIX=$ROOTDIR \
+        -Dminimal=ON \
+        -Dgdml=ON \
+        -Dpyroot=ON \
+        -DCMAKE_CXX_STANDARD=17 \
+        ../root
+fi
 
 # build and install
 make install 

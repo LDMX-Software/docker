@@ -1,11 +1,11 @@
 
-name: Base
+name: Minimal
 
 # only build if push changes something other than README or derivatives
 on:
   push:
     branches: [ master ]
-    paths: [ 'ldmx.sh' , 'Dockerfile' , 'install-scripts/**' , '**base.yml' ]
+    paths: [ 'ldmx.sh' , 'Dockerfile' , 'install-scripts/**' , '**minimal.yml' ]
 
 # build the two "base" images in parallel
 # one uses the default versions and the other uses a more recent version of Geant4
@@ -21,9 +21,5 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
         repository: ldmx/dev
-        tags: latest
-    - name: Tell Derivatives to Rebuild
-      uses: peter-evans/repository-dispatch@v1
-      with:
-        token: ${{ secrets.LDMX_ORG_TOKEN }}
-        event-type: rebuild-derivatives
+        build_args: MINIMAL=ON
+        tags: minimal
