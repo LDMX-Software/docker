@@ -1,7 +1,10 @@
 # docker
 
-<img src="https://github.com/LDMX-Software/docker/workflows/Builds/badge.svg" />
+<p align="center">
+<img src="https://github.com/LDMX-Software/docker/workflows/Base/badge.svg" />
+<img src="https://github.com/LDMX-Software/docker/workflows/Geant4.10.6/badge.svg" />
 <img src="https://github.com/LDMX-Software/docker/workflows/Derivatives/badge.svg" />
+</p>
 
 Docker build context for developing and running ldmx-sw: [Docker Hub](https://hub.docker.com/repository/docker/ldmx/dev)
 
