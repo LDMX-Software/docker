@@ -20,6 +20,7 @@ jobs:
   
   #other derivative containers
   
+  #copy the following into the '.yml' file and change my-tag to your chosen tag
   my-tag:
     runs-on: ubuntu-latest
     steps:
