@@ -45,31 +45,25 @@ RUN apt-get update \
     && apt-get update
 
 # move to location to keep working files
-WORKDIR /tmp/
-
-# Let's build and install our dependencies
-
-COPY install-scripts/ .
+COPY install-scripts/ /tmp/
 
 # Let's build and install our dependencies
 ENV ROOTDIR /deps/cernroot
-RUN /bin/bash /tmp/install-root.sh
-
 ENV XercesC_DIR /deps/xerces-c
-RUN /bin/bash /tmp/install-xerces.sh
-
 ENV G4DIR /deps/geant4
-RUN /bin/bash /tmp/install-geant4.sh
-
 ENV ONNX_DIR /deps/onnxruntime
-RUN /bin/bash /tmp/install-onnxruntime.sh
+
+RUN /bin/bash /tmp/install-root.sh        &&\
+    /bin/bash /tmp/install-xerces.sh      &&\
+    /bin/bash /tmp/install-geant4.sh      &&\
+    /bin/bash /tmp/install-onnxruntime.sh &&\
+    rm -rf /tmp/*
 
 # clean up source and build files
-RUN apt-get clean && apt-get autoremove && rm -rf /tmp/*
+RUN apt-get clean && apt-get autoremove 
 
 #copy over necessary running script
-WORKDIR /home/
-COPY ./ldmx.sh .
+COPY ./ldmx.sh /home/
 RUN chmod 755 /home/ldmx.sh
 
 #run environment setup when docker container is launched
