@@ -1,11 +1,5 @@
----
-name: New Derivative
-about: Add a new derivative development container to the list that are automatically updated
-title: ''
-labels: ''
-assignees: ''
 
----
+I am adding a new derivative container, here are the details.
 
 ## Derivative Description
 ### What new packages does this derivative add to the development container?
