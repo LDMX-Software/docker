@@ -1,6 +1,6 @@
 ---
 name: Derivative Request
-about: Suggest an derivative for the development container
+about: Request a derivative of the development container to be created.
 title: ''
 labels: 'help wanted'
 assignees: ''
@@ -12,6 +12,12 @@ A clear and concise description of what the problem is. Ex. I'm always frustrate
 
 ## Describe the solution you'd like. What packages do you want installed?
 A clear and concise description of what you want to happen.
+
+**The Development Container is based on Ubuntu 18.04. How do you install your necessary packages on Ubuntu?**
+A description and list of commands to run, for example
+```
+apt-get install my-package
+```
 
 **Additional context**
 Add any other context or screenshots about the feature request here.
