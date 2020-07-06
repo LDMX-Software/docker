@@ -19,11 +19,11 @@ mkdir build && cd build
 
 # configure the build
 cmake \
-    -DGEANT4_INSTALL_DATA=ON \
-    -DGEANT4_USE_GDML=ON \
+    -DGEANT4_INSTALL_DATA=ON        \
+    -DGEANT4_USE_GDML=ON            \
+    -DGEANT4_INSTALL_EXAMPLES=OFF   \
     -DXERCESC_ROOT_DIR=$XercesC_DIR \
-    -DGEANT4_USE_OPENGL_X11=ON \
-    -DCMAKE_INSTALL_PREFIX=$G4DIR \
+    -DCMAKE_INSTALL_PREFIX=$G4DIR   \
     ../geant4
 
 # build and install
