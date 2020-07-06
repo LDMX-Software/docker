@@ -9,7 +9,7 @@ on:
     types: [ 'rebuild-derivatives' ]
  
 jobs:
-  uproot:
+  pytools:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -20,6 +20,6 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
         repository: ldmx/dev
         path: derivatives
-        dockerfile: derivatives/Dockerfile.uproot
-        tags: uproot
+        dockerfile: derivatives/Dockerfile.pytools
+        tags: pytools
 

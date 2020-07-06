@@ -13,7 +13,7 @@ source ldmx-sw/scripts/ldmx-env.sh . tag
 
 | Tag | Extra Packages |
 |---|---|
-|`uproot`|uproot|
+|`pytools`|uproot,rootpy,numpy,matplotlib|
 
 ### Documentation
 After developing a derivative dockerfile (i.e. making sure it builds successfully and runs the way you want it to),
