@@ -26,8 +26,8 @@ MAINTAINER Tom Eichlersmith <eichl008@umn.edu>
 
 # First install any required dependencies from ubuntu repos
 #   TODO clean up this dependency list
-RUN apt-get update \
-    && apt-get install -y \
+RUN apt-get update &&\
+    apt-get install -y \
         wget \
         git \
         cmake \
@@ -43,8 +43,7 @@ RUN apt-get update \
         libxext-dev \
         libboost-all-dev \
         libxmu-dev \
-        libgl1-mesa-dev \
-    && apt-get update
+        libgl1-mesa-dev
 
 # move to location to keep working files
 COPY install-scripts/ /tmp/
