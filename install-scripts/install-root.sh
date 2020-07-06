@@ -14,18 +14,20 @@ mkdir build && cd build
 # configure the build
 if [[ ${MINIMAL} == *"OFF"* ]]
 then
+    # build all possble components (and use python3)
     cmake \
         -DCMAKE_INSTALL_PREFIX=$ROOTDIR \
-        -Dgdml=ON \
         -DCMAKE_CXX_STANDARD=17 \
+        -DPYTHON_EXECUTABLE=$(which python3) \
         ../root
 else
+    # only build necessary components
+    #   ldmx-sw uses Core, I/O, and Hists mainly
+    #   root includes _a lot_ of components in its "necessary" list
     cmake \
         -DCMAKE_INSTALL_PREFIX=$ROOTDIR \
-        -Dminimal=ON \
-        -Dgdml=ON \
-        -Dpyroot=ON \
         -DCMAKE_CXX_STANDARD=17 \
+        -Dminimal=ON \
         ../root
 fi
 
