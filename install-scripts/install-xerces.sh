@@ -9,6 +9,7 @@ wget http://archive.apache.org/dist/xerces/c/3/sources/xerces-c-${XERCESC}.tar.g
 
 # unpack the source
 tar -zxvf xerces-c-*.tar.gz
+rm xerces-c-*.tar.gz
 
 # make and enter a build directory
 cd xerces* && mkdir build && cd build 
