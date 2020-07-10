@@ -1,5 +1,5 @@
 
-name: Base
+name: PyROOT2
 
 # only build if push changes to files involved in the base build
 on:
