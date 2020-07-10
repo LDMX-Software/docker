@@ -15,11 +15,19 @@ mkdir build && cd build
 if [[ ${MINIMAL} == *"OFF"* ]]
 then
     # build all possble components (and use python3)
-    cmake \
-        -DCMAKE_INSTALL_PREFIX=$ROOTDIR \
-        -DCMAKE_CXX_STANDARD=17 \
-        -DPYTHON_EXECUTABLE=$(which python3) \
-        ../root
+    if [[ ${PyROOT_PyVersion} == *"3"* ]]
+    then
+        cmake \
+            -DCMAKE_INSTALL_PREFIX=$ROOTDIR \
+            -DCMAKE_CXX_STANDARD=17 \
+            -DPYTHON_EXECUTABLE=$(which python3) \
+            ../root
+    else
+        cmake \
+            -DCMAKE_INSTALL_PREFIX=$ROOTDIR \
+            -DCMAKE_CXX_STANDARD=17 \
+            ../root
+    fi
 else
     # only build necessary components
     #   ldmx-sw uses Core, I/O, and Hists mainly
