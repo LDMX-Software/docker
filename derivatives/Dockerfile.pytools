@@ -1,9 +1,9 @@
 #basic dev container with extra python packages on top
 FROM ldmx/dev:latest
 # modify container entry point to put cache and config directories in LDMX_BASE
-RUN echo "export XDG_CONFIG_HOME=\"\$LDMX_BASE\"/.config" >> /home/ldmx.sh &&\
-    echo "export XDG_CACHE_HOME=\"\$LDMX_BASE\"/.cache"   >> /home/ldmx.sh
-RUN cat /home/ldmx.sh
+RUN sed -i '/export\ CMAKE.*/ a export XDG_CONFIG_HOME=\$LDMX_BASE/.rootpy/config' /home/ldmx.sh &&\
+    sed -i '/export\ CMAKE.*/ a export XDG_CACHE_HOME=\$LDMX_BASE/.rootpy/cache'   /home/ldmx.sh &&\
+    sed -i '/export\ CMAKE.*/ a #Change cache and config location of rootpy'      /home/ldmx.sh
 # update and install packages
 RUN apt-get update &&\
     apt-get install python3-pip -y &&\
