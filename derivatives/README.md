@@ -11,6 +11,7 @@ source ldmx-sw/scripts/ldmx-env.sh . tag
 | Tag | Extra Packages |
 |---|---|
 |`pytools`|uproot,rootpy,numpy,matplotlib,xgboost,sklearn,PyROOT in python3|
+|`py2tools`|uproot,numpy,matplotlib,PyROOT in python2|
 
 ### Documentation
 After developing a derivative dockerfile (i.e. making sure it builds successfully and runs the way you want it to),
