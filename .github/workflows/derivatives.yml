@@ -22,4 +22,3 @@ jobs:
         path: derivatives
         dockerfile: derivatives/Dockerfile.pytools
         tags: pytools
-
