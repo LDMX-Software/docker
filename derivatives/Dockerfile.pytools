@@ -1,15 +1,36 @@
-#basic dev container with extra python packages on top
+# basic dev container with extra ml tools
 FROM ldmx/dev:latest
+
 # modify container entry point to put cache and config directories in LDMX_BASE
 RUN sed -i '/export\ CMAKE.*/ a export XDG_CONFIG_HOME=\$LDMX_BASE/.rootpy/config' /home/ldmx.sh &&\
     sed -i '/export\ CMAKE.*/ a export XDG_CACHE_HOME=\$LDMX_BASE/.rootpy/cache'   /home/ldmx.sh &&\
     sed -i '/export\ CMAKE.*/ a #Change cache and config location of rootpy'      /home/ldmx.sh
-# update and install packages
+
+# enable sudo
+RUN apt-get install sudo
+RUN adduser --disabled-password --gecos '' admin
+RUN adduser admin sudo
+RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+
+# remove old cmake
+RUN sudo apt-get remove -y --purge cmake
+RUN hash -r
+
+# install new cmake
+RUN sudo apt-get install -y apt-transport-https ca-certificates gnupg software-properties-common wget
+RUN sudo wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | sudo tee /etc/apt/trusted.gpg.d/kitware.gpg >/dev/null
+RUN sudo apt-add-repository 'deb https://apt.kitware.com/ubuntu/ bionic main'
+RUN sudo apt-get update
+RUN sudo apt-get install -y cmake
+RUN sudo apt-get install kitware-archive-keyring
+
+# install other packages
 RUN apt-get update &&\
     apt-get install python3-pip -y &&\
     ./home/ldmx.sh . python3 -m pip install --upgrade --no-cache-dir \
         uproot \
         numpy \
         rootpy \
-        matplotlib
-
+        matplotlib \
+        xgboost \
+        sklearn
