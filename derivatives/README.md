@@ -9,7 +9,9 @@ source ldmx-sw/scripts/ldmx-env.sh . tag
 ```
 
 | Tag | Extra Packages |
-|---|---|
+|-----|----------------|
+|`pyroot2`|PyROOT in python2 (`latest` has PyROOT in python3)|
+|`minimal`|Minimal build of ROOT (functional with ldmx-sw, but doesn't have extensions e.g. PyROOT)|
 |`pytools`|uproot,rootpy,numpy,matplotlib,xgboost,sklearn,PyROOT in python3|
 
 ### Documentation
