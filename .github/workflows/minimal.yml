@@ -4,7 +4,7 @@ name: Minimal
 # only build if push changes something other than README or derivatives
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
     paths: [ 'ldmx.sh' , 'Dockerfile' , 'install-scripts/**' , '**minimal.yml' ]
 
 # build the two "base" images in parallel

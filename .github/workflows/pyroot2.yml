@@ -4,7 +4,7 @@ name: PyROOT2
 # only build if push changes to files involved in the base build
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
     paths: [ 'ldmx.sh' , 'Dockerfile' , 'install-scripts/**' , '**pyroot2.yml' ]
 
 # build the two "base" images in parallel
