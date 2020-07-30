@@ -47,10 +47,23 @@ jobs:
         repository: ldmx/dev
         build_args: PyROOT_PyVersion=2
         tags: pyroot2
+  # newer version of ROOT
+  root6-22-00:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build It!
+      uses: docker/build-push-action@v1
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+        repository: ldmx/dev
+        build_args: ROOT=v6-22-00
+        tags: root6-22-00
   # let the derivatives know they should rebuild
   inform-derivatives:
     runs-on: ubuntu-latest
-    needs: [ basic, pyroot2, minimal ]
+    needs: [ basic, pyroot2, minimal, root6-22-00 ]
     steps:
     - name: Tell Derivatives to Rebuild
       uses: peter-evans/repository-dispatch@v1

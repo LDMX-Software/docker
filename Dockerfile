@@ -32,7 +32,7 @@ RUN apt-get update &&\
     apt-get install -y \
         wget \
         git \
-        cmake \
+        python3-pip \
         dpkg-dev \
         python-dev \
         make \
@@ -45,7 +45,8 @@ RUN apt-get update &&\
         libxext-dev \
         libboost-all-dev \
         libxmu-dev \
-        libgl1-mesa-dev
+        libgl1-mesa-dev &&\
+    python3 -m pip install --upgrade --no-cache-dir cmake
 
 # move to location to keep working files
 COPY install-scripts/ /tmp/
