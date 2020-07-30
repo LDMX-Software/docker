@@ -5,9 +5,8 @@ FROM ubuntu:18.04
 # are formatted as the branch/tag to 
 # pull from git
 ARG GEANT4=LDMX.10.2.3_v0.3
-ARG ROOT=v6-20-00
+ARG ROOT=v6-22-00-patches
 ARG MINIMAL=OFF
-ARG PyROOT_PyVersion=3
 
 # XercesC and ONNX version arguments
 # are formatted as they appear in
@@ -18,7 +17,6 @@ ARG ONNX=1.3.0
 
 LABEL ubuntu.version="18.04" \
       root.version="${ROOT}" \
-      root.pyroot.python.version="${PyROOT_PyVersion}" \
       minimal="${MINIMAL}" \
       geant4.version="${GEANT4}" \
       xerces.version="${XERCESC}" \
@@ -35,6 +33,8 @@ RUN apt-get update &&\
         python3-pip \
         dpkg-dev \
         python-dev \
+        python3-dev \
+        python3-numpy \
         make \
         g++-7 \
         gcc-7 \

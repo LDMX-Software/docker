@@ -11,33 +11,18 @@ git clone -b ${ROOT} --single-branch https://github.com/root-project/root.git
 # make a build directory and go into it
 mkdir build && cd build
 
-# configure the build
-if [[ ${MINIMAL} == *"OFF"* ]]
+# Decide if we are going to do a minimal build
+_yes_minimal=""
+if [[ ${MINIMAL} == *"ON"* ]]
 then
-    # build all possble components (and use python3)
-    if [[ ${PyROOT_PyVersion} == *"3"* ]]
-    then
-        cmake \
-            -DCMAKE_INSTALL_PREFIX=$ROOTDIR \
-            -DCMAKE_CXX_STANDARD=17 \
-            -DPYTHON_EXECUTABLE=$(which python3) \
-            ../root
-    else
-        cmake \
-            -DCMAKE_INSTALL_PREFIX=$ROOTDIR \
-            -DCMAKE_CXX_STANDARD=17 \
-            ../root
-    fi
-else
-    # only build necessary components
-    #   ldmx-sw uses Core, I/O, and Hists mainly
-    #   root includes _a lot_ of components in its "necessary" list
-    cmake \
-        -DCMAKE_INSTALL_PREFIX=$ROOTDIR \
-        -DCMAKE_CXX_STANDARD=17 \
-        -Dminimal=ON \
-        ../root
+    _yes_minimal="-Dminimal=ON"
 fi
+
+# configure the build
+cmake \
+    -DCMAKE_INSTALL_PREFIX=$ROOTDIR \
+    -DCMAKE_CXX_STANDARD=17 \
+    ${_yes_minimal} ../root
 
 # build and install
 make install 
