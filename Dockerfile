@@ -7,6 +7,7 @@ FROM ubuntu:18.04
 ARG GEANT4=LDMX.10.2.3_v0.3
 ARG ROOT=v6-20-00
 ARG MINIMAL=OFF
+ARG PyROOT_PyVersion=3
 
 # XercesC and ONNX version arguments
 # are formatted as they appear in

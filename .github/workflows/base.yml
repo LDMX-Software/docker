@@ -34,6 +34,19 @@ jobs:
         repository: ldmx/dev
         build_args: MINIMAL=ON
         tags: minimal
+  # container with PyROOT built with python 2
+  pyroot2:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build It!
+      uses: docker/build-push-action@v1
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+        repository: ldmx/dev
+        build_args: PyROOT_PyVerison=2
+        tags: pyroot2
   # let the derivatives know they should rebuild
 #  inform-derivatives:
 #    runs-on: ubuntu-latest
