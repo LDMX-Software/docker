@@ -20,7 +20,7 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
         repository: ldmx/dev
-        tags: testing
+        tags: latest
   # container with minimal ROOT build for lighter production container
   minimal:
     runs-on: ubuntu-latest

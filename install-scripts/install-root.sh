@@ -18,17 +18,17 @@ then
     _yes_minimal="-Dminimal=ON"
 fi
 
-_use_python3="-DPYTHON_EXECUTABLE=$(which python3)"
+_use_python="-DPYTHON_EXECUTABLE=$(which python3)"
 if [[ ${PyROOT_PyVersion} == *"2" ]]
 then
-    _use_python3=""
+    _use_python="-DPYTHON_EXECUTABLE=$(which python)"
 fi
 
 # configure the build
 cmake \
     -DCMAKE_INSTALL_PREFIX=$ROOTDIR \
     -DCMAKE_CXX_STANDARD=17 \
-    ${_yes_minimal} ${_use_python3} ../root
+    ${_yes_minimal} ${_use_python} ../root
 
 # build and install
 make install 
