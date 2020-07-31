@@ -26,12 +26,13 @@ fi
 
 # configure the build
 cmake \
+    -Dxrootd=OFF \
     -DCMAKE_INSTALL_PREFIX=$ROOTDIR \
     -DCMAKE_CXX_STANDARD=17 \
     ${_yes_minimal} ${_use_python} ../root
 
 # build and install
-make install 
+cmake --build . --target install
 
 # clean up before this layer is saved
 cd ..
