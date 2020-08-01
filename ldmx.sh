@@ -48,6 +48,10 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH$_lib_path_additions
 # helps simplify any cmake nonsense
 export CMAKE_PREFIX_PATH=$XercesC_DIR:$ROOTDIR:$G4DIR:$LDMX_BASE/ldmx-sw/install
 
+# move cache and config directories of rootpy to something outside the container and accessible by the user
+export XDG_CONFIG_HOME=$LDMX_BASE/.rootpy/config
+export XDG_CACHE_HOME=$LDMX_BASE/.rootpy/cache
+
 # go to first argument
 cd "$1"
 

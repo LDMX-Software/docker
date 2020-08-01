@@ -5,9 +5,8 @@ FROM ubuntu:18.04
 # are formatted as the branch/tag to 
 # pull from git
 ARG GEANT4=LDMX.10.2.3_v0.3
-ARG ROOT=v6-20-00
+ARG ROOT=v6-22-00-patches
 ARG MINIMAL=OFF
-ARG PyROOT_PyVersion=3
 
 # XercesC and ONNX version arguments
 # are formatted as they appear in
@@ -31,10 +30,12 @@ RUN apt-get update &&\
     apt-get install -y \
         wget \
         git \
-        python3-pip \
         dpkg-dev \
         python-dev \
+        python-pip \
+        python-numpy \
         python3-dev \
+        python3-pip \
         python3-numpy \
         make \
         g++-7 \
@@ -69,7 +70,23 @@ RUN apt-get clean && apt-get autoremove
 COPY ./ldmx.sh /home/
 RUN chmod 755 /home/ldmx.sh
 
+# extra python packages
+RUN ./home/ldmx.sh . python3 -m pip install --upgrade --no-cache-dir \
+        uproot \
+        numpy \
+        rootpy \
+        matplotlib \
+        xgboost \
+        sklearn &&\
+    ./home/ldmx.sh . python -m pip install --upgrade --no-cache-dir \
+        uproot \
+        numpy \
+        rootpy \
+        matplotlib \
+        xgboost \
+        sklearn
+
 #run environment setup when docker container is launched
 # and decide what to do from there
-#   will required the environment variable LDMX_BASE defined
+#   will require the environment variable LDMX_BASE defined
 ENTRYPOINT ["/home/ldmx.sh"]
