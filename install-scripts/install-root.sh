@@ -18,10 +18,10 @@ then
     _yes_minimal="-Dminimal=ON"
 fi
 
-_use_python="-DPYTHON_EXECUTABLE=$(which python3)"
-if [[ ${PyROOT_PyVersion} == *"2" ]]
+_use_python=""
+if [[ ${PyROOT_PyVersion} == *"3"* ]]
 then
-    _use_python="-DPython_EXECUTABLE=$(which python)"
+    _use_python="-DPYTHON_EXECUTABLE=$(which python3)"
 fi
 
 # configure the build
