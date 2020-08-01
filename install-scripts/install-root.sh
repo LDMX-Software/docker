@@ -18,7 +18,7 @@ then
     _yes_minimal="-Dminimal=ON"
 fi
 
-_use_python="-DPython_EXECUTABLE=$(which python3)"
+_use_python="-DPYTHON_EXECUTABLE=$(which python3)"
 if [[ ${PyROOT_PyVersion} == *"2" ]]
 then
     _use_python="-DPython_EXECUTABLE=$(which python)"
