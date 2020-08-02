@@ -56,12 +56,10 @@ COPY install-scripts/ /tmp/
 ENV ROOTDIR /deps/cernroot
 ENV XercesC_DIR /deps/xerces-c
 ENV G4DIR /deps/geant4
-ENV ONNX_DIR /deps/onnxruntime
 
 RUN /bin/bash /tmp/install-root.sh        &&\
     /bin/bash /tmp/install-xerces.sh      &&\
     /bin/bash /tmp/install-geant4.sh      &&\
-    /bin/bash /tmp/install-onnxruntime.sh &&\
     rm -rf /tmp/*
 
 # clean up source and build files

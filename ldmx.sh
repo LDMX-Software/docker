@@ -25,7 +25,6 @@ set -e
 ## Bash environment script for use **within** the docker container
 ## Assuming the following environment variables are already defined by Dockerfile:
 #   XercesC_DIR      - install of xerces-c
-#   ONNX_DIR         - install of onnx runtime
 #   ROOTDIR          - install of root
 #   G4DIR            - install of Geant4
 #   LDMX_BASE        - base directory where all ldmx-sw/ldmx-analysis code is
@@ -34,12 +33,12 @@ source $ROOTDIR/bin/thisroot.sh #adds root directories to necessary xxxPATH shel
 source $G4DIR/bin/geant4.sh #adds geant4 and xerces-c directories to necessary xxxPATH shell variables
 
 # add ldmx-sw and ldmx-analysis installs to the various paths
-export LD_LIBRARY_PATH=$ONNX_DIR/lib:$LDMX_BASE/ldmx-sw/install/lib:$LDMX_BASE/ldmx-analysis/install/lib:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=$LDMX_BASE/ldmx-sw/install/lib:$LDMX_BASE/ldmx-analysis/install/lib:$LD_LIBRARY_PATH
 export PYTHONPATH=$LDMX_BASE/ldmx-sw/install/lib/python:$LDMX_BASE/ldmx-analysis/install/lib/python:$PYTHONPATH
 export PATH=$LDMX_BASE/ldmx-sw/install/bin:$PATH
 
 # helps simplify any cmake nonsense
-export CMAKE_PREFIX_PATH=$XercesC_DIR:$ROOTDIR:$G4DIR:$ONNX_DIR:$LDMX_BASE/ldmx-sw/install
+export CMAKE_PREFIX_PATH=$XercesC_DIR:$ROOTDIR:$G4DIR:$LDMX_BASE/ldmx-sw/install
 
 # go to first argument
 cd "$1"
