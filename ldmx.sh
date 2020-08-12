@@ -33,7 +33,7 @@ source $ROOTDIR/bin/thisroot.sh #adds root directories to necessary xxxPATH shel
 source $G4DIR/bin/geant4.sh #adds geant4 and xerces-c directories to necessary xxxPATH shell variables
 
 # add ldmx-sw and ldmx-analysis installs to the various paths
-export LD_LIBRARY_PATH=$LDMX_BASE/ldmx-sw/install/lib:$LDMX_BASE/ldmx-analysis/install/lib:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=$LDMX_BASE/ldmx-sw/install/lib:$LDMX_BASE/ldmx-analysis/install/lib:$LDMX_BASE/ldmx-sw/install/onxx/lib:$LD_LIBRARY_PATH
 export PYTHONPATH=$LDMX_BASE/ldmx-sw/install/lib/python:$LDMX_BASE/ldmx-analysis/install/lib/python:$PYTHONPATH
 export PATH=$LDMX_BASE/ldmx-sw/install/bin:$PATH
 
