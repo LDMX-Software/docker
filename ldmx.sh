@@ -32,9 +32,18 @@ source $ROOTDIR/bin/thisroot.sh #adds root directories to necessary xxxPATH shel
 source $G4DIR/bin/geant4.sh #adds geant4 and xerces-c directories to necessary xxxPATH shell variables
 
 # add ldmx-sw and ldmx-analysis installs to the various paths
-export LD_LIBRARY_PATH=$LDMX_BASE/ldmx-sw/install/lib:$LDMX_BASE/ldmx-sw/install/external/onnx/lib:$LD_LIBRARY_PATH
-export PYTHONPATH=$LDMX_BASE/ldmx-sw/install/python:$PYTHONPATH
-export PATH=$LDMX_BASE/ldmx-sw/install/bin:$PATH
+export LDMX_SW_INSTALL=$LDMX_BASE/ldmx-sw/install
+export LD_LIBRARY_PATH=$LDMX_SW_INSTALL/lib:$LD_LIBRARY_PATH
+export PYTHONPATH=$LDMX_SW_INSTALL/python:$PYTHONPATH
+export PATH=$LDMX_SW_INSTALL/bin:$PATH
+
+# add externals installed along side ldmx-sw
+_lib_path_additions=""
+for lib in $LDMX_SW_INSTALL/external/*
+do
+    _lib_path_additions=$_lib_path_additions:$lib/lib
+done
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH$_lib_path_additions
 
 # helps simplify any cmake nonsense
 export CMAKE_PREFIX_PATH=$XercesC_DIR:$ROOTDIR:$G4DIR:$LDMX_BASE/ldmx-sw/install
