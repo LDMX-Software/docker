@@ -1,0 +1,36 @@
+
+name: Build
+
+# only build if push changes to files involved in the build
+on:
+  pull_request:
+    branches: [ main ]
+
+# make sure the changes can build and run ldmx-sw
+jobs:
+  test:
+    defaults:
+      run:
+        working-directory: test
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build It!
+      run: docker build . -t ldmx/dev:testing
+      working-directory: ${GITHUB_WORKSPACE}
+    - name: Get ldmx-sw
+      uses: actions/checkout@v2
+      with:
+          repository: 'LDMX-Software/ldmx-sw'
+          submodules: 'recursive'
+    - name: Configure the build
+      run: |
+          mkdir build &&
+          docker run -i -v $(pwd):$(pwd) ldmx/dev:testing $(pwd)/build cmake -DBUILD_TESTS=ON ..
+    - name: Build and Install
+      run: docker run -i -v $(pwd):$(pwd) ldmx/dev:testing $(pwd)/build make install
+    - name: Test the build
+      run: |
+          cd ../ &&
+          export LDMX_BASE=$(pwd) &&
+          docker run -i -e LDMX_BASE -v $(pwd):$(pwd) ldmx/dev:testing $LDMX_BASE/ldmx-sw/install ./bin/run_test
