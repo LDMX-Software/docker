@@ -1,7 +1,6 @@
 
-name: Build
+name: Test a PR
 
-# only build if push changes to files involved in the build
 on:
   pull_request:
     branches: [ main ]
