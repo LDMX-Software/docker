@@ -1,5 +1,5 @@
 
-name: Foundations
+name: Build
 
 # only build if push changes to files involved in the build
 on:

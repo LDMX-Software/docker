@@ -13,14 +13,12 @@ ARG MINIMAL=OFF
 # the download link provided by those
 # companies
 ARG XERCESC=3.2.3
-ARG ONNX=1.3.0
 
 LABEL ubuntu.version="18.04" \
       root.version="${ROOT}" \
       minimal="${MINIMAL}" \
       geant4.version="${GEANT4}" \
-      xerces.version="${XERCESC}" \
-      onnx.version="${ONNX}"
+      xerces.version="${XERCESC}"
 
 MAINTAINER Tom Eichlersmith <eichl008@umn.edu>
 

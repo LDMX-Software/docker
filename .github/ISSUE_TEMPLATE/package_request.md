@@ -1,6 +1,6 @@
 ---
-name: Derivative Request
-about: Request a derivative of the development container to be created.
+name: Package Request
+about: Request a package installed into the development container.
 title: ''
 labels: 'help wanted'
 assignees: ''
@@ -8,7 +8,7 @@ assignees: ''
 ---
 
 ## Is your request related to a problem? Please describe.
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+A clear and concise description of what the problem is. Ex. I'm used to using this package when [...]
 
 ## Describe the solution you'd like. What packages do you want installed?
 A clear and concise description of what you want to happen.
