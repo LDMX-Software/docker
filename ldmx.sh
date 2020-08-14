@@ -38,15 +38,16 @@ export PYTHONPATH=$LDMX_SW_INSTALL/python:$PYTHONPATH
 export PATH=$LDMX_SW_INSTALL/bin:$PATH
 
 # add externals installed along side ldmx-sw
-_lib_path_additions=""
-for lib in $LDMX_SW_INSTALL/external/*
+for _external_path in $LDMX_SW_INSTALL/external/*
 do
-    _lib_path_additions=$_lib_path_additions:$lib/lib
+    if [ -d $_external_path/lib ]
+    then
+        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$_external_path/lib
+    fi
 done
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH$_lib_path_additions
 
 # helps simplify any cmake nonsense
-export CMAKE_PREFIX_PATH=$XercesC_DIR:$ROOTDIR:$G4DIR:$LDMX_BASE/ldmx-sw/install
+export CMAKE_PREFIX_PATH=$XercesC_DIR:$ROOTDIR:$G4DIR:$LDMX_SW_INSTALL
 
 # move cache and config directories of rootpy to something outside the container and accessible by the user
 export XDG_CONFIG_HOME=$LDMX_BASE/.rootpy/config
