@@ -20,7 +20,7 @@ jobs:
       with:
           repository: 'LDMX-Software/ldmx-sw'
           submodules: 'recursive'
-      working-directory: test
+          path: test
 
     - name: Configure the build
       run: |
