@@ -38,6 +38,7 @@ export PYTHONPATH=$LDMX_SW_INSTALL/python:$PYTHONPATH
 export PATH=$LDMX_SW_INSTALL/bin:$PATH
 
 # add externals installed along side ldmx-sw
+# TODO this for loop might be very slow... might want to hard-code the externals path
 for _external_path in $LDMX_SW_INSTALL/external/*
 do
     if [ -d $_external_path/lib ]

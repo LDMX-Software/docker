@@ -7,9 +7,10 @@ on:
     branches: [ main , unification ]
     paths: [ 'ldmx.sh' , 'Dockerfile' , 'install-scripts/**' , '**base.yml' ]
 
-# build the "base" images
+# the jobs are the different container tags that we want built
 jobs:
   # basic, defaults development container
+  #     this is the container that pretty much everyone in ldmx-sw should use
   basic:
     runs-on: ubuntu-latest
     steps:
@@ -21,7 +22,9 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
         repository: ldmx/dev
         tags: unification
-  #newer version of Geant4
+
+  # newer version of Geant4
+  #     allow for developers to have access to a container with Geant4.10.6 in it
   geant4:
     runs-on: ubuntu-latest
     steps:
