@@ -72,14 +72,12 @@ RUN chmod 755 /home/ldmx.sh
 RUN ./home/ldmx.sh . python3 -m pip install --upgrade --no-cache-dir \
         uproot \
         numpy \
-        rootpy \
         matplotlib \
         xgboost \
         sklearn &&\
     ./home/ldmx.sh . python -m pip install --upgrade --no-cache-dir \
         uproot \
         numpy \
-        rootpy \
         matplotlib \
         xgboost \
         sklearn
