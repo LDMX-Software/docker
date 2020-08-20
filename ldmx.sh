@@ -39,12 +39,9 @@ export PATH=$LDMX_SW_INSTALL/bin:$PATH
 
 # add externals installed along side ldmx-sw
 # TODO this for loop might be very slow... might want to hard-code the externals path
-for _external_path in $LDMX_SW_INSTALL/external/*
+for _external_path in $LDMX_SW_INSTALL/external/*/lib
 do
-    if [ -d $_external_path/lib ]
-    then
-        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$_external_path/lib
-    fi
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$_external_path
 done
 
 # helps simplify any cmake nonsense
