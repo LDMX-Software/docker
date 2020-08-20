@@ -15,7 +15,7 @@ fi
 git clone -b ${GEANT4} --single-branch ${_geant4_remote}
 
 # make and enter build directory
-mkdir build && cd build
+cd geant4 && mkdir build && cd build
 
 # configure the build
 cmake \
@@ -24,11 +24,12 @@ cmake \
     -DGEANT4_INSTALL_EXAMPLES=OFF   \
     -DXERCESC_ROOT_DIR=$XercesC_DIR \
     -DCMAKE_INSTALL_PREFIX=$G4DIR   \
-    ../geant4
+    ..
 
 # build and install
 make install
 
 # clean up before saving this layer
-cd ..
-rm -rf geant4 build
+cd .. #move out of build directory
+cd .. #move out of source directory
+rm -rf geant4 
