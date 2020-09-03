@@ -82,6 +82,10 @@ RUN ./home/ldmx.sh . python3 -m pip install --upgrade --no-cache-dir \
         xgboost \
         sklearn
 
+# add any certificates to the container
+COPY ./certs/ /usr/local/share/ca-certificates
+RUN update-ca-certificates
+
 #run environment setup when docker container is launched
 # and decide what to do from there
 #   will require the environment variable LDMX_BASE defined

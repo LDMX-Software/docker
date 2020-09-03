@@ -23,6 +23,7 @@ A description of this setup process is given for both [docker](docs/use_with_doc
 - XercesC built and installed from source version 3.2.3
 - Geant4 built and installed from source version LDMX.10.2.3\_v0.3
 - python packages uproot, numpy, rootpy, matplotlib, xgboost, and sklearn or both versions 2 and 3
+- SSL Certificates that will be trusted by container are in the `certs` directory
 
 ### Other Packages
 If you would like another package included in the development container, please open an issue in this repository.
