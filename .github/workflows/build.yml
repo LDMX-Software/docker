@@ -39,7 +39,7 @@ jobs:
           _tag=latest
           if [ "${{ github.event_name }}" == "pull_request" ]
           then
-              _tag=${GITHUB_REF#refs/heads/}
+              _tag=pr-${{ github.event.number }}
           fi
           _full=ldmx/dev:${_tag}
           echo ::set-output name=tag::${_full}
