@@ -42,7 +42,7 @@ jobs:
               _tag=${GITHUB_REF#refs/heads/}
           fi
           _full=ldmx/dev:${_tag}
-          echo echo ::set-output name=tag::${_full}
+          echo ::set-output name=tag::${_full}
     -
       name: Build the Image to Local Cache
       id: docker_build
