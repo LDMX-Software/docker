@@ -1,0 +1,115 @@
+
+name: Build
+
+# only build if push changes to files involved in the build
+on:
+  push:
+    branches: [ main ]
+    paths: [ 'ldmx.sh' , 'Dockerfile' , 'install-scripts/**' , '**base.yml' ]
+  pull_request:
+    branches: [ main ]
+
+# the jobs are the different container tags that we want built
+jobs:
+  # basic, defaults development container
+  #     this is the container that pretty much everyone in ldmx-sw should use
+  basic:
+    runs-on: ubuntu-latest
+#    services:
+#      registry:
+#        image: registry:2
+#        ports:
+#          - 5000:5000
+    steps:
+    -
+      name: Setup QEMU
+      uses: docker/setup-qemu-action@v1
+    -
+      name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+#      with:
+#        driver-opts: network=host
+    - 
+      name: Get Build Context
+      uses: actions/checkout@v2
+    -
+      name: Determine Image Tag
+      id: generate_tag
+      run: |
+          _tag=latest
+          if [ "${{ github.event_name }}" == "pull_request" ]
+          then
+              _tag=pr-${{ github.event.number }}
+          fi
+          _full=ldmx/dev:${_tag}
+          echo ::set-output name=tag::${_full}
+#    -
+#      name: Build the Image to Local Cache
+#      id: docker_build
+#      uses: docker/build-push-action@v2
+#      with:
+#        push: true
+#        cache-from: ${{ steps.generate_tag.outputs.tag }}
+#        tags: localhost:5000/${{ steps.generate_tag.outputs.tag }}
+#    -
+#      name: Pull down ldmx-sw for testing
+#      uses: actions/checkout@v2
+#      with:
+#        repository: LDMX-Software/ldmx-sw
+#        submodules: recursive
+#    - 
+#      name: Test the Build Image
+#      run: |
+#          export LDMX_BASE=$(pwd)
+#          _image=localhost:5000/${{ steps.generate_tag.outputs.tag }}
+#          mkdir ldmx-sw/build
+#          docker run -i -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE $_image ldmx-sw/build cmake -DBUILD_TESTS=ON ..
+#          docker run -i -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE $_image ldmx-sw/build make install
+#          docker run -i -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE $_image . run_test
+#          for c in `ls ldmx-sw/*/test/*.py`; do if ! docker run -i -e LDMX_BASE -v $(pwd):$(pwd) $_image . fire $c; then exit 1; fi; done
+#          docker run -i -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE $_image . python test.py
+#          docker run -i -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE $_image . python3 test.py
+    -
+      name: Login to DockerHub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+    -
+      name: Push Build to DockerHub
+      uses: docker/build-push-action@v2
+      with:
+        push: true
+#        cache-from: localhost:5000/${{ steps.generate_tag.outputs.tag }}
+        tags: ${{ steps.generate_tag.outputs.tag }}
+
+
+  # newer version of Geant4
+  #     allow for developers to have access to a container with Geant4.10.6 in it
+  geant4:
+    runs-on: ubuntu-latest
+    steps:
+    -
+      name: Setup QEMU
+      uses: docker/setup-qemu-action@v1
+    -
+      name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+    -
+      name: Login to DockerHub
+      uses: docker/login-action@v1
+      if: ${{ github.event_name != 'pull_request' }}
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+    - 
+      name: Get Build Context
+      uses: actions/checkout@v2
+    -
+      name: Build and push
+      id: docker_build
+      uses: docker/build-push-action@v2
+      with:
+        push: ${{ github.event_name != 'pull_request' }}
+        tags: ldmx/dev:geant4.10.6
+        build_args: GEANT4=geant4-10.6-release

@@ -1,37 +1,34 @@
 
-I am adding a new derivative container, here are the details.
+I am adding a new package to the container, here are the details.
 
-## Derivative Description
-### What new packages does this derivative add to the development container?
+### What new packages does this PR add to the development container?
 - package1
 - package2
 
-### What do you want to tag this container?
-`my-tag`
-(Check the [Docker Hub](https://hub.docker.com/repository/docker/ldmx/dev) to see what tags are already taken.)
-
 ## Check List
 - [ ] I successfully built the container using docker
-- [ ] I was able to test my container with ldmx-sw using `source ldmx-sw/scripts/ldmx-env.sh . my-tag local`
-- [ ] I put my Dockerfile in the `derivatives` directory and named it `Dockerfile.my-tag`
-- [ ] I added my container to the list of derivatives to be built in `.github/workflows/derivatives.yml`:
-```yml
-jobs:
-  
-  #other derivative containers
-  
-  #copy the following into the '.yml' file and change my-tag to your chosen tag
-  my-tag:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Build It!
-      uses: docker/build-push-action@v1
-      with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
-        repository: ldmx/dev
-        path: derivatives
-        dockerfile: derivatives/Dockerfile.my-tag
-        tags: my-tag
 ```
+# outline of container build instructions
+cd docker
+git checkout my-updates
+docker build . -t ldmx/local:temp-tag
+```
+- [ ] I was able to build ldmx-sw using this new container build
+```
+# outline of build instructions
+ldmx-container-pull local temp-tag
+cd ldmx-sw
+mkdir build
+cd build
+ldmx cmake -DBUILD_TESTS=ON ..
+ldmx make install
+```
+- [ ] I was able to test run a small simulation and reconstruction inside this container
+```
+# outline of test instructions
+cd $LDMX_BASE
+ldmx run_test
+for c in `ls ldmx-sw/*/test/*.py`; ldmx fire $c; done
+```
+- [ ] I was able to successfully use the new packages. Explain what you did to test them below:
+

@@ -1,8 +1,0 @@
-#basic dev container with uproot on top
-FROM ldmx/dev:pyroot2
-RUN apt-get update &&\
-    apt-get install python-pip -y &&\
-    ./home/ldmx.sh . pip install --upgrade --no-cache-dir \
-        uproot \
-        numpy \
-        matplotlib

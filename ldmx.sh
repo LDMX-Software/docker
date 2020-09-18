@@ -38,15 +38,17 @@ export PYTHONPATH=$LDMX_SW_INSTALL/python:$PYTHONPATH
 export PATH=$LDMX_SW_INSTALL/bin:$PATH
 
 # add externals installed along side ldmx-sw
-_lib_path_additions=""
-for lib in $LDMX_SW_INSTALL/external/*
+# TODO this for loop might be very slow... might want to hard-code the externals path
+for _external_path in $LDMX_SW_INSTALL/external/*/lib
 do
-    _lib_path_additions=$_lib_path_additions:$lib/lib
+    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$_external_path
 done
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH$_lib_path_additions
 
 # helps simplify any cmake nonsense
-export CMAKE_PREFIX_PATH=$XercesC_DIR:$ROOTDIR:$G4DIR:$LDMX_BASE/ldmx-sw/install
+export CMAKE_PREFIX_PATH=$XercesC_DIR:$ROOTDIR:$G4DIR:$LDMX_SW_INSTALL
+
+# puts a config/cache directory for matplotlib to use
+export MPLCONFIGDIR=$LDMX_BASE/.config/matplotlib
 
 # go to first argument
 cd "$1"

@@ -1,0 +1,6 @@
+
+# temp is just a working directory for making intermediate containers
+temp/**
+
+# test python script generated compilation
+*.pyc
