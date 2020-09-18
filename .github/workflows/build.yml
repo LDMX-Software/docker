@@ -4,10 +4,17 @@ name: Build
 # only build if push changes to files involved in the build
 on:
   push:
-    branches: [ main ]
-    paths: [ 'ldmx.sh' , 'Dockerfile' , 'install-scripts/**' , '**base.yml' ]
+    branches:
+      - main
+    paths: 
+      - 'ldmx.sh' 
+      - 'Dockerfile'
+      - 'install-scripts/**'
+      - '**base.yml'
   pull_request:
-    branches: [ main ]
+    branches: 
+      - main
+  release:
 
 # the jobs are the different container tags that we want built
 jobs:
@@ -15,11 +22,11 @@ jobs:
   #     this is the container that pretty much everyone in ldmx-sw should use
   basic:
     runs-on: ubuntu-latest
-#    services:
-#      registry:
-#        image: registry:2
-#        ports:
-#          - 5000:5000
+    services:
+      registry:
+        image: registry:2
+        ports:
+          - 5000:5000
     steps:
     -
       name: Setup QEMU
@@ -27,8 +34,8 @@ jobs:
     -
       name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v1
-#      with:
-#        driver-opts: network=host
+      with:
+        driver-opts: network=host
     - 
       name: Get Build Context
       uses: actions/checkout@v2
@@ -37,38 +44,39 @@ jobs:
       id: generate_tag
       run: |
           _tag=latest
-          if [ "${{ github.event_name }}" == "pull_request" ]
-          then
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
               _tag=pr-${{ github.event.number }}
+          elif [[ $GITHUB_REF == refs/tags/* ]]; then
+              _tag=${GITHUB_REF#refs/tags/}
           fi
           _full=ldmx/dev:${_tag}
           echo ::set-output name=tag::${_full}
-#    -
-#      name: Build the Image to Local Cache
-#      id: docker_build
-#      uses: docker/build-push-action@v2
-#      with:
-#        push: true
-#        cache-from: ${{ steps.generate_tag.outputs.tag }}
-#        tags: localhost:5000/${{ steps.generate_tag.outputs.tag }}
-#    -
-#      name: Pull down ldmx-sw for testing
-#      uses: actions/checkout@v2
-#      with:
-#        repository: LDMX-Software/ldmx-sw
-#        submodules: recursive
-#    - 
-#      name: Test the Build Image
-#      run: |
-#          export LDMX_BASE=$(pwd)
-#          _image=localhost:5000/${{ steps.generate_tag.outputs.tag }}
-#          mkdir ldmx-sw/build
-#          docker run -i -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE $_image ldmx-sw/build cmake -DBUILD_TESTS=ON ..
-#          docker run -i -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE $_image ldmx-sw/build make install
-#          docker run -i -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE $_image . run_test
-#          for c in `ls ldmx-sw/*/test/*.py`; do if ! docker run -i -e LDMX_BASE -v $(pwd):$(pwd) $_image . fire $c; then exit 1; fi; done
-#          docker run -i -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE $_image . python test.py
-#          docker run -i -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE $_image . python3 test.py
+    -
+      name: Build the Image to Local Cache
+      id: docker_build
+      uses: docker/build-push-action@v2
+      with:
+        push: true
+        cache-from: ${{ steps.generate_tag.outputs.tag }}
+        tags: localhost:5000/${{ steps.generate_tag.outputs.tag }}
+    -
+      name: Pull down ldmx-sw for testing
+      uses: actions/checkout@v2
+      with:
+        repository: LDMX-Software/ldmx-sw
+        submodules: recursive
+    - 
+      name: Test the Build Image
+      run: |
+          export LDMX_BASE=$(pwd)
+          _image=localhost:5000/${{ steps.generate_tag.outputs.tag }}
+          mkdir ldmx-sw/build
+          docker run -i -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE $_image ldmx-sw/build cmake -DBUILD_TESTS=ON ..
+          docker run -i -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE $_image ldmx-sw/build make install
+          docker run -i -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE $_image . run_test
+          for c in `ls ldmx-sw/*/test/*.py`; do if ! docker run -i -e LDMX_BASE -v $(pwd):$(pwd) $_image . fire $c; then exit 1; fi; done
+          docker run -i -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE $_image . python test.py
+          docker run -i -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE $_image . python3 test.py
     -
       name: Login to DockerHub
       uses: docker/login-action@v1
@@ -80,7 +88,7 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         push: true
-#        cache-from: localhost:5000/${{ steps.generate_tag.outputs.tag }}
+        cache-from: localhost:5000/${{ steps.generate_tag.outputs.tag }}
         tags: ${{ steps.generate_tag.outputs.tag }}
 
 
