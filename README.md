@@ -19,10 +19,10 @@ A description of this setup process is given for both [docker](docs/use_with_doc
 - python dev, pip, and numpy packages for both versions 2 and 3
 - All boost development packages
 - cmake from python3 pip (currently version 3.18)
-- ROOT built and installed from source for version 6.22.00 (branch v6-22-00-patches)
+- ROOT built and installed from source for version 6.22 (branch v6-22-00-patches)
 - XercesC built and installed from source version 3.2.3
 - Geant4 built and installed from source version [LDMX.10.2.3\_v0.4](https://github.com/LDMX-Software/geant4/tree/LDMX.10.2.3_v0.4)
-- python packages uproot, numpy, rootpy, matplotlib, xgboost, and sklearn or both versions 2 and 3
+- python packages uproot, numpy, matplotlib, xgboost, and sklearn for both versions 2 and 3
 - SSL Certificates that will be trusted by container are in the `certs` directory
 
 ### Other Packages
