@@ -1,7 +1,13 @@
 # Development Container for ldmx-sw
 
 <p align="center">
-<img src="https://github.com/LDMX-Software/docker/workflows/Build/badge.svg" />
+    <a href="http://perso.crans.org/besson/LICENSE.html" alt="GPLv3 license">
+        <img src="https://img.shields.io/badge/License-GPLv3-blue.svg" />
+    </a>
+    <img src="https://github.com/LDMX-Software/docker/workflows/Build/badge.svg" />
+    <a href="https://hub.docker.com/r/ldmx/dev">
+        <img src="https://img.shields.io/github/v/release/LDMX-Software/docker" />
+    </a>
 </p>
 
 Docker build context for developing and running ldmx-sw: [Docker Hub](https://hub.docker.com/repository/docker/ldmx/dev)
