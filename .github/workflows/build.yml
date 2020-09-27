@@ -87,7 +87,7 @@ jobs:
           docker run -i -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE $_image . python3 test.py
     -
       name: Push Build to DockerHub
-      run: docker push ${{ setps.generate_tag.outputs.tag }}
+      run: docker push ${{ steps.generate_tag.outputs.tag }}
 
   # newer version of Geant4
   #     allow for developers to have access to a container with Geant4.10.6 in it
