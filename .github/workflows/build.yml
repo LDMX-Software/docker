@@ -22,11 +22,6 @@ jobs:
   #     this is the container that pretty much everyone in ldmx-sw should use
   basic:
     runs-on: ubuntu-latest
-    services:
-      registry:
-        image: registry:2
-        ports:
-          - 5000:5000
     steps:
     -
       name: Setup QEMU
@@ -34,8 +29,19 @@ jobs:
     -
       name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v1
+    - 
+      name: Cache Docker Layers on GitHub
+      uses: actions/cache@v2
       with:
-        driver-opts: network=host
+        path: /tmp/.buildx-cache
+        key: ${{ runner.os }}-buildx-${{ github.sha }}
+        restore-keys: ${{ runner.os }}-buildx
+    -
+      name: Login to DockerHub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
     - 
       name: Get Build Context
       uses: actions/checkout@v2
@@ -52,13 +58,15 @@ jobs:
           _full=ldmx/dev:${_tag}
           echo ::set-output name=tag::${_full}
     -
-      name: Build the Image to Local Cache
+      name: Build the Image
       id: docker_build
       uses: docker/build-push-action@v2
       with:
-        push: true
-        cache-from: ${{ steps.generate_tag.outputs.tag }}
-        tags: localhost:5000/${{ steps.generate_tag.outputs.tag }}
+        push: false # don't push to docker hub yet
+        load: true # allow image to be availabe to the docker program later in this job
+        cache-from: type=local,src=/tmp/.buildx-cache
+        cache-to: type=local,dest=/tmp/.buildx-cache
+        tags: ${{ steps.generate_tag.outputs.tag }}
     -
       name: Pull down ldmx-sw for testing
       uses: actions/checkout@v2
@@ -69,7 +77,7 @@ jobs:
       name: Test the Build Image
       run: |
           export LDMX_BASE=$(pwd)
-          _image=localhost:5000/${{ steps.generate_tag.outputs.tag }}
+          _image=${{ steps.generate_tag.outputs.tag }}
           mkdir ldmx-sw/build
           docker run -i -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE $_image ldmx-sw/build cmake -DBUILD_TESTS=ON ..
           docker run -i -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE $_image ldmx-sw/build make install
@@ -78,19 +86,8 @@ jobs:
           docker run -i -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE $_image . python test.py
           docker run -i -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE $_image . python3 test.py
     -
-      name: Login to DockerHub
-      uses: docker/login-action@v1
-      with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
-    -
       name: Push Build to DockerHub
-      uses: docker/build-push-action@v2
-      with:
-        push: true
-        cache-from: localhost:5000/${{ steps.generate_tag.outputs.tag }}
-        tags: ${{ steps.generate_tag.outputs.tag }}
-
+      run: docker push ${{ setps.generate_tag.outputs.tag }}
 
   # newer version of Geant4
   #     allow for developers to have access to a container with Geant4.10.6 in it
