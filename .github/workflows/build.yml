@@ -10,7 +10,7 @@ on:
       - 'ldmx.sh' 
       - 'Dockerfile'
       - 'install-scripts/**'
-      - '**base.yml'
+      - '**build.yml'
   pull_request:
     branches: 
       - main
