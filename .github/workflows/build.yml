@@ -73,6 +73,7 @@ jobs:
       with:
         repository: LDMX-Software/ldmx-sw
         submodules: recursive
+        path: ldmx-sw
     - 
       name: Test the Build Image
       run: |
