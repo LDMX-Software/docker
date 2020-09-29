@@ -6,6 +6,10 @@ on:
     paths-ignore:
       - 'README.md'
       - 'docs/**'
+      - 'LICENSE'
+      - '.gitignore'
+      - '.github/ISSUE_TEMPLATE/**'
+      - '.github/PULL_REQUEST_TEMPLATE.md'
     branches:
       - '**'
     tags:
