@@ -4,7 +4,7 @@ FROM ubuntu:18.04
 # Geant4 and ROOT version arguments
 # are formatted as the branch/tag to 
 # pull from git
-ARG GEANT4=LDMX.10.2.3_v0.4
+ARG GEANT4=geant4-10.5-release
 ARG ROOT=v6-22-00-patches
 ARG MINIMAL=OFF
 
