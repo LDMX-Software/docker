@@ -67,25 +67,25 @@ jobs:
         cache-from: type=local,src=/tmp/.buildx-cache
         cache-to: type=local,dest=/tmp/.buildx-cache
         tags: ${{ steps.generate_tag.outputs.tag }}
-#    -
-#      name: Pull down ldmx-sw for testing
-#      uses: actions/checkout@v2
-#      with:
-#        repository: LDMX-Software/ldmx-sw
-#        submodules: recursive
-#        path: ldmx-sw
-#    - 
-#      name: Test the Build Image
-#      run: |
-#          export LDMX_BASE=$(pwd)
-#          _image=${{ steps.generate_tag.outputs.tag }}
-#          mkdir ldmx-sw/build
-#          docker run -i -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE $_image ldmx-sw/build cmake -DBUILD_TESTS=ON ..
-#          docker run -i -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE $_image ldmx-sw/build make install
-#          docker run -i -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE $_image . run_test
-#          for c in `ls ldmx-sw/*/test/*.py`; do if ! docker run -i -e LDMX_BASE -v $(pwd):$(pwd) $_image . fire $c; then exit 1; fi; done
-#          docker run -i -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE $_image . python test.py
-#          docker run -i -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE $_image . python3 test.py
+    -
+      name: Pull down ldmx-sw for testing
+      uses: actions/checkout@v2
+      with:
+        repository: LDMX-Software/ldmx-sw
+        submodules: recursive
+        path: ldmx-sw
+    - 
+      name: Test the Build Image
+      run: |
+          export LDMX_BASE=$(pwd)
+          _image=${{ steps.generate_tag.outputs.tag }}
+          mkdir ldmx-sw/build
+          docker run -i -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE $_image ldmx-sw/build cmake -DBUILD_TESTS=ON ..
+          docker run -i -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE $_image ldmx-sw/build make install
+          docker run -i -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE $_image . run_test
+          for c in `ls ldmx-sw/*/test/*.py`; do if ! docker run -i -e LDMX_BASE -v $(pwd):$(pwd) $_image . fire $c; then exit 1; fi; done
+          docker run -i -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE $_image . python test.py
+          docker run -i -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE $_image . python3 test.py
     -
       name: Push Build to DockerHub
       run: docker push ${{ steps.generate_tag.outputs.tag }}
