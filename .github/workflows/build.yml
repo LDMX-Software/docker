@@ -109,6 +109,5 @@ jobs:
           docker run $_docker_parameters $(pwd) python3 test.py
     -
       name: Push Build to DockerHub
-      #NOTE: this only works because we have a maximum of two docker tags
-      run: _csv_list=${{ steps.generate_tag.outputs.push_tags }}; for tag in ${_csv_list/,/\ }; do docker push $tag; done
+      run: _csv_list=${{ steps.generate_tag.outputs.push_tags }}; for tag in ${_csv_list//,/ }; do docker push $tag; done
       if: ${{ github.event_name != 'pull_request' }}
