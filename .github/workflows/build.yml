@@ -22,6 +22,9 @@ jobs:
   #     this is the container that pretty much everyone in ldmx-sw should use
   basic:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
     -
       name: Setup QEMU
@@ -78,14 +81,16 @@ jobs:
       name: Test the Build Image
       run: |
           export LDMX_BASE=$(pwd)
-          _image=${{ steps.generate_tag.outputs.tag }}
+          alias ldmx='docker run -i -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE ${{ steps.generate_tag.outputs.tag }} $(pwd)'
           mkdir ldmx-sw/build
-          docker run -i -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE $_image ldmx-sw/build cmake -DBUILD_TESTS=ON ..
-          docker run -i -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE $_image ldmx-sw/build make install
-          docker run -i -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE $_image . run_test
-          for c in `ls ldmx-sw/*/test/*.py`; do if ! docker run -i -e LDMX_BASE -v $(pwd):$(pwd) $_image . fire $c; then exit 1; fi; done
-          docker run -i -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE $_image . python test.py
-          docker run -i -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE $_image . python3 test.py
+          cd ldmx-sw/build
+          ldmx cmake -DBUILD_TESTS=ON ..
+          ldmx make install
+          cd ../../
+          ldmx run_test
+          for c in `ls ldmx-sw/*/test/*.py`; do if ! ldmx fire $c; then exit 1; fi; done
+          ldmx python test.py
+          ldmx python3 test.py
     -
       name: Push Build to DockerHub
       run: docker push ${{ steps.generate_tag.outputs.tag }}
