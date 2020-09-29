@@ -132,4 +132,4 @@ jobs:
         cache-from: type=local,src=/tmp/.buildx-cache
         cache-to: type=local,dest=/tmp/.buildx-cache
         tags: ldmx/dev:geant4.10.6
-        build_args: GEANT4=geant4-10.6-release
+        build-args: GEANT4=geant4-10.6-release
