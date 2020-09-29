@@ -81,12 +81,10 @@ jobs:
       name: Test the Build Image
       run: |
           export LDMX_BASE=$(pwd)
-          export _image_to_test="${{ steps.generate_tag.outputs.tag }}"
+          export _image_to_test=${{ steps.generate_tag.outputs.tag }}
           export _docker_parameters="-i -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE $_image_to_test"
           mkdir ldmx-sw/build
-          cd ldmx-sw/build
-          docker run $_docker_parameters $(pwd) 'cmake -DBUILD_TESTS=ON .. && make install'
-          cd ../../
+          docker run $_docker_parameters $(pwd)/ldmx-sw/build 'cmake -DBUILD_TESTS=ON .. && make install'
           docker run $_docker_parameters $(pwd) run_test
           for c in `ls ldmx-sw/*/test/*.py`; do if ! docker run $_docker_parameters $(pwd) fire $c; then exit 1; fi; done
           docker run $_docker_parameters $(pwd) python test.py
