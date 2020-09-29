@@ -81,16 +81,13 @@ jobs:
       name: Test the Build Image
       run: |
           export LDMX_BASE=$(pwd)
-          alias ldmx='docker run -i -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE ${{ steps.generate_tag.outputs.tag }} $(pwd)'
+          export ldmx="docker run -i -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE ${{ steps.generate_tag.outputs.tag }}"
           mkdir ldmx-sw/build
-          cd ldmx-sw/build
-          ldmx cmake -DBUILD_TESTS=ON ..
-          ldmx make install
-          cd ../../
-          ldmx run_test
-          for c in `ls ldmx-sw/*/test/*.py`; do if ! ldmx fire $c; then exit 1; fi; done
-          ldmx python test.py
-          ldmx python3 test.py
+          $ldmx $(pwd)/ldmx-sw/build 'cmake -DBUILD_TESTS=ON .. && make install'
+          $ldmx . run_test
+          for c in `ls ldmx-sw/*/test/*.py`; do if ! $ldmx . fire $c; then exit 1; fi; done
+          $ldmx . python test.py
+          $ldmx . python3 test.py
     -
       name: Push Build to DockerHub
       run: docker push ${{ steps.generate_tag.outputs.tag }}
