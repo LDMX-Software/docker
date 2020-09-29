@@ -1,25 +1,28 @@
 
 name: Build
 
-# only build if push changes to files involved in the build
 on:
   push:
-    branches: [ main ]
-    paths: [ 'ldmx.sh' , 'Dockerfile' , 'install-scripts/**' , '**base.yml' ]
+    paths-ignore:
+      - 'README.md'
+      - 'docs/**'
+      - 'LICENSE'
+      - '.gitignore'
+      - '.github/ISSUE_TEMPLATE/**'
+      - '.github/PULL_REQUEST_TEMPLATE.md'
+    branches:
+      - '**'
+    tags:
+      - 'v*.*'
   pull_request:
-    branches: [ main ]
 
-# the jobs are the different container tags that we want built
+# workflow consists of one building and testing job
 jobs:
-  # basic, defaults development container
-  #     this is the container that pretty much everyone in ldmx-sw should use
-  basic:
+  build-test:
     runs-on: ubuntu-latest
-#    services:
-#      registry:
-#        image: registry:2
-#        ports:
-#          - 5000:5000
+    defaults:
+      run:
+        shell: bash
     steps:
     -
       name: Setup QEMU
@@ -27,89 +30,84 @@ jobs:
     -
       name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v1
-#      with:
-#        driver-opts: network=host
+    - 
+      name: Cache Docker Layers on GitHub
+      uses: actions/cache@v2
+      with:
+        path: /tmp/.buildx-cache
+        key: ${{ runner.os }}-buildx-${{ github.sha }}
+        restore-keys: ${{ runner.os }}-buildx
+    -
+      name: Login to DockerHub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
     - 
       name: Get Build Context
       uses: actions/checkout@v2
     -
-      name: Determine Image Tag
+      name: Determine Image Tags
       id: generate_tag
       run: |
-          _tag=latest
-          if [ "${{ github.event_name }}" == "pull_request" ]
-          then
-              _tag=pr-${{ github.event.number }}
+          _repo=ldmx/dev
+          _tag=noop
+          if [[ $GITHUB_REF == refs/tags/* ]]; then
+            # if pushing a git tag ==> get the git tag for the docker tag
+            _tag=${GITHUB_REF#refs/tags/}
+          elif [[ $GITHUB_REF == refs/heads/* ]]; then
+            # pushing to a branch ==> docker tag is branch name
+            #   if branch name is default_branch, docker tag is 'edge'
+            _tag=$(echo ${GITHUB_REF#refs/heads/} | sed -r 's#/+#-#g')
+            if [ "${{ github.event.repository.default_branch }}" = "$_tag" ]; then
+              _tag=edge
+            fi
+          elif [[ $GITHUB_REF == refs/pull/* ]]; then
+            # pull request branch ==> docker tag is pr number
+            _tag=pr-${{ github.event.number }}
           fi
-          _full=ldmx/dev:${_tag}
-          echo ::set-output name=tag::${_full}
-#    -
-#      name: Build the Image to Local Cache
-#      id: docker_build
-#      uses: docker/build-push-action@v2
-#      with:
-#        push: true
-#        cache-from: ${{ steps.generate_tag.outputs.tag }}
-#        tags: localhost:5000/${{ steps.generate_tag.outputs.tag }}
-#    -
-#      name: Pull down ldmx-sw for testing
-#      uses: actions/checkout@v2
-#      with:
-#        repository: LDMX-Software/ldmx-sw
-#        submodules: recursive
-#    - 
-#      name: Test the Build Image
-#      run: |
-#          export LDMX_BASE=$(pwd)
-#          _image=localhost:5000/${{ steps.generate_tag.outputs.tag }}
-#          mkdir ldmx-sw/build
-#          docker run -i -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE $_image ldmx-sw/build cmake -DBUILD_TESTS=ON ..
-#          docker run -i -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE $_image ldmx-sw/build make install
-#          docker run -i -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE $_image . run_test
-#          for c in `ls ldmx-sw/*/test/*.py`; do if ! docker run -i -e LDMX_BASE -v $(pwd):$(pwd) $_image . fire $c; then exit 1; fi; done
-#          docker run -i -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE $_image . python test.py
-#          docker run -i -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE $_image . python3 test.py
+          _main_tag="${_repo}:${_tag}"
+          _push_tags="${_main_tag}"
+          if [[ $_tag =~ ^v[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
+            # latest docker tag is latest version built matching the format v<1-3 digis>.<1-3 digis>
+            _push_tags="$_push_tags,${_repo}:latest"
+          elif [ "${{ github.event_name }}" = "push" ]; then
+            # on push actions, tag with sha of GITHUB as well
+            _push_tags="$_push_tags,${_repo}:sha-${GITHUB_SHA::8}"
+          fi
+          echo "Generated Tags: ${_push_tags}"
+          echo ::set-output name=push_tags::${_push_tags}
+          echo ::set-output name=main_tag::${_main_tag}
     -
-      name: Login to DockerHub
-      uses: docker/login-action@v1
-      with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
-    -
-      name: Push Build to DockerHub
-      uses: docker/build-push-action@v2
-      with:
-        push: true
-#        cache-from: localhost:5000/${{ steps.generate_tag.outputs.tag }}
-        tags: ${{ steps.generate_tag.outputs.tag }}
-
-
-  # newer version of Geant4
-  #     allow for developers to have access to a container with Geant4.10.6 in it
-  geant4:
-    runs-on: ubuntu-latest
-    steps:
-    -
-      name: Setup QEMU
-      uses: docker/setup-qemu-action@v1
-    -
-      name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v1
-    -
-      name: Login to DockerHub
-      uses: docker/login-action@v1
-      if: ${{ github.event_name != 'pull_request' }}
-      with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
-    - 
-      name: Get Build Context
-      uses: actions/checkout@v2
-    -
-      name: Build and push
+      name: Build the Image
       id: docker_build
       uses: docker/build-push-action@v2
       with:
-        push: ${{ github.event_name != 'pull_request' }}
-        tags: ldmx/dev:geant4.10.6
-        build_args: GEANT4=geant4-10.6-release
+        push: false # don't push to docker hub yet
+        load: true # allow image to be availabe to the docker program later in this job
+        cache-from: type=local,src=/tmp/.buildx-cache
+        cache-to: type=local,dest=/tmp/.buildx-cache
+        tags: ${{ steps.generate_tag.outputs.push_tags }}
+    -
+      name: Pull down ldmx-sw for testing
+      uses: actions/checkout@v2
+      with:
+        repository: LDMX-Software/ldmx-sw
+        submodules: recursive
+        path: ldmx-sw
+    - 
+      name: Test the Build Image
+      run: |
+          export LDMX_BASE=$(pwd)
+          export _image_to_test=${{ steps.generate_tag.outputs.main_tag }}
+          export _docker_parameters="-i -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE $_image_to_test"
+          mkdir ldmx-sw/build
+          docker run $_docker_parameters $(pwd)/ldmx-sw/build 'cmake -DBUILD_TESTS=ON .. && make install'
+          docker run $_docker_parameters $(pwd) run_test
+          for c in `ls ldmx-sw/*/test/*.py`; do if ! docker run $_docker_parameters $(pwd) fire $c; then exit 1; fi; done
+          docker run $_docker_parameters $(pwd) python test.py
+          docker run $_docker_parameters $(pwd) python3 test.py
+    -
+      name: Push Build to DockerHub
+      run: _csv_list=${{ steps.generate_tag.outputs.push_tags }}; for tag in ${_csv_list//,/ }; do docker push $tag; done
+      if: ${{ github.event_name != 'pull_request' }}

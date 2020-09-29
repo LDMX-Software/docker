@@ -28,7 +28,7 @@ MAINTAINER Tom Eichlersmith <eichl008@umn.edu>
 #   Dep              | Reason
 #   wget             | install xerces and download Conditions tables
 #   git              | download ROOT and Geant4 source
-#   dpkg-dev         | 
+#   dpkg-dev         | ROOT external dependency for compression algorithms
 #   python-dev       | ROOT interface with python2
 #   python-pip       | install extra python2 packages
 #   python-numpy     | extra python2 package numpy
@@ -40,7 +40,7 @@ MAINTAINER Tom Eichlersmith <eichl008@umn.edu>
 #   make             | Build tool for compiling source code
 #   g++-7            | Compiler with C++17 support
 #   gcc-7            | Compiler with C++17 support
-#   binutils         |
+#   binutils         | ROOT external dependency for compression algorithms
 #   libx11-dev       | ROOT external dependency for accessing screen
 #   libxpm-dev       | ROOT external dependency for accessing screen
 #   libxft-dev       | ROOT external dependency for accessing screen
