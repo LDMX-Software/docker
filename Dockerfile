@@ -79,19 +79,27 @@ RUN apt-get update &&\
 # put installation scripts into temporary directory for later cleanup
 COPY install-scripts/ /tmp/
 
-# decide where our three big external dependency will be installed
-ENV ROOTDIR /deps/cernroot
-ENV XercesC_DIR /deps/xerces-c
-ENV G4DIR /deps/geant4
-
 # run installation scripts and then remove them (and any generated files)
-RUN /bin/bash /tmp/install-root.sh        &&\
-    /bin/bash /tmp/install-xerces.sh      &&\
-    /bin/bash /tmp/install-geant4.sh      &&\
-    rm -rf /tmp/*
+ENV ROOTDIR /deps/cernroot
+RUN /bin/bash /tmp/install-root.sh
+
+ENV XercesC_DIR /deps/xerces-c
+RUN /bin/bash /tmp/install-xerces.sh
+
+ENV G4DIR /deps/geant4
+RUN /bin/bash /tmp/install-geant4.sh
+
+ENV DD4hep_DIR /deps/dd4hep
+RUN /bin/bash /tmp/install-dd4hep.sh
+
+ENV Eigen_DIR /deps/eigen
+RUN /bin/bash /tmp/install-eigen.sh
+
+ENV ACTS_DIR /deps/acts
+RUN /bin/bash /tmp/install-acts.sh
 
 # clean up source and build files from apt-get
-RUN apt-get clean && apt-get autoremove 
+RUN rm -rf /tmp/* && apt-get clean && apt-get autoremove 
 
 #copy over necessary running script which sets up environment
 COPY ./ldmx.sh /home/

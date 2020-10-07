@@ -1,6 +1,16 @@
 
 set -e
 
+###############################################################################
+# install-root.sh
+#   Install CERN's ROOT into the container
+#
+#   Assumptions
+#       - ROOT defined as a  tag/branch of ROOT's git source tree
+#       - MINIMAL defined as either ON or OFF
+#       - ROOTDIR defined as target install location
+###############################################################################
+
 # make a working directory for the build
 mkdir cernroot && cd cernroot
 
@@ -20,14 +30,15 @@ fi
 
 # configure the build
 cmake \
-    -Dxrootd=OFF \
+    -Dxrootd=OFF                    \
     -DCMAKE_INSTALL_PREFIX=$ROOTDIR \
-    -DCMAKE_CXX_STANDARD=17 \
+    -DCMAKE_CXX_STANDARD=17         \
     ${_yes_minimal} ../root
 
 # build and install
 cmake --build . --target install
 
 # clean up before this layer is saved
-cd ..
-rm -rf build root
+cd .. #leave build
+cd .. #leave cernroot
+rm -rf cernroot

@@ -1,5 +1,15 @@
+#!/bin/bash
 
 set -e
+
+################################################################################
+# install-xerces.sh
+#   Install Xerces-C into container
+#
+#   Assumptions
+#       - XERCESC set to version matching an archived location of its source
+#       - XercesC_DIR set to target installation location
+################################################################################
 
 # make working directory
 mkdir xerces-c && cd xerces-c;
@@ -22,5 +32,7 @@ cmake -DCMAKE_INSTALL_PREFIX=$XercesC_DIR ..
 make install 
 
 # clean up before saving this layer
-cd ../../
-rm -rf xerces-c*
+cd .. #leave build
+cd .. #leave xerces source dir
+cd .. #leave working dir
+rm -rf xerces-c

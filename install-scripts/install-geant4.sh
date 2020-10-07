@@ -1,5 +1,16 @@
+#!/bin/bash
 
 set -e
+
+###############################################################################
+# install-geant4.sh
+#   Install Geant4 into the container
+#
+#   Assumptions
+#       - GEANT4 defined to be a branch/tag of geant4 or LDMX's fork of geant4
+#       - XercesC_DIR set to install of Xerces-C
+#       - G4DIR set to path where Geant4 should be installed
+###############################################################################
 
 # make and enter working directory
 mkdir geant4 && cd geant4
