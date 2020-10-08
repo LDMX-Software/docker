@@ -119,14 +119,14 @@ RUN mkdir xerces-c && cd xerces-c &&\
 ENV G4DIR /deps/geant4
 RUN /bin/bash /tmp/install-geant4.sh
 
-ENV DD4hep_DIR /deps/dd4hep
-RUN /bin/bash /tmp/install-dd4hep.sh
-
-ENV Eigen_DIR /deps/eigen
-RUN /bin/bash /tmp/install-eigen.sh
-
-ENV ACTS_DIR /deps/acts
-RUN /bin/bash /tmp/install-acts.sh
+#ENV DD4hep_DIR /deps/dd4hep
+#RUN /bin/bash /tmp/install-dd4hep.sh
+#
+#ENV Eigen_DIR /deps/eigen
+#RUN /bin/bash /tmp/install-eigen.sh
+#
+#ENV ACTS_DIR /deps/acts
+#RUN /bin/bash /tmp/install-acts.sh
 
 # clean up source and build files from apt-get
 RUN rm -rf /tmp/* && apt-get clean && apt-get autoremove 
