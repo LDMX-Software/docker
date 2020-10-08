@@ -6,6 +6,9 @@ FROM ubuntu:18.04
 # pull from git
 ARG GEANT4=geant4-10.5-release
 ARG ROOT=v6-22-00-patches
+ARG DD4HEP=v01-14-01
+ARG EIGEN=3.3.8
+ARG ACTS=v1.1.0
 ARG MINIMAL=OFF
 
 # XercesC and ONNX version arguments
@@ -18,7 +21,10 @@ LABEL ubuntu.version="18.04" \
       root.version="${ROOT}" \
       minimal="${MINIMAL}" \
       geant4.version="${GEANT4}" \
-      xerces.version="${XERCESC}"
+      xerces.version="${XERCESC}" \
+      dd4hep.version="${DD4HEP}" \
+      eigen.version="${EIGEN}" \
+      acts.version="${ACTS}"
 
 MAINTAINER Tom Eichlersmith <eichl008@umn.edu>
 
@@ -52,9 +58,53 @@ MAINTAINER Tom Eichlersmith <eichl008@umn.edu>
 RUN apt-get update &&\
     DEBIAN_FRONTEND=noninteractive \
     apt-get install -y \
-        wget \
-        git \
+        binutils \
+        ca-certificates \
+        davix-dev \
+        dcap-dev \
         dpkg-dev \
+        fonts-freefont-ttf \
+        g++-7 \
+        gcc-7 \
+        git \
+        libafterimage-dev \
+        libboost-all-dev \
+        libcfitsio-dev \
+        libfcgi-dev \
+        libfftw3-dev \
+        libfreetype6-dev \
+        libftgl-dev \
+        libgfal2-dev \
+        libgif-dev \
+        libgl1-mesa-dev \
+        libgl2ps-dev \
+        libglew-dev \
+        libglu-dev \
+        libgraphviz-dev \
+        libgsl-dev \
+        libjpeg-dev \
+        liblz4-dev \
+        liblzma-dev \
+        libmysqlclient-dev \
+        libpcre++-dev \
+        libpng-dev \
+        libpq-dev \
+        libpythia8-dev \
+        libsqlite3-dev \
+        libssl-dev \
+        libtbb-dev \
+        libtiff-dev \
+        libx11-dev \
+        libxext-dev \  
+        libxft-dev \
+        libxml2-dev \
+        libxmu-dev \
+        libxpm-dev \
+        libxxhash-dev \
+        libz-dev \
+        libzstd-dev \
+        locales \
+        make \
         python-dev \
         python-pip \
         python-numpy \
@@ -63,17 +113,10 @@ RUN apt-get update &&\
         python3-pip \
         python3-numpy \
         python3-tk \
-        make \
-        g++-7 \
-        gcc-7 \
-        binutils \
-        libx11-dev \
-        libxpm-dev \
-        libxft-dev \
-        libxext-dev \
-        libboost-all-dev \
-        libxmu-dev \
-        libgl1-mesa-dev &&\
+        srm-ifce-dev \
+        unixodbc-dev \
+        wget \
+    && rm -rf /var/lib/apt/lists/* &&\
     python3 -m pip install --upgrade --no-cache-dir cmake
 
 # put installation scripts into temporary directory for later cleanup
@@ -116,17 +159,91 @@ RUN mkdir xerces-c && cd xerces-c &&\
     make install &&\
     cd ../../../ && rm -rf xerces-c
 
+###############################################################################
+# Install Geant4 into the container
+#
+# Assumptions
+#  - GEANT4 defined to be a branch/tag of geant4 or LDMX's fork of geant4
+#  - XercesC_DIR set to install of Xerces-C
+#  - G4DIR set to path where Geant4 should be installed
+###############################################################################
 ENV G4DIR /deps/geant4
-RUN /bin/bash /tmp/install-geant4.sh
+RUN _geant4_remote="https://gitlab.cern.ch/geant4/geant4.git" &&\
+    if echo "${GEANT4}" | grep -q "LDMX"; then \
+        _geant4_remote="https://github.com/LDMX-Software/geant4.git" \
+    fi &&\
+    git clone -b ${GEANT4} --single-branch ${_geant4_remote} &&\
+    cd geant4 && mkdir build && cd build &&\
+    cmake \
+        -DGEANT4_INSTALL_DATA=ON \
+        -DGEANT4_USE_GDML=ON \
+        -DGEANT4_INSTALL_EXAMPLES=OFF \
+        -DXERCESC_ROOT_DIR=$XercesC_DIR \
+        -DCMAKE_INSTALL_PREFIX=$G4DIR \
+        .. &&\
+    make install &&\
+    cd ../../ && rm -rf geant4
 
-#ENV DD4hep_DIR /deps/dd4hep
-#RUN /bin/bash /tmp/install-dd4hep.sh
+###############################################################################
+# Installing DD4hep within the container build
 #
-#ENV Eigen_DIR /deps/eigen
-#RUN /bin/bash /tmp/install-eigen.sh
+# Assumptions
+#  - ROOT installed at $ROOTDIR
+#  - Geant4 installed at $G4DIR
+#  - $DD4hep_DIR set to install path
+###############################################################################
+ENV DD4hep_DIR /deps/dd4hep
+RUN cd ${ROOTDIR}/bin && . thisroot.sh &&\
+    cd ${G4DIR}/bin && . geant4.sh &&\
+    cd / &&\
+    git clone -b ${DD4HEP} --single-branch https://github.com/AIDASoft/DD4hep.git &&\
+    mkdir DD4hep/build && cd DD4hep/build &&\
+    CMAKE_PREFIX_PATH=$XercesC_DIR:$ROOTDIR:$G4DIR cmake \
+        -DCMAKE_INSTALL_PREFIX=$DD4hep_DIR \
+        -DBoost_NO_BOOST_CMAKE=ON \
+        -DBUILD_TESTING=OFF \
+        -DDD4HEP_USE_GEANT4=ON \
+        -DDD4HEP_USE_XSERCESC=ON \
+        -DDD4HEP_BUILD_PACKAGES="DDRec DDDetectors DDCond DDAlign DDCAD DDDigi DDG4" \
+        .. &&\
+    make install
+    cd ../../ && rm -rf DD4hep
+
+################################################################################
+# Install Eigen headers into container
 #
-#ENV ACTS_DIR /deps/acts
-#RUN /bin/bash /tmp/install-acts.sh
+# Assumptions
+#  - Eigen_DIR set to install path
+################################################################################
+ENV Eigen_DIR /deps/eigen
+RUN git clone -b ${EIGEN} --single-branch https://gitlab.com/libeigen/eigen.git &&\
+    mkdir eigen/build && cd eigen/build &&\
+    cmake -DCMAKE_INSTALL_PREFIX=$Eigen_DIR .. &&\
+    make install &&\
+    cd ../../ && rm -rf eigen
+
+###############################################################################
+# Install ACTS Common Tracking Software into the container
+#
+# Assumptions
+#  - Eigen installed at Eigen_DIR
+#  - ACTS_DIR set to install path
+#  - ROOTDIR set to ROOT install path
+#  - G4DIR set to Geant4 install path
+#  - XercesC_DIR set to xerces-c install path
+#  - DD4hep_DIR set to DD4hep install path
+###############################################################################
+ENV ACTS_DIR /deps/acts
+RUN git clone -b ${ACTS} --single-branch https://github.com/acts-project/acts &&\
+    CMAKE_PREFIX_PATH=$XercesC_DIR:$ROOTDIR:$G4DIR:$DD4hep_DIR cmake \
+        -B acts/build \
+        -S acts \
+        -DACTS_BUILD_PLUGIN_DD4HEP=ON \
+        -DACTS_BUILD_EXAMPLES=OFF \
+        -DEigen3_DIR=$Eigen_DIR \
+        -DCMAKE_INSTALL_PREFIX=$ACTS_DIR &&\
+    cmake --build acts/build &&\
+    rm -rf acts
 
 # clean up source and build files from apt-get
 RUN rm -rf /tmp/* && apt-get clean && apt-get autoremove 
