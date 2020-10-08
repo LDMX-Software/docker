@@ -21,7 +21,7 @@ export CMAKE_PREFIX_PATH=$XercesC_DIR:$ROOTDIR:$G4DIR
 git clone https://github.com/AIDASoft/DD4hep.git
 
 # remove DDEve from list of compiled modules
-sed -in 's/DDEve\ //g' DD4hep/CMakeLists.txt
+sed -in 's/DDEve\ UtilityApps//g' DD4hep/CMakeLists.txt
 
 mkdir DD4hep/build
 cd DD4hep/build
