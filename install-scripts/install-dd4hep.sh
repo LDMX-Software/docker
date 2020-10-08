@@ -20,18 +20,16 @@ export CMAKE_PREFIX_PATH=$XercesC_DIR:$ROOTDIR:$G4DIR
 
 git clone https://github.com/AIDASoft/DD4hep.git
 
-# remove DDEve from list of compiled modules
-sed -in 's/DDEve\ UtilityApps//g' DD4hep/CMakeLists.txt
-
 mkdir DD4hep/build
 cd DD4hep/build
 
 cmake \
     -DCMAKE_INSTALL_PREFIX=$DD4hep_DIR \
-    -DDD4HEP_USE_GEANT4=ON             \
-    -DDD4HEP_USE_XERCESC=ON            \
     -DBoost_NO_BOOST_CMAKE=ON          \
     -DBUILD_TESTING=OFF                \
+    -DDD4HEP_USE_GEANT4=ON             \
+    -DDD4HEP_USE_XERCESC=ON            \
+    -DDD4HEP_BUILD_PACKAGES="DDRec DDDetectors DDCond DDAlign DDCAD DDDigi DDG4" \
     ..
 
 make install
