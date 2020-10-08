@@ -46,7 +46,6 @@ libxft-dev |
 libxml2-dev |
 libxmu-dev |
 libxpm-dev |
-libxxhash-dev |
 libz-dev |
 libzstd-dev |
 locales |
