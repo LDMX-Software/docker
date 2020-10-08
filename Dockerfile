@@ -79,12 +79,42 @@ RUN apt-get update &&\
 # put installation scripts into temporary directory for later cleanup
 COPY install-scripts/ /tmp/
 
-# run installation scripts and then remove them (and any generated files)
+###############################################################################
+# Install CERN's ROOT into the container
+#
+# Assumptions
+#  - ROOT defined as a  tag/branch of ROOT's git source tree
+#  - MINIMAL defined as either ON or OFF
+#  - ROOTDIR defined as target install location
+###############################################################################
 ENV ROOTDIR /deps/cernroot
-RUN /bin/bash /tmp/install-root.sh
+RUN mkdir cernroot && cd cernroot &&\
+    git clone -b ${ROOT} --single-branch https://github.com/root-project/root.git &&\
+    mkdir build && cd build &&\
+    cmake \
+        -Dxrootd=OFF \
+        -DCMAKE_CXX_STANDARD=17 \
+        -Dminimal=${MINIMAL} \
+        -DCMAKE_INSTALL_PREFIX=$ROOTDIR \
+        ../root &&\
+    cmake --build . --target install &&\
+    cd ../../ && rm -rf cernroot
 
+################################################################################
+# Install Xerces-C into container
+#
+# Assumptions
+#  - XERCESC set to version matching an archived location of its source
+#  - XercesC_DIR set to target installation location
+################################################################################
 ENV XercesC_DIR /deps/xerces-c
-RUN /bin/bash /tmp/install-xerces.sh
+RUN mkdir xerces-c && cd xerces-c &&\
+    wget http://archive.apache.org/dist/xerces/c/3/sources/xerces-c-${XERCESC}.tar.gz &&\
+    tar -zxvf xerces-c-*.tar.gz &&\
+    cd xerces* && mkdir build && cd build &&\
+    cmake -DCMAKE_INSTALL_PREFIX=$XercesC_DIR .. &&\
+    make install &&\
+    cd ../../../ && rm -rf xerces-c
 
 ENV G4DIR /deps/geant4
 RUN /bin/bash /tmp/install-geant4.sh
