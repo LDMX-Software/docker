@@ -28,6 +28,9 @@ A description of this setup process is given for both [docker](docs/use_with_doc
 - ROOT built and installed from source for version 6.22 (branch v6-22-00-patches)
 - XercesC built and installed from source version 3.2.3
 - Geant4 built and installed from source version [LDMX.10.2.3\_v0.4](https://github.com/LDMX-Software/geant4/tree/LDMX.10.2.3_v0.4)
+- DD4hep built and installed from source version v01-14-01
+- Eigen installed from source version 3.8.3
+- ACTS built and installed from source version v1.1.0
 - python packages uproot, numpy, matplotlib, xgboost, and sklearn for both versions 2 and 3
 - SSL Certificates that will be trusted by container are in the `certs` directory
 

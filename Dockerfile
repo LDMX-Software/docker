@@ -30,31 +30,7 @@ MAINTAINER Tom Eichlersmith <eichl008@umn.edu>
 
 # First install any required dependencies from ubuntu repos
 #   TODO clean up this dependency list
-#
-#   Dep              | Reason
-#   wget             | install xerces and download Conditions tables
-#   git              | download ROOT and Geant4 source
-#   dpkg-dev         | ROOT external dependency for compression algorithms
-#   python-dev       | ROOT interface with python2
-#   python-pip       | install extra python2 packages
-#   python-numpy     | extra python2 package numpy
-#   python-tk        | matplotlib needs python-tk for some plotting stuff
-#   python3-dev      | ROOT interface with python3 and ConfigurePython
-#   python3-pip      | install extra python3 packages
-#   python3-numpy    | extra python3 package numpy
-#   python3-tk       | matplotlib needs python3-tk for some plotting stuff
-#   make             | Build tool for compiling source code
-#   g++-7            | Compiler with C++17 support
-#   gcc-7            | Compiler with C++17 support
-#   binutils         | ROOT external dependency for compression algorithms
-#   libx11-dev       | ROOT external dependency for accessing screen
-#   libxpm-dev       | ROOT external dependency for accessing screen
-#   libxft-dev       | ROOT external dependency for accessing screen
-#   libxext-dev      | ROOT and Geant4 external dependency for accessing screen
-#   libxmu-dev       | ROOT and Geant4 external dependency for accessing screen
-#   libgl1-mesa-dev  | ROOT and Geant4 external dependency for accessing screen
-#   libboost-all-dev | Boost packages ldmx-sw uses
-#   cmake            | Version 3.18 of cmake available from python3-pip
+# Ongoing documentation for this list is in docs/ubuntu-packages.md
 RUN apt-get update &&\
     DEBIAN_FRONTEND=noninteractive \
     apt-get install -y \
