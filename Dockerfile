@@ -76,7 +76,6 @@ RUN apt-get update &&\
         libxml2-dev \
         libxmu-dev \
         libxpm-dev \
-        libxxhash-dev \
         libz-dev \
         libzstd-dev \
         locales \
@@ -94,9 +93,6 @@ RUN apt-get update &&\
         wget \
     && rm -rf /var/lib/apt/lists/* &&\
     python3 -m pip install --upgrade --no-cache-dir cmake
-
-# put installation scripts into temporary directory for later cleanup
-COPY install-scripts/ /tmp/
 
 ###############################################################################
 # Install CERN's ROOT into the container
@@ -182,7 +178,7 @@ RUN cd ${ROOTDIR}/bin && . thisroot.sh &&\
         -DDD4HEP_USE_XSERCESC=ON \
         -DDD4HEP_BUILD_PACKAGES="DDRec DDDetectors DDCond DDAlign DDCAD DDDigi DDG4" \
         .. &&\
-    make install
+    make install &&\
     cd ../../ && rm -rf DD4hep
 
 ################################################################################
@@ -201,6 +197,9 @@ RUN git clone -b ${EIGEN} --single-branch https://gitlab.com/libeigen/eigen.git 
 ###############################################################################
 # Install ACTS Common Tracking Software into the container
 #
+# Requires Boost 1.69 (Ubuntu 18.04 packages is only 1.66), 
+# so update to a newer PPA.
+#
 # Assumptions
 #  - Eigen installed at Eigen_DIR
 #  - ACTS_DIR set to install path
@@ -210,7 +209,10 @@ RUN git clone -b ${EIGEN} --single-branch https://gitlab.com/libeigen/eigen.git 
 #  - DD4hep_DIR set to DD4hep install path
 ###############################################################################
 ENV ACTS_DIR /deps/acts
-RUN git clone -b ${ACTS} --single-branch https://github.com/acts-project/acts &&\
+RUN add-apt-repository ppa:mhier/libboost-latest &&\
+    apt update &&\
+    apt install -y libboost &&\
+    git clone -b ${ACTS} --single-branch https://github.com/acts-project/acts &&\
     CMAKE_PREFIX_PATH=$XercesC_DIR:$ROOTDIR:$G4DIR:$DD4hep_DIR cmake \
         -B acts/build \
         -S acts \
