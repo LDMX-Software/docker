@@ -156,6 +156,29 @@ RUN _geant4_remote="https://gitlab.cern.ch/geant4/geant4.git" &&\
     rm -rf geant4
 
 ###############################################################################
+# Install Boost into the container
+#
+# TODO: THe boost installed from this PPA seems to work with everything,
+#       but cmake complains with piles of warnings.
+# 
+# Assumptions
+#  - BOOST version of boost release available at the referenced PPA
+###############################################################################
+ARG BOOST=1.74
+LABEL boost.version="${BOOST}"
+RUN apt-get update &&\
+    apt-get install -y \
+        software-properties-common \
+    &&\
+    add-apt-repository ppa:mhier/libboost-latest &&\
+    apt-get update &&\
+    apt-get install -y libboost${BOOST}-dev &&\
+    apt-get purge -y \
+        software-properties-common \
+    &&\
+    apt-get autoremove -y
+
+###############################################################################
 # Installing DD4hep within the container build
 #
 # Assumptions
@@ -208,29 +231,6 @@ RUN git clone -b ${EIGEN} --single-branch https://gitlab.com/libeigen/eigen.git 
         --target install \
     &&\
     rm -rf eigen
-
-###############################################################################
-# Install Boost into the container
-#
-# TODO: THe boost installed from this PPA seems to work with everything,
-#       but cmake complains with piles of warnings.
-# 
-# Assumptions
-#  - BOOST version of boost release available at the referenced PPA
-###############################################################################
-ARG BOOST=1.74
-LABEL boost.version="${BOOST}"
-RUN apt-get update &&\
-    apt-get install -y \
-        software-properties-common \
-    &&\
-    add-apt-repository ppa:mhier/libboost-latest &&\
-    apt-get update &&\
-    apt-get install -y libboost${BOOST}-dev &&\
-    apt-get purge -y \
-        software-properties-common \
-    &&\
-    apt-get autoremove -y
 
 ###############################################################################
 # Install ACTS Common Tracking Software into the container
