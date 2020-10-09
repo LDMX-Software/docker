@@ -146,7 +146,7 @@ RUN _geant4_remote="https://gitlab.cern.ch/geant4/geant4.git" &&\
         -DXERCESC_ROOT_DIR=$XercesC_DIR \
         -DCMAKE_INSTALL_PREFIX=$G4DIR \
         -B geant4/build \
-        -S geant4
+        -S geant4 \
         &&\
     cmake \
         --build geant4/build \
