@@ -1,32 +1,15 @@
 
 FROM ubuntu:18.04
-
-# Geant4 and ROOT version arguments
-# are formatted as the branch/tag to 
-# pull from git
-ARG GEANT4=geant4-10.5-release
-ARG ROOT=v6-22-00-patches
-ARG DD4HEP=v01-14-01
-ARG EIGEN=3.3.8
-ARG ACTS=v1.1.0
-ARG MINIMAL=OFF
-
-# XercesC and ONNX version arguments
-# are formatted as they appear in
-# the download link provided by those
-# companies
-ARG XERCESC=3.2.3
-
-LABEL ubuntu.version="18.04" \
-      root.version="${ROOT}" \
-      minimal="${MINIMAL}" \
-      geant4.version="${GEANT4}" \
-      xerces.version="${XERCESC}" \
-      dd4hep.version="${DD4HEP}" \
-      eigen.version="${EIGEN}" \
-      acts.version="${ACTS}"
-
+LABEL ubuntu.version="18.04"
 MAINTAINER Tom Eichlersmith <eichl008@umn.edu>
+
+# The minimal argument is an attempt to decrease the size of the container
+# by only including necessary packages/libraries for running ldmx-sw.
+#   It is still in development
+#
+# The options are: "ON" or "OFF"
+ARG MINIMAL=OFF
+LABEL minimal="${MINIMAL}"
 
 # First install any required dependencies from ubuntu repos
 #   TODO clean up this dependency list
@@ -44,7 +27,6 @@ RUN apt-get update &&\
         gcc-7 \
         git \
         libafterimage-dev \
-        libboost-all-dev \
         libcfitsio-dev \
         libfcgi-dev \
         libfftw3-dev \
@@ -100,9 +82,11 @@ RUN apt-get update &&\
 # Assumptions
 #  - ROOT defined as a  tag/branch of ROOT's git source tree
 #  - MINIMAL defined as either ON or OFF
-#  - ROOTDIR defined as target install location
+#  - ROOTSYS defined as target install location
 ###############################################################################
-ENV ROOTDIR /deps/cernroot
+ARG ROOT=v6-22-00-patches
+LABEL root.version="${ROOT}"
+ENV ROOTSYS /deps/cernroot
 RUN mkdir cernroot && cd cernroot &&\
     git clone -b ${ROOT} --single-branch https://github.com/root-project/root.git &&\
     mkdir build && cd build &&\
@@ -110,7 +94,7 @@ RUN mkdir cernroot && cd cernroot &&\
         -Dxrootd=OFF \
         -DCMAKE_CXX_STANDARD=17 \
         -Dminimal=${MINIMAL} \
-        -DCMAKE_INSTALL_PREFIX=$ROOTDIR \
+        -DCMAKE_INSTALL_PREFIX=$ROOTSYS \
         ../root &&\
     cmake --build . --target install &&\
     cd ../../ && rm -rf cernroot
@@ -123,6 +107,8 @@ RUN mkdir cernroot && cd cernroot &&\
 #  - XercesC_DIR set to target installation location
 ################################################################################
 ENV XercesC_DIR /deps/xerces-c
+ARG XERCESC=3.2.3
+LABEL xercesc.version="${XERCESC}"
 RUN mkdir xerces-c && cd xerces-c &&\
     wget http://archive.apache.org/dist/xerces/c/3/sources/xerces-c-${XERCESC}.tar.gz &&\
     tar -zxvf xerces-c-*.tar.gz &&\
@@ -140,6 +126,8 @@ RUN mkdir xerces-c && cd xerces-c &&\
 #  - G4DIR set to path where Geant4 should be installed
 ###############################################################################
 ENV G4DIR /deps/geant4
+ARG GEANT4=geant4-10.5-release
+LABEL geant4.version="${GEANT4}"
 RUN _geant4_remote="https://gitlab.cern.ch/geant4/geant4.git" &&\
     if echo "${GEANT4}" | grep -q "LDMX"; then \
         _geant4_remote="https://github.com/LDMX-Software/geant4.git"; \
@@ -160,18 +148,20 @@ RUN _geant4_remote="https://gitlab.cern.ch/geant4/geant4.git" &&\
 # Installing DD4hep within the container build
 #
 # Assumptions
-#  - ROOT installed at $ROOTDIR
+#  - ROOT installed at $ROOTSYS
 #  - Geant4 installed at $G4DIR
 #  - Xerces-C installed at $XercesC_DIR
+#  - DD4HEP set to branch/tag name from GitHub repository
 #  - $DD4hep_DIR set to install path
 ###############################################################################
 ENV DD4hep_DIR /deps/dd4hep
+ARG DD4HEP=v01-14-01
+LABEL dd4hep.version="${DD4HEP}"
 RUN git clone -b ${DD4HEP} --single-branch https://github.com/AIDASoft/DD4hep.git &&\
-    export ROOTSYS=$ROOTDIR &&\
-    export PYTHONPATH=$ROOTDIR/lib &&\
+    export PYTHONPATH=$ROOTSYS/lib &&\
     export CLING_STANDARD_PCH=none &&\
-    export LD_LIBRARY_PATH=$XercesC_DIR/lib:$ROOTDIR/lib:$G4DIR/lib:$LD_LIBRARY_PATH &&\
-    export CMAKE_PREFIX_PATH=$XercesC_DIR:$ROOTDIR:$G4DIR &&\
+    export LD_LIBRARY_PATH=$XercesC_DIR/lib:$ROOTSYS/lib:$G4DIR/lib:$LD_LIBRARY_PATH &&\
+    export CMAKE_PREFIX_PATH=$XercesC_DIR:$ROOTSYS:$G4DIR &&\
     cmake \
         -DCMAKE_INSTALL_PREFIX=$DD4hep_DIR \
         -DBoost_NO_BOOST_CMAKE=ON \
@@ -190,9 +180,12 @@ RUN git clone -b ${DD4HEP} --single-branch https://github.com/AIDASoft/DD4hep.gi
 # Install Eigen headers into container
 #
 # Assumptions
+#  - EIGEN set to branch/tag name from GitLab repository
 #  - Eigen_DIR set to install path
 ################################################################################
 ENV Eigen_DIR /deps/eigen
+ARG EIGEN=3.3.8
+LABEL eigen.version="${EIGEN}"
 RUN git clone -b ${EIGEN} --single-branch https://gitlab.com/libeigen/eigen.git &&\
     cmake \
         -DCMAKE_INSTALL_PREFIX=$Eigen_DIR \
@@ -206,18 +199,22 @@ RUN git clone -b ${EIGEN} --single-branch https://gitlab.com/libeigen/eigen.git 
     rm -rf eigen
 
 ###############################################################################
-# Update Boost to version 1.74
-#   TEMP: will move up after development
+# Install Boost into the container
+#
+# TODO: THe boost installed from this PPA seems to work with everything,
+#       but cmake complains with piles of warnings.
+# 
+# Assumptions
+#  - BOOST version of boost release available at the referenced PPA
 ###############################################################################
-RUN apt-get purge -y libboost-all-dev &&\
-    apt-get autoremove -y &&\
-    apt-get update &&\
+ARG BOOST=1.74
+LABEL boost.version="${BOOST}"
+RUN apt-get update &&\
     apt-get install -y \
         software-properties-common \
     &&\
     add-apt-repository ppa:mhier/libboost-latest &&\
     apt-get update &&\
-    export BOOST=1.74 &&\
     apt-get install -y libboost${BOOST}-dev &&\
     apt-get purge -y \
         software-properties-common \
@@ -227,24 +224,23 @@ RUN apt-get purge -y libboost-all-dev &&\
 ###############################################################################
 # Install ACTS Common Tracking Software into the container
 #
-# Requires Boost 1.69 (Ubuntu 18.04 packages is only 1.66), 
-# so update to a newer PPA.
-#
 # Assumptions
 #  - Eigen installed at Eigen_DIR
 #  - ACTS_DIR set to install path
-#  - ROOTDIR set to ROOT install path
+#  - ACTS set to branch/tag name of GitHub repository
+#  - ROOTSYS set to ROOT install path
 #  - G4DIR set to Geant4 install path
 #  - XercesC_DIR set to xerces-c install path
 #  - DD4hep_DIR set to DD4hep install path
 ###############################################################################
 ENV ACTS_DIR /deps/acts
+ARG ACTS=v1.1.0
+LABEL acts.version="${ACTS}"
 RUN git clone -b ${ACTS} --single-branch https://github.com/acts-project/acts &&\
-    export ROOTSYS=$ROOTDIR &&\
-    export PYTHONPATH=$ROOTDIR/lib &&\
+    export PYTHONPATH=$ROOTSYS/lib &&\
     export CLING_STANDARD_PCH=none &&\
-    export LD_LIBRARY_PATH=$XercesC_DIR/lib:$ROOTDIR/lib:$G4DIR/lib:$LD_LIBRARY_PATH &&\
-    export CMAKE_PREFIX_PATH=$XercesC_DIR:$ROOTDIR:$G4DIR:$Eigen_DIR &&\
+    export LD_LIBRARY_PATH=$XercesC_DIR/lib:$ROOTSYS/lib:$G4DIR/lib:$LD_LIBRARY_PATH &&\
+    export CMAKE_PREFIX_PATH=$XercesC_DIR:$ROOTSYS:$G4DIR:$Eigen_DIR &&\
     mkdir acts/build &&\
     cmake \
         -DACTS_BUILD_PLUGIN_DD4HEP=ON \
@@ -260,17 +256,15 @@ RUN git clone -b ${ACTS} --single-branch https://github.com/acts-project/acts &&
     &&\
     rm -rf acts
 
-
 ###############################################################################
 # Extra python packages for analysis
 #   
 # Assumptions
-#  - ROOTDIR is installation location of root
+#  - ROOTSYS is installation location of root
 ###############################################################################
-RUN export ROOTSYS=$ROOTDIR &&\
-    export PYTHONPATH=$ROOTDIR/lib &&\
+RUN export PYTHONPATH=$ROOTSYS/lib &&\
     export CLING_STANDARD_PCH=none &&\
-    export LD_LIBRARY_PATH=$XercesC_DIR/lib:$ROOTDIR/lib:$G4DIR/lib:$LD_LIBRARY_PATH &&\
+    export LD_LIBRARY_PATH=$XercesC_DIR/lib:$ROOTSYS/lib:$G4DIR/lib:$LD_LIBRARY_PATH &&\
     python3 -m pip install --upgrade --no-cache-dir \
         uproot \
         numpy \
