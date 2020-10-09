@@ -88,7 +88,7 @@ ARG ROOT=v6-22-00-patches
 LABEL root.version="${ROOT}"
 ENV ROOTSYS /deps/cernroot
 RUN mkdir cernroot &&\
-    git clone -b ${ROOT} --single-branch https://github.com/root-project/root.git &&\
+    git clone -b ${ROOT} --single-branch https://github.com/root-project/root.git cernroot/root &&\
     mkdir /cernroot/build &&\
     cmake \
         -Dxrootd=OFF \
