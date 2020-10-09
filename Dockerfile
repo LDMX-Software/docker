@@ -87,17 +87,22 @@ RUN apt-get update &&\
 ARG ROOT=v6-22-00-patches
 LABEL root.version="${ROOT}"
 ENV ROOTSYS /deps/cernroot
-RUN mkdir cernroot && cd cernroot &&\
+RUN mkdir cernroot &&\
     git clone -b ${ROOT} --single-branch https://github.com/root-project/root.git &&\
-    mkdir build && cd build &&\
+    mkdir /cernroot/build &&\
     cmake \
         -Dxrootd=OFF \
         -DCMAKE_CXX_STANDARD=17 \
         -Dminimal=${MINIMAL} \
         -DCMAKE_INSTALL_PREFIX=$ROOTSYS \
-        ../root &&\
-    cmake --build . --target install &&\
-    cd ../../ && rm -rf cernroot
+        -B /cernroot/build \
+        -S /cernroot/root \
+        &&\
+    cmake \
+        --build /cernroot/build \
+        --target install \
+    &&\
+    rm -rf cernroot
 
 ################################################################################
 # Install Xerces-C into container
@@ -133,16 +138,22 @@ RUN _geant4_remote="https://gitlab.cern.ch/geant4/geant4.git" &&\
         _geant4_remote="https://github.com/LDMX-Software/geant4.git"; \
     fi &&\
     git clone -b ${GEANT4} --single-branch ${_geant4_remote} &&\
-    cd geant4 && mkdir build && cd build &&\
+    mkdir geant4/build &&\
     cmake \
         -DGEANT4_INSTALL_DATA=ON \
         -DGEANT4_USE_GDML=ON \
         -DGEANT4_INSTALL_EXAMPLES=OFF \
         -DXERCESC_ROOT_DIR=$XercesC_DIR \
         -DCMAKE_INSTALL_PREFIX=$G4DIR \
-        .. &&\
+        -B geant4/build \
+        -S geant4
+        &&\
+    cmake \
+        --build geant4/build \
+        --target install \
+    &&\
     make install &&\
-    cd ../../ && rm -rf geant4
+    rm -rf geant4
 
 ###############################################################################
 # Installing DD4hep within the container build
