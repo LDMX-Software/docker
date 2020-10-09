@@ -142,7 +142,7 @@ RUN mkdir xerces-c && cd xerces-c &&\
 ENV G4DIR /deps/geant4
 RUN _geant4_remote="https://gitlab.cern.ch/geant4/geant4.git" &&\
     if echo "${GEANT4}" | grep -q "LDMX"; then \
-        _geant4_remote="https://github.com/LDMX-Software/geant4.git" \
+        _geant4_remote="https://github.com/LDMX-Software/geant4.git"; \
     fi &&\
     git clone -b ${GEANT4} --single-branch ${_geant4_remote} &&\
     cd geant4 && mkdir build && cd build &&\
@@ -162,24 +162,29 @@ RUN _geant4_remote="https://gitlab.cern.ch/geant4/geant4.git" &&\
 # Assumptions
 #  - ROOT installed at $ROOTDIR
 #  - Geant4 installed at $G4DIR
+#  - Xerces-C installed at $XercesC_DIR
 #  - $DD4hep_DIR set to install path
 ###############################################################################
 ENV DD4hep_DIR /deps/dd4hep
-RUN cd ${ROOTDIR}/bin && . thisroot.sh &&\
-    cd ${G4DIR}/bin && . geant4.sh &&\
-    cd / &&\
-    git clone -b ${DD4HEP} --single-branch https://github.com/AIDASoft/DD4hep.git &&\
-    mkdir DD4hep/build && cd DD4hep/build &&\
-    CMAKE_PREFIX_PATH=$XercesC_DIR:$ROOTDIR:$G4DIR cmake \
+RUN git clone -b ${DD4HEP} --single-branch https://github.com/AIDASoft/DD4hep.git &&\
+    export ROOTSYS=$ROOTDIR &&\
+    export PYTHONPATH=$ROOTDIR/lib &&\
+    export CLING_STANDARD_PCH=none &&\
+    export LD_LIBRARY_PATH=$XercesC_DIR/lib:$ROOTDIR/lib:$G4DIR/lib:$LD_LIBRARY_PATH &&\
+    export CMAKE_PREFIX_PATH=$XercesC_DIR:$ROOTDIR:$G4DIR &&\
+    cmake \
         -DCMAKE_INSTALL_PREFIX=$DD4hep_DIR \
         -DBoost_NO_BOOST_CMAKE=ON \
         -DBUILD_TESTING=OFF \
         -DDD4HEP_USE_GEANT4=ON \
-        -DDD4HEP_USE_XSERCESC=ON \
-        -DDD4HEP_BUILD_PACKAGES="DDRec DDDetectors DDCond DDAlign DDCAD DDDigi DDG4" \
-        .. &&\
-    make install &&\
-    cd ../../ && rm -rf DD4hep
+        -B DD4hep/build \
+        -S DD4hep \
+    &&\
+    cmake \
+        --build DD4hep/build \
+        --target install \
+    &&\
+    rm -rf DD4hep
 
 ################################################################################
 # Install Eigen headers into container
@@ -189,10 +194,35 @@ RUN cd ${ROOTDIR}/bin && . thisroot.sh &&\
 ################################################################################
 ENV Eigen_DIR /deps/eigen
 RUN git clone -b ${EIGEN} --single-branch https://gitlab.com/libeigen/eigen.git &&\
-    mkdir eigen/build && cd eigen/build &&\
-    cmake -DCMAKE_INSTALL_PREFIX=$Eigen_DIR .. &&\
-    make install &&\
-    cd ../../ && rm -rf eigen
+    cmake \
+        -DCMAKE_INSTALL_PREFIX=$Eigen_DIR \
+        -B eigen/build \
+        -S eigen \
+    &&\
+    cmake \
+        --build eigen/build \
+        --target install \
+    &&\
+    rm -rf eigen
+
+###############################################################################
+# Update Boost to version 1.74
+#   TEMP: will move up after development
+###############################################################################
+RUN apt-get purge -y libboost-all-dev &&\
+    apt-get autoremove -y &&\
+    apt-get update &&\
+    apt-get install -y \
+        software-properties-common \
+    &&\
+    add-apt-repository ppa:mhier/libboost-latest &&\
+    apt-get update &&\
+    export BOOST=1.74 &&\
+    apt-get install -y libboost${BOOST}-dev &&\
+    apt-get purge -y \
+        software-properties-common \
+    &&\
+    apt-get autoremove -y
 
 ###############################################################################
 # Install ACTS Common Tracking Software into the container
@@ -209,19 +239,50 @@ RUN git clone -b ${EIGEN} --single-branch https://gitlab.com/libeigen/eigen.git 
 #  - DD4hep_DIR set to DD4hep install path
 ###############################################################################
 ENV ACTS_DIR /deps/acts
-RUN add-apt-repository ppa:mhier/libboost-latest &&\
-    apt update &&\
-    apt install -y libboost &&\
-    git clone -b ${ACTS} --single-branch https://github.com/acts-project/acts &&\
-    CMAKE_PREFIX_PATH=$XercesC_DIR:$ROOTDIR:$G4DIR:$DD4hep_DIR cmake \
-        -B acts/build \
-        -S acts \
+RUN git clone -b ${ACTS} --single-branch https://github.com/acts-project/acts &&\
+    export ROOTSYS=$ROOTDIR &&\
+    export PYTHONPATH=$ROOTDIR/lib &&\
+    export CLING_STANDARD_PCH=none &&\
+    export LD_LIBRARY_PATH=$XercesC_DIR/lib:$ROOTDIR/lib:$G4DIR/lib:$LD_LIBRARY_PATH &&\
+    export CMAKE_PREFIX_PATH=$XercesC_DIR:$ROOTDIR:$G4DIR:$Eigen_DIR &&\
+    mkdir acts/build &&\
+    cmake \
         -DACTS_BUILD_PLUGIN_DD4HEP=ON \
         -DACTS_BUILD_EXAMPLES=OFF \
-        -DEigen3_DIR=$Eigen_DIR \
-        -DCMAKE_INSTALL_PREFIX=$ACTS_DIR &&\
-    cmake --build acts/build &&\
+        -DEigen3_DIR=$Eigen_DIR/share/eigen3/cmake \
+        -DCMAKE_INSTALL_PREFIX=$ACTS_DIR \
+        -B acts/build \
+        -S acts \
+    &&\
+    cmake \
+        --build acts/build \
+        --target install \
+    &&\
     rm -rf acts
+
+
+###############################################################################
+# Extra python packages for analysis
+#   
+# Assumptions
+#  - ROOTDIR is installation location of root
+###############################################################################
+RUN export ROOTSYS=$ROOTDIR &&\
+    export PYTHONPATH=$ROOTDIR/lib &&\
+    export CLING_STANDARD_PCH=none &&\
+    export LD_LIBRARY_PATH=$XercesC_DIR/lib:$ROOTDIR/lib:$G4DIR/lib:$LD_LIBRARY_PATH &&\
+    python3 -m pip install --upgrade --no-cache-dir \
+        uproot \
+        numpy \
+        matplotlib \
+        xgboost \
+        sklearn &&\
+    python -m pip install --upgrade --no-cache-dir \
+        uproot \
+        numpy \
+        matplotlib \
+        xgboost \
+        sklearn
 
 # clean up source and build files from apt-get
 RUN rm -rf /tmp/* && apt-get clean && apt-get autoremove 
@@ -229,22 +290,6 @@ RUN rm -rf /tmp/* && apt-get clean && apt-get autoremove
 #copy over necessary running script which sets up environment
 COPY ./ldmx.sh /home/
 RUN chmod 755 /home/ldmx.sh
-
-# extra python packages
-#   we run these python packages through the running script
-#   because we want them to 'know' the container run-time environment
-RUN ./home/ldmx.sh . python3 -m pip install --upgrade --no-cache-dir \
-        uproot \
-        numpy \
-        matplotlib \
-        xgboost \
-        sklearn &&\
-    ./home/ldmx.sh . python -m pip install --upgrade --no-cache-dir \
-        uproot \
-        numpy \
-        matplotlib \
-        xgboost \
-        sklearn
 
 # add any ssl certificates to the container to trust
 COPY ./certs/ /usr/local/share/ca-certificates
