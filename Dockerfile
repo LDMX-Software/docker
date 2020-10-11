@@ -152,7 +152,6 @@ RUN _geant4_remote="https://gitlab.cern.ch/geant4/geant4.git" &&\
         --build geant4/build \
         --target install \
     &&\
-    make install &&\
     rm -rf geant4
 
 ###############################################################################
