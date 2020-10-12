@@ -14,7 +14,6 @@ g++-7 | Compiler with C++17 support
 gcc-7 | Compiler with C++17 support
 git | Downloading dependency sources
 libafterimage-dev |
-libboost-all-dev | ldmx-sw direct dependency
 libcfitsio-dev |
 libfcgi-dev |
 libfftw3-dev |
@@ -48,7 +47,7 @@ libxmu-dev |
 libxpm-dev |
 libz-dev |
 libzstd-dev |
-locales |
+locales | Configuration of TPython and other python packages
 make | Building dependencies and ldmx-sw source
 python-dev | ROOT TPython
 python-pip | For downloading more python packages later
