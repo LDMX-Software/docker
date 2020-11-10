@@ -244,7 +244,7 @@ RUN git clone -b ${EIGEN} --single-branch https://gitlab.com/libeigen/eigen.git 
 #  - DD4hep_DIR set to DD4hep install path
 ###############################################################################
 ENV ACTS_DIR /deps/acts
-ARG ACTS=v1.1.0
+ARG ACTS=v1.2.1
 LABEL acts.version="${ACTS}"
 RUN git clone -b ${ACTS} --single-branch https://github.com/acts-project/acts &&\
     export PYTHONPATH=$ROOTSYS/lib &&\
