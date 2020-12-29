@@ -24,12 +24,17 @@ set -e
 ## Bash environment script for use **within** the docker container
 ## Assuming the following environment variables are already defined by Dockerfile:
 #   XercesC_DIR      - install of xerces-c
-#   ROOTDIR          - install of root
+#   ROOTSYS          - install of root
 #   G4DIR            - install of Geant4
+#   DD4hep_DIR       - install of DD4hep
+#   Eigen_DIR        - install of Eigen3
+#   ACTS_DIR         - install of ACTS
 #   LDMX_BASE        - base directory where all ldmx-sw/ldmx-analysis code is
 
-source $ROOTDIR/bin/thisroot.sh #adds root directories to necessary xxxPATH shell variables
+source $ROOTSYS/bin/thisroot.sh #adds root directories to necessary xxxPATH shell variables
 source $G4DIR/bin/geant4.sh #adds geant4 and xerces-c directories to necessary xxxPATH shell variables
+source $ACTS_DIR/bin/this_acts.sh #adds ACTS 
+source $DD4hep_DIR/bin/thisdd4hep.sh #adds DD4hep
 
 # add ldmx-sw and ldmx-analysis installs to the various paths
 export LDMX_SW_INSTALL=$LDMX_BASE/ldmx-sw/install
@@ -45,7 +50,7 @@ do
 done
 
 # helps simplify any cmake nonsense
-export CMAKE_PREFIX_PATH=$XercesC_DIR:$ROOTDIR:$G4DIR:$LDMX_SW_INSTALL
+export CMAKE_PREFIX_PATH=$XercesC_DIR:$ROOTSYS:$G4DIR:$DD4hep_DIR:$Eigen_DIR:$ACTS_DIR:$LDMX_SW_INSTALL
 
 # puts a config/cache directory for matplotlib to use
 export MPLCONFIGDIR=$LDMX_BASE/.config/matplotlib

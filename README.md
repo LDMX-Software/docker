@@ -4,8 +4,10 @@
     <a href="http://perso.crans.org/besson/LICENSE.html" alt="GPLv3 license">
         <img src="https://img.shields.io/badge/License-GPLv3-blue.svg" />
     </a>
-    <img src="https://github.com/LDMX-Software/docker/workflows/Build/badge.svg" />
-    <a href="https://hub.docker.com/r/ldmx/dev">
+    <a href="https://github.com/LDMX-Software/docker/actions" alt="Actions">
+        <img src="https://github.com/LDMX-Software/docker/workflows/Build/badge.svg" />
+    </a>
+    <a href="https://hub.docker.com/r/ldmx/dev" alt="DockerHub">
         <img src="https://img.shields.io/github/v/release/LDMX-Software/docker" />
     </a>
 </p>
@@ -21,16 +23,38 @@ In _ldmx-sw_, an [environment script](https://github.com/LDMX-Software/ldmx-sw/b
 A description of this setup process is given for both [docker](docs/use_with_docker.md) and [singularity](docs/use_with_singularity.md) if you desire more information.
 
 ## Current Container Configuration
-- Ubuntu 18.04 Server base image
-- python dev, pip, and numpy packages for both versions 2 and 3
-- All boost development packages
-- cmake from python3 pip (currently version 3.18)
-- ROOT built and installed from source for version 6.22 (branch v6-22-00-patches)
-- XercesC built and installed from source version 3.2.3
-- Geant4 built and installed from source version [LDMX.10.2.3\_v0.4](https://github.com/LDMX-Software/geant4/tree/LDMX.10.2.3_v0.4)
-- python packages uproot, numpy, matplotlib, xgboost, and sklearn for both versions 2 and 3
+
+Direct Dependecy of ldmx-sw | Version | Construction Process
+---|---|---
+Ubuntu Server | 18.04 | Base Image
+Python 3 | 3.6.9 | From Ubuntu Repos
+cmake | 3.18 | From python3 pip
+Boost | 1.74 | From custom PPA
+ROOT | 6.22/03 (branch v6-22-00-patches) | Built from source
+XercesC | 3.2.3 | Built from source
+Geant4 | [LDMX.10.2.3\_v0.4](https://github.com/LDMX-Software/geant4/tree/LDMX.10.2.3_v0.4) | Built from source
+DD4hep | v01-14-01 | Built from source
+ACTS | v1.1.0 | Built from source
+
+Other Large Package | Version | Reason | Construction Process
+---|---|---|---
+Python 2 | 2.7.17 | Helpful for those who want to do python2-based analyses, built into ROOT TPython | From Ubuntu Repos
+Eigen | 3.8.3 | ACTS Dependency | Built from source
+
+A detailed list of all packages installed from ubuntu repositories is given [here](docs/ubuntu-packages.md).
+
+### Python Packages for Analyses
+Installed in both Python 2 and Python 3.
+- pip 
+- numpy
+- uproot
+- matplotlib
+- xgboost
+- sklearn
+
+### Other Configuration
 - SSL Certificates that will be trusted by container are in the `certs` directory
 
-### Other Packages
+## Other Packages
 If you would like another package included in the development container, please open an issue in this repository.
 
