@@ -276,12 +276,14 @@ RUN export PYTHONPATH=$ROOTSYS/lib &&\
     export CLING_STANDARD_PCH=none &&\
     export LD_LIBRARY_PATH=$XercesC_DIR/lib:$ROOTSYS/lib:$G4DIR/lib:$LD_LIBRARY_PATH &&\
     python3 -m pip install --upgrade --no-cache-dir \
+        Cython \
         uproot \
         numpy \
         matplotlib \
         xgboost \
         sklearn &&\
     python -m pip install --upgrade --no-cache-dir \
+        Cython \
         uproot \
         numpy \
         matplotlib \
