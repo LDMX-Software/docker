@@ -48,7 +48,7 @@ do
 done
 
 # helps simplify any cmake nonsense
-export CMAKE_PREFIX_PATH=$XercesC_DIR:$ROOTSYS:$G4DIR:$DD4hep_DIR:$Eigen_DIR:$ACTS_DIR:$LDMX_SW_INSTALL
+export CMAKE_PREFIX_PATH=$XercesC_DIR:$ROOTSYS:$G4DIR:$Eigen_DIR:$LDMX_SW_INSTALL
 
 # puts a config/cache directory for matplotlib to use
 export MPLCONFIGDIR=$LDMX_BASE/.config/matplotlib
