@@ -33,8 +33,6 @@ set -e
 
 source $ROOTSYS/bin/thisroot.sh #adds root directories to necessary xxxPATH shell variables
 source $G4DIR/bin/geant4.sh #adds geant4 and xerces-c directories to necessary xxxPATH shell variables
-source $ACTS_DIR/bin/this_acts.sh #adds ACTS 
-source $DD4hep_DIR/bin/thisdd4hep.sh #adds DD4hep
 
 # add ldmx-sw and ldmx-analysis installs to the various paths
 export LDMX_SW_INSTALL=$LDMX_BASE/ldmx-sw/install
@@ -50,7 +48,7 @@ do
 done
 
 # helps simplify any cmake nonsense
-export CMAKE_PREFIX_PATH=$XercesC_DIR:$ROOTSYS:$G4DIR:$DD4hep_DIR:$Eigen_DIR:$ACTS_DIR:$LDMX_SW_INSTALL
+export CMAKE_PREFIX_PATH=$XercesC_DIR:$ROOTSYS:$G4DIR:$Eigen_DIR:$LDMX_SW_INSTALL
 
 # puts a config/cache directory for matplotlib to use
 export MPLCONFIGDIR=$LDMX_BASE/.config/matplotlib
