@@ -94,6 +94,7 @@ RUN mkdir cernroot &&\
         -Dxrootd=OFF \
         -DCMAKE_CXX_STANDARD=17 \
         -Dminimal=${MINIMAL} \
+        -Dopengl=ON \
         -DCMAKE_INSTALL_PREFIX=$ROOTSYS \
         -B /cernroot/build \
         -S /cernroot/root \
@@ -143,6 +144,7 @@ RUN _geant4_remote="https://gitlab.cern.ch/geant4/geant4.git" &&\
         -DGEANT4_INSTALL_DATA=ON \
         -DGEANT4_USE_GDML=ON \
         -DGEANT4_INSTALL_EXAMPLES=OFF \
+        -DGEANT4_USE_OPENGL_X11=ON \
         -DXERCESC_ROOT_DIR=$XercesC_DIR \
         -DCMAKE_INSTALL_PREFIX=$G4DIR \
         -B geant4/build \
