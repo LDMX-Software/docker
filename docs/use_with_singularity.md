@@ -14,7 +14,7 @@ function ldmx() {
     _current_working_dir=${PWD##"${LDMX_BASE}/"} #store current working directory relative to ldmx base
     cd ${LDMX_BASE} # go to ldmx base directory outside container
     # actually run the singularity image stored in the base directory going to working directory inside container
-    singularity run --no-home ${LDMX_SINGULARITY_IMG} ${_current_working_dir} "$@"
+    singularity run --no-home --bind ${LDMX_BASE} --cleanenv --env LDMX_BASE=${LDMX_BASE} ${LDMX_SINGULARITY_IMG} ${_current_working_dir} "$@"
     cd - &> /dev/null #go back outside the container
 }
 ```
@@ -37,6 +37,9 @@ Then we enter the container there before going back to where the user was _while
 singularity \ #base singularity command
     run \ #run the container
     --no-home \ #don't mount home directory (might overlap with current directory)
+    --bind ${LDMX_BASE} \ #mount the directory containting all things LDMX
+    --cleanenv \ #don't copy the environment variables into the container
+    --env LDMX_BASE=${LDMX_BASE} \ #copy the one environment variable we need shared with the container
     ${LDMX_SINGULARITY_IMG} \ #full path to singularity image to make container out of
     ${_current_working_dir} \ #go to the working directory after entering the container
     "$@" #run the arguments given by the user as a command in the container
