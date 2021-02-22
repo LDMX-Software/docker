@@ -139,7 +139,7 @@ RUN _geant4_remote="https://gitlab.cern.ch/geant4/geant4.git" &&\
         _geant4_remote="https://github.com/LDMX-Software/geant4.git"; \
     fi &&\
     git clone -b ${GEANT4} --single-branch ${_geant4_remote} &&\
-    mkdir geant4/build &&\
+    cd geant4 &&\
     cmake \
         -DGEANT4_INSTALL_DATA=ON \
         -DGEANT4_USE_GDML=ON \
@@ -147,14 +147,14 @@ RUN _geant4_remote="https://gitlab.cern.ch/geant4/geant4.git" &&\
         -DGEANT4_USE_OPENGL_X11=ON \
         -DXERCESC_ROOT_DIR=$XercesC_DIR \
         -DCMAKE_INSTALL_PREFIX=$G4DIR \
-        -B geant4/build \
-        -S geant4 \
+        -B build \
+        -S . \
         &&\
     cmake \
-        --build geant4/build \
+        --build build \
         --target install \
     &&\
-    rm -rf geant4
+    cd .. && rm -rf geant4
 
 ###############################################################################
 # Install Boost into the container
