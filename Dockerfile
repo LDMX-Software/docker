@@ -27,6 +27,7 @@ RUN apt-get update &&\
         gcc-7 \
         git \
         libafterimage-dev \
+        libboost-all-dev \
         libcfitsio-dev \
         libfcgi-dev \
         libfftw3-dev \
@@ -94,6 +95,7 @@ RUN mkdir cernroot &&\
         -Dxrootd=OFF \
         -DCMAKE_CXX_STANDARD=17 \
         -Dminimal=${MINIMAL} \
+        -Dopengl=ON \
         -DCMAKE_INSTALL_PREFIX=$ROOTSYS \
         -B /cernroot/build \
         -S /cernroot/root \
@@ -138,44 +140,22 @@ RUN _geant4_remote="https://gitlab.cern.ch/geant4/geant4.git" &&\
         _geant4_remote="https://github.com/LDMX-Software/geant4.git"; \
     fi &&\
     git clone -b ${GEANT4} --single-branch ${_geant4_remote} &&\
-    mkdir geant4/build &&\
+    cd geant4 &&\
     cmake \
         -DGEANT4_INSTALL_DATA=ON \
         -DGEANT4_USE_GDML=ON \
         -DGEANT4_INSTALL_EXAMPLES=OFF \
+        -DGEANT4_USE_OPENGL_X11=ON \
         -DXERCESC_ROOT_DIR=$XercesC_DIR \
         -DCMAKE_INSTALL_PREFIX=$G4DIR \
-        -B geant4/build \
-        -S geant4 \
+        -B build \
+        -S . \
         &&\
     cmake \
-        --build geant4/build \
+        --build build \
         --target install \
     &&\
-    rm -rf geant4
-
-###############################################################################
-# Install Boost into the container
-#
-# TODO: THe boost installed from this PPA seems to work with everything,
-#       but cmake complains with piles of warnings.
-# 
-# Assumptions
-#  - BOOST version of boost release available at the referenced PPA
-###############################################################################
-ARG BOOST=1.74
-LABEL boost.version="${BOOST}"
-RUN apt-get update &&\
-    apt-get install -y \
-        software-properties-common \
-    &&\
-    add-apt-repository ppa:mhier/libboost-latest &&\
-    apt-get update &&\
-    apt-get install -y libboost${BOOST}-dev &&\
-    apt-get purge -y \
-        software-properties-common \
-    &&\
-    apt-get autoremove -y
+    cd .. && rm -rf geant4
 
 ###############################################################################
 # Extra python packages for analysis
