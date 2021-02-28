@@ -33,3 +33,13 @@ docker \ #base docker command
     ${LDMX_DOCKER_TAG} \ #docker image to build container from
     $(pwd) \ #go to present directory inside the continaer
 ```
+
+### Display Connection
+In order to connect the display, you need to add two more parameters to the above `docker run` command.
+This only works for Unix-based systems (Linux and MacOS), the windows connection procedure is [far more complicated](https://cuneyt.aliustaoglu.biz/en/running-gui-applications-in-docker-on-windows-linux-mac-hosts/).
+
+0. Define how to interface wiith the display.
+   - For Linux: `export LDMX_CONTAINER_DISPLAY=""`
+   - For MacOS: `export LDMX_CONTAINER_DISPLAY="docker.for.mac.host.internal"`
+1. Define the `DISPLAY` environment variable for inside the container. `-e DISPLAY=${LDMX_CONTAINER_DISPLAY}:0`
+2. Mount the cache directory for the window manager for the container to share. `-v /tmp/.X11-unix:/tmp/.X11-unix`
