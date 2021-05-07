@@ -131,7 +131,7 @@ RUN mkdir xerces-c && cd xerces-c &&\
 #  - G4DIR set to path where Geant4 should be installed
 ###############################################################################
 ENV G4DIR /deps/geant4
-ARG GEANT4=geant4-10.5-release
+ARG GEANT4=LDMX.10.2.3_v0.4
 LABEL geant4.version="${GEANT4}"
 RUN _geant4_remote="https://gitlab.cern.ch/geant4/geant4.git" &&\
     if echo "${GEANT4}" | grep -q "LDMX"; then \
@@ -193,13 +193,12 @@ LABEL dd4hep.version="${DD4HEP}"
 RUN git clone -b ${DD4HEP} --single-branch https://github.com/AIDASoft/DD4hep.git &&\
     export PYTHONPATH=$ROOTSYS/lib &&\
     export CLING_STANDARD_PCH=none &&\
-    export LD_LIBRARY_PATH=$XercesC_DIR/lib:$ROOTSYS/lib:$G4DIR/lib:$LD_LIBRARY_PATH &&\
-    export CMAKE_PREFIX_PATH=$XercesC_DIR:$ROOTSYS:$G4DIR &&\
+    export LD_LIBRARY_PATH=$XercesC_DIR/lib:$ROOTSYS/lib:$LD_LIBRARY_PATH &&\
+    export CMAKE_PREFIX_PATH=$XercesC_DIR:$ROOTSYS &&\
     cmake \
         -DCMAKE_INSTALL_PREFIX=$DD4hep_DIR \
         -DBoost_NO_BOOST_CMAKE=ON \
         -DBUILD_TESTING=OFF \
-        -DDD4HEP_USE_GEANT4=ON \
         -B DD4hep/build \
         -S DD4hep \
     &&\
@@ -249,8 +248,8 @@ LABEL acts.version="${ACTS}"
 RUN git clone -b ${ACTS} --single-branch https://github.com/acts-project/acts &&\
     export PYTHONPATH=$ROOTSYS/lib &&\
     export CLING_STANDARD_PCH=none &&\
-    export LD_LIBRARY_PATH=$XercesC_DIR/lib:$ROOTSYS/lib:$G4DIR/lib:$LD_LIBRARY_PATH &&\
-    export CMAKE_PREFIX_PATH=$XercesC_DIR:$ROOTSYS:$G4DIR:$Eigen_DIR &&\
+    export LD_LIBRARY_PATH=$XercesC_DIR/lib:$ROOTSYS/lib:$LD_LIBRARY_PATH &&\
+    export CMAKE_PREFIX_PATH=$XercesC_DIR:$ROOTSYS:$Eigen_DIR &&\
     mkdir acts/build &&\
     cmake \
         -DACTS_BUILD_PLUGIN_DD4HEP=ON \
