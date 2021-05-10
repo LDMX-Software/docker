@@ -33,8 +33,8 @@ Boost | 1.74 | From custom PPA
 ROOT | 6.22/03 (branch v6-22-00-patches) | Built from source
 XercesC | 3.2.3 | Built from source
 Geant4 | [LDMX.10.2.3\_v0.4](https://github.com/LDMX-Software/geant4/tree/LDMX.10.2.3_v0.4) | Built from source
-DD4hep | v01-14-01 | Built from source
-ACTS | v1.1.0 | Built from source
+DD4hep | [v01-16-01](https://github.com/AIDASoft/DD4hep) | Built from source
+ACTS | [v8.2.0](https://github.com/acts-project/acts) | Built from source
 
 Other Large Package | Version | Reason | Construction Process
 ---|---|---|---

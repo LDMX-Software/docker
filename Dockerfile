@@ -188,7 +188,7 @@ RUN apt-get update &&\
 #  - $DD4hep_DIR set to install path
 ###############################################################################
 ENV DD4hep_DIR /deps/dd4hep
-ARG DD4HEP=v01-14-01
+ARG DD4HEP=v01-16-01
 LABEL dd4hep.version="${DD4HEP}"
 RUN git clone -b ${DD4HEP} --single-branch https://github.com/AIDASoft/DD4hep.git &&\
     export PYTHONPATH=$ROOTSYS/lib &&\
@@ -243,7 +243,7 @@ RUN git clone -b ${EIGEN} --single-branch https://gitlab.com/libeigen/eigen.git 
 #  - DD4hep_DIR set to DD4hep install path
 ###############################################################################
 ENV ACTS_DIR /deps/acts
-ARG ACTS=v1.2.1
+ARG ACTS=v8.2.0
 LABEL acts.version="${ACTS}"
 RUN git clone -b ${ACTS} --single-branch https://github.com/acts-project/acts &&\
     export PYTHONPATH=$ROOTSYS/lib &&\
