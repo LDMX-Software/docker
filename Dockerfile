@@ -85,7 +85,7 @@ RUN apt-get update &&\
 #  - MINIMAL defined as either ON or OFF
 #  - ROOTSYS defined as target install location
 ###############################################################################
-ARG ROOT=v6-22-00-patches
+ARG ROOT=v6-18-04
 LABEL root.version="${ROOT}"
 ENV ROOTSYS /deps/cernroot
 RUN mkdir cernroot &&\
@@ -163,23 +163,23 @@ RUN _geant4_remote="https://gitlab.cern.ch/geant4/geant4.git" &&\
 # Assumptions
 #  - ROOTSYS is installation location of root
 ###############################################################################
-RUN export PYTHONPATH=$ROOTSYS/lib &&\
-    export CLING_STANDARD_PCH=none &&\
-    export LD_LIBRARY_PATH=$XercesC_DIR/lib:$ROOTSYS/lib:$G4DIR/lib:$LD_LIBRARY_PATH &&\
-    python3 -m pip install --upgrade --no-cache-dir \
-        Cython \
-        uproot \
-        numpy \
-        matplotlib \
-        xgboost \
-        sklearn &&\
-    python -m pip install --upgrade --no-cache-dir \
-        Cython \
-        uproot \
-        numpy \
-        matplotlib \
-        xgboost \
-        sklearn
+#RUN export PYTHONPATH=$ROOTSYS/lib &&\
+#    export CLING_STANDARD_PCH=none &&\
+#    export LD_LIBRARY_PATH=$XercesC_DIR/lib:$ROOTSYS/lib:$G4DIR/lib:$LD_LIBRARY_PATH &&\
+#    python3 -m pip install --upgrade --no-cache-dir \
+#        Cython \
+#        uproot \
+#        numpy \
+#        matplotlib \
+#        xgboost \
+#        sklearn &&\
+#    python -m pip install --upgrade --no-cache-dir \
+#        Cython \
+#        uproot \
+#        numpy \
+#        matplotlib \
+#        xgboost \
+#        sklearn
 
 # clean up source and build files from apt-get
 RUN rm -rf /tmp/* && apt-get clean && apt-get autoremove 
