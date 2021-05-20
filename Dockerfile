@@ -193,6 +193,7 @@ COPY ./certs/ /usr/local/share/ca-certificates
 RUN update-ca-certificates
 
 # install ldmx-sw
+RUN ls -lah
 COPY ./ldmx-sw /ldmx-sw-code
 RUN mkdir /ldmx-sw-code/build &&\
     ./home/ldmx.sh /ldmx-sw-code/build cmake -DCMAKE_INSTALL_PREFIX=/usr/local .. &&\
