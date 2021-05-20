@@ -95,7 +95,6 @@ RUN mkdir cernroot &&\
         -Dxrootd=OFF \
         -DCMAKE_CXX_STANDARD=17 \
         -Dminimal=${MINIMAL} \
-        -Dopengl=ON \
         -DCMAKE_INSTALL_PREFIX=$ROOTSYS \
         -B /cernroot/build \
         -S /cernroot/root \
