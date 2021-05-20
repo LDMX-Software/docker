@@ -8,7 +8,7 @@ MAINTAINER Tom Eichlersmith <eichl008@umn.edu>
 #   It is still in development
 #
 # The options are: "ON" or "OFF"
-ARG MINIMAL=OFF
+ARG MINIMAL=ON
 LABEL minimal="${MINIMAL}"
 
 # First install any required dependencies from ubuntu repos
