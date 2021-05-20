@@ -50,6 +50,7 @@ jobs:
       name: Determine Image Tags
       id: generate_tag
       run: |
+          ls -alh
           _repo=ldmx/dev
           _tag=noop
           if [[ $GITHUB_REF == refs/tags/* ]]; then
