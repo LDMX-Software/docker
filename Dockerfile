@@ -192,6 +192,13 @@ RUN chmod 755 /home/ldmx.sh
 COPY ./certs/ /usr/local/share/ca-certificates
 RUN update-ca-certificates
 
-#run environment setup when docker container is launched and decide what to do from there
-#   will require the environment variable LDMX_BASE defined
-ENTRYPOINT ["/home/ldmx.sh"]
+# install ldmx-sw
+COPY ./ldmx-sw/ /ldmx-sw-code
+RUN mkdir /ldmx-sw-code/build &&\
+    ./home/ldmx.sh /ldmx-sw-code/build cmake -DCMAKE_INSTALL_PREFIX=/usr/local .. &&\
+    ./home/ldmx.sh /ldmx-sw-code/build make install &&\
+    rm -rf ldmx-sw-code
+
+COPY ./ldmx-sw/scripts/docker_entrypoint.sh /home/entrypoint.sh
+RUN chmod 755 /home/entrypoint.sh
+ENTRYPOINT ["/home/entrypoint.sh"]
