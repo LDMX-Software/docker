@@ -133,7 +133,7 @@ RUN mkdir xerces-c && cd xerces-c &&\
 #  - G4DIR set to path where Geant4 should be installed
 ###############################################################################
 ENV G4DIR /deps/geant4
-ARG GEANT4=LDMX.10.2.3_v0.4
+ARG GEANT4=LDMX.upKaonsAll
 LABEL geant4.version="${GEANT4}"
 RUN _geant4_remote="https://gitlab.cern.ch/geant4/geant4.git" &&\
     if echo "${GEANT4}" | grep -q "LDMX"; then \
