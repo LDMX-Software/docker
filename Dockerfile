@@ -8,7 +8,7 @@ MAINTAINER Tom Eichlersmith <eichl008@umn.edu>
 #   It is still in development
 #
 # The options are: "ON" or "OFF"
-ARG MINIMAL=ON
+ARG MINIMAL=OFF
 LABEL minimal="${MINIMAL}"
 
 # First install any required dependencies from ubuntu repos
@@ -156,30 +156,6 @@ RUN _geant4_remote="https://gitlab.cern.ch/geant4/geant4.git" &&\
     &&\
     cd .. && rm -rf geant4
 
-###############################################################################
-# Extra python packages for analysis
-#   
-# Assumptions
-#  - ROOTSYS is installation location of root
-###############################################################################
-#RUN export PYTHONPATH=$ROOTSYS/lib &&\
-#    export CLING_STANDARD_PCH=none &&\
-#    export LD_LIBRARY_PATH=$XercesC_DIR/lib:$ROOTSYS/lib:$G4DIR/lib:$LD_LIBRARY_PATH &&\
-#    python3 -m pip install --upgrade --no-cache-dir \
-#        Cython \
-#        uproot \
-#        numpy \
-#        matplotlib \
-#        xgboost \
-#        sklearn &&\
-#    python -m pip install --upgrade --no-cache-dir \
-#        Cython \
-#        uproot \
-#        numpy \
-#        matplotlib \
-#        xgboost \
-#        sklearn
-
 # clean up source and build files from apt-get
 RUN rm -rf /tmp/* && apt-get clean && apt-get autoremove 
 
@@ -190,14 +166,3 @@ RUN chmod 755 /home/ldmx.sh
 # add any ssl certificates to the container to trust
 COPY ./certs/ /usr/local/share/ca-certificates
 RUN update-ca-certificates
-
-# install ldmx-sw
-COPY ./ldmx-sw /ldmx-sw-code
-RUN mkdir /ldmx-sw-code/build &&\
-    ./home/ldmx.sh /ldmx-sw-code/build cmake -DCMAKE_INSTALL_PREFIX=/usr/local .. &&\
-    ./home/ldmx.sh /ldmx-sw-code/build make install &&\
-    mv /ldmx-sw-code/scripts/docker_entrypoint.sh /home/entrypoint.sh &&\
-    rm -rf ldmx-sw-code
-
-RUN chmod 755 /home/entrypoint.sh
-ENTRYPOINT ["/home/entrypoint.sh"]
