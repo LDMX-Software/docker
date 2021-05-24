@@ -192,12 +192,12 @@ COPY ./certs/ /usr/local/share/ca-certificates
 RUN update-ca-certificates
 
 # install ldmx-sw
-#COPY ./ldmx-sw /ldmx-sw-code
-#RUN mkdir /ldmx-sw-code/build &&\
-#    ./home/ldmx.sh /ldmx-sw-code/build cmake -DCMAKE_INSTALL_PREFIX=/usr/local .. &&\
-#    ./home/ldmx.sh /ldmx-sw-code/build make install &&\
-#    mv /ldmx-sw-code/scripts/docker_entrypoint.sh /home/entrypoint.sh &&\
-#    rm -rf ldmx-sw-code
-#
-#RUN chmod 755 /home/entrypoint.sh
-#ENTRYPOINT ["/home/entrypoint.sh"]
+COPY ./ldmx-sw /ldmx-sw-code
+RUN mkdir /ldmx-sw-code/build &&\
+    ./home/ldmx.sh /ldmx-sw-code/build cmake -DCMAKE_INSTALL_PREFIX=/usr/local .. &&\
+    ./home/ldmx.sh /ldmx-sw-code/build make install &&\
+    mv /ldmx-sw-code/scripts/docker_entrypoint.sh /home/entrypoint.sh &&\
+    rm -rf ldmx-sw-code
+
+RUN chmod 755 /home/entrypoint.sh
+ENTRYPOINT ["/home/entrypoint.sh"]
