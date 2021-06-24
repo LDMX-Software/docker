@@ -249,7 +249,7 @@ RUN git clone -b ${ACTS} --single-branch https://github.com/acts-project/acts &&
     export PYTHONPATH=$ROOTSYS/lib &&\
     export CLING_STANDARD_PCH=none &&\
     export LD_LIBRARY_PATH=$XercesC_DIR/lib:$ROOTSYS/lib:$LD_LIBRARY_PATH &&\
-    export CMAKE_PREFIX_PATH=$XercesC_DIR:$ROOTSYS:$Eigen_DIR &&\
+    export CMAKE_PREFIX_PATH=$XercesC_DIR:$ROOTSYS:$Eigen_DIR:${CMAKE_PREFIX_PATH} &&\
     mkdir acts/build &&\
     cmake \
         -DACTS_BUILD_PLUGIN_DD4HEP=ON \
