@@ -251,11 +251,12 @@ RUN git clone -b ${ACTS} --single-branch https://github.com/acts-project/acts &&
     export LD_LIBRARY_PATH=$XercesC_DIR/lib:$ROOTSYS/lib:$LD_LIBRARY_PATH &&\
     export CMAKE_PREFIX_PATH=$XercesC_DIR:$ROOTSYS:$Eigen_DIR:${CMAKE_PREFIX_PATH} &&\
     mkdir acts/build &&\
+    cmake --version &&\
     cmake \
         -DACTS_BUILD_PLUGIN_DD4HEP=ON \
         -DACTS_BUILD_EXAMPLES=OFF \
         -DEigen3_DIR=$Eigen_DIR/share/eigen3/cmake \
-        -DBoost_NO_BOOST_CMAKE=ON \
+        -DBOOST_ROOT=/usr/ \
         -DCMAKE_INSTALL_PREFIX=$ACTS_DIR \
         -B acts/build \
         -S acts \
