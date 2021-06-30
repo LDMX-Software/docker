@@ -250,7 +250,6 @@ RUN git clone -b ${ACTS} --single-branch https://github.com/acts-project/acts &&
         -DACTS_BUILD_PLUGIN_DD4HEP=ON \
         -DACTS_BUILD_EXAMPLES=OFF \
         -DEigen3_DIR=$Eigen_DIR/share/eigen3/cmake \
-        -DBOOST_ROOT=/usr/ \
         -DCMAKE_INSTALL_PREFIX=$ACTS_DIR \
         -B acts/build \
         -S acts \
