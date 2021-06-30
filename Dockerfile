@@ -168,6 +168,7 @@ RUN mkdir /boost && cd /boost &&\
     cd boost_*/ &&\
     ./bootstrap.sh &&\
     ./b2 install &&\
+    ldconfig &&\
     cd / && rm -rf boost
 
 ###############################################################################
