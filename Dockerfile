@@ -156,26 +156,19 @@ RUN _geant4_remote="https://gitlab.cern.ch/geant4/geant4.git" &&\
 
 ###############################################################################
 # Install Boost into the container
-#
-# TODO: THe boost installed from this PPA seems to work with everything,
-#       but cmake complains with piles of warnings.
 # 
 # Assumptions
-#  - BOOST version of boost release available at the referenced PPA
+#  - BOOST version of boost release matches source archive being downloaded
 ###############################################################################
-ARG BOOST=1.74
+ARG BOOST=1.76.0
 LABEL boost.version="${BOOST}"
-RUN apt-get update &&\
-    apt-get install -y \
-        software-properties-common \
-    &&\
-    add-apt-repository ppa:mhier/libboost-latest &&\
-    apt-get update &&\
-    apt-get install -y libboost${BOOST}-dev &&\
-    apt-get purge -y \
-        software-properties-common \
-    &&\
-    apt-get autoremove -y
+RUN mkdir /boost && cd /boost &&\
+    wget https://boostorg.jfrog.io/artifactory/main/release/1.76.0/source/boost_1_76_0.tar.gz &&\
+    tar -zxvf boost*.tar.gz &&\
+    cd boost_*/ &&\
+    ./bootstrap.sh &&\
+    ./b2 install &&\
+    cd / && rm -rf boost
 
 ###############################################################################
 # Installing DD4hep within the container build
