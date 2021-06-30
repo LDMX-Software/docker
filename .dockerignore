@@ -1,11 +1,8 @@
-# ignore the .git directory
+# ignore the .git directories
 .git**
-
 # ignore README
 README*
-
-# ignore derivatives
-derivatives/**
-
+# ignore tmp directory
+tmp/**
 # ignore documentation
 docs/**
