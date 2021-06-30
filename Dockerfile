@@ -191,7 +191,6 @@ RUN git clone -b ${DD4HEP} --single-branch https://github.com/AIDASoft/DD4hep.gi
     export CMAKE_PREFIX_PATH=$XercesC_DIR:$ROOTSYS &&\
     cmake \
         -DCMAKE_INSTALL_PREFIX=$DD4hep_DIR \
-        -DBoost_NO_BOOST_CMAKE=ON \
         -DBUILD_TESTING=OFF \
         -B DD4hep/build \
         -S DD4hep \
@@ -249,7 +248,6 @@ RUN git clone -b ${ACTS} --single-branch https://github.com/acts-project/acts &&
     cmake \
         -DACTS_BUILD_PLUGIN_DD4HEP=ON \
         -DACTS_BUILD_EXAMPLES=OFF \
-        -DEigen3_DIR=$Eigen_DIR/share/eigen3/cmake \
         -DCMAKE_INSTALL_PREFIX=$ACTS_DIR \
         -B acts/build \
         -S acts \
