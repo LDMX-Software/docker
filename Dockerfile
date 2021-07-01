@@ -86,7 +86,7 @@ RUN mkdir src &&\
     ${__wget} https://boostorg.jfrog.io/artifactory/main/release/1.76.0/source/boost_1_76_0.tar.gz |\
       ${__untar} &&\
     cd src &&\
-    ./bootstrap.sh &&\
+    ./bootstrap.sh --prefix ${__prefix} &&\
     ./b2 install &&\
     ldconfig &&\
     cd .. && rm -rf src
@@ -96,7 +96,8 @@ RUN mkdir src &&\
 ###############################################################################
 LABEL root.version="6.22.08"
 RUN mkdir src &&\
-    ${__wget} https://root.cern/download/root_v6.22.08.source.tar.gz | ${__untar} &&\
+    ${__wget} https://root.cern/download/root_v6.22.08.source.tar.gz |\
+     ${__untar} &&\
     cmake \
       -DCMAKE_BUILD_TYPE=Release \
       -DCMAKE_CXX_STANDARD=17 \
@@ -120,8 +121,8 @@ RUN mkdir src &&\
 #  - XercesC_DIR set to target installation location
 ################################################################################
 LABEL xercesc.version="3.2.3"
-RUN mkdir src \
-    && ${__wget} http://archive.apache.org/dist/xerces/c/3/sources/xerces-c-${XERCESC}.tar.gz |\
+RUN mkdir src &&\
+    ${__wget} http://archive.apache.org/dist/xerces/c/3/sources/xerces-c-${XERCESC}.tar.gz |\
       ${__untar} \
     cmake -B build -S src -DCMAKE_INSTALL_PREFIX=${__prefix} &&\
     make install &&\
@@ -135,30 +136,29 @@ RUN mkdir src \
 #  - XercesC_DIR set to install of Xerces-C
 #  - G4DIR set to path where Geant4 should be installed
 ###############################################################################
-ENV G4DIR /deps/geant4
 ARG GEANT4=LDMX.10.2.3_v0.4
 LABEL geant4.version="${GEANT4}"
-RUN _geant4_remote="https://gitlab.cern.ch/geant4/geant4.git" &&\
-    if echo "${GEANT4}" | grep -q "LDMX"; then \
-        _geant4_remote="https://github.com/LDMX-Software/geant4.git"; \
-    fi &&\
-    git clone -b ${GEANT4} --single-branch ${_geant4_remote} &&\
-    cd geant4 &&\
+RUN __owner="geant4" &&\
+    echo "${GEANT4}" | grep -q "LDMX" && __owner="LDMX-Software" &&\
+    mkdir src &&\
+    ${__wget} https://github.com/${__owner}/geant4/archive/${GEANT4}.tar.gz | ${__untar} &&\
     cmake \
         -DGEANT4_INSTALL_DATA=ON \
         -DGEANT4_USE_GDML=ON \
         -DGEANT4_INSTALL_EXAMPLES=OFF \
         -DGEANT4_USE_OPENGL_X11=ON \
         -DXERCESC_ROOT_DIR=$XercesC_DIR \
-        -DCMAKE_INSTALL_PREFIX=$G4DIR \
-        -B build \
-        -S . \
+        -DCMAKE_INSTALL_PREFIX=${__prefix} \
+        -B src/build \
+        -S src \
         &&\
     cmake \
-        --build build \
+        --build src/build \
         --target install \
     &&\
-    cd .. && rm -rf geant4
+    rm -rf src
+
+RUN ldconfig
 
 ###############################################################################
 # Extra python packages for analysis
@@ -166,17 +166,9 @@ RUN _geant4_remote="https://gitlab.cern.ch/geant4/geant4.git" &&\
 # Assumptions
 #  - ROOTSYS is installation location of root
 ###############################################################################
-RUN export PYTHONPATH=$ROOTSYS/lib &&\
-    export CLING_STANDARD_PCH=none &&\
-    export LD_LIBRARY_PATH=$XercesC_DIR/lib:$ROOTSYS/lib:$G4DIR/lib:$LD_LIBRARY_PATH &&\
-    python3 -m pip install --upgrade --no-cache-dir \
-        Cython \
-        uproot \
-        numpy \
-        matplotlib \
-        xgboost \
-        sklearn &&\
-    python -m pip install --upgrade --no-cache-dir \
+ENV PYTHONPATH /usr/local/lib
+ENV CLING_STANDARD_PCH none
+RUN python3 -m pip install --upgrade --no-cache-dir \
         Cython \
         uproot \
         numpy \
@@ -193,7 +185,7 @@ RUN chmod 755 /home/ldmx.sh
 
 # add any ssl certificates to the container to trust
 COPY ./certs/ /usr/local/share/ca-certificates
-RUN update-ca-certificates
+RUN update-ca-certificates && ldconfig
 
 #run environment setup when docker container is launched and decide what to do from there
 #   will require the environment variable LDMX_BASE defined
