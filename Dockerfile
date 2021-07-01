@@ -3,14 +3,6 @@ FROM ubuntu:18.04
 LABEL ubuntu.version="18.04"
 MAINTAINER Tom Eichlersmith <eichl008@umn.edu>
 
-# The minimal argument is an attempt to decrease the size of the container
-# by only including necessary packages/libraries for running ldmx-sw.
-#   It is still in development
-#
-# The options are: "ON" or "OFF"
-ARG MINIMAL=OFF
-LABEL minimal="${MINIMAL}"
-
 # First install any required dependencies from ubuntu repos
 #   TODO clean up this dependency list
 # Ongoing documentation for this list is in docs/ubuntu-packages.md
@@ -27,7 +19,6 @@ RUN apt-get update &&\
         gcc-7 \
         git \
         libafterimage-dev \
-        libboost-all-dev \
         libcfitsio-dev \
         libfcgi-dev \
         libfftw3-dev \
@@ -78,33 +69,48 @@ RUN apt-get update &&\
     python3 -m pip install --upgrade --no-cache-dir cmake
 
 ###############################################################################
-# Install CERN's ROOT into the container
+# Source-Code Downloading Method
+#   mkdir src && ${__wget} <url-to-tar.gz-source-archive> | ${__untar}
 #
-# Assumptions
-#  - ROOT defined as a  tag/branch of ROOT's git source tree
-#  - MINIMAL defined as either ON or OFF
-#  - ROOTSYS defined as target install location
+#   Adapted from acts-project/machines
 ###############################################################################
-ARG ROOT=v6-22-00-patches
-LABEL root.version="${ROOT}"
-ENV ROOTSYS /deps/cernroot
-RUN mkdir cernroot &&\
-    git clone -b ${ROOT} --single-branch https://github.com/root-project/root.git cernroot/root &&\
-    mkdir /cernroot/build &&\
+ENV __wget wget -q -O -
+ENV __untar tar -xz --strip-components=1 --directory src
+ENV __prefix /usr/local
+
+###############################################################################
+# Install Boost
+###############################################################################
+LABEL boost.version="1.76.0"
+RUN mkdir src &&\
+    ${__wget} https://boostorg.jfrog.io/artifactory/main/release/1.76.0/source/boost_1_76_0.tar.gz |\
+      ${__untar} &&\
+    cd src &&\
+    ./bootstrap.sh &&\
+    ./b2 install &&\
+    ldconfig &&\
+    cd .. && rm -rf src
+
+###############################################################################
+# Install CERN's ROOT into the container
+###############################################################################
+LABEL root.version="6.22.08"
+RUN mkdir src &&\
+    ${__wget} https://root.cern/download/root_v6.22.08.source.tar.gz | ${__untar} &&\
     cmake \
-        -Dxrootd=OFF \
-        -DCMAKE_CXX_STANDARD=17 \
-        -Dminimal=${MINIMAL} \
-        -Dopengl=ON \
-        -DCMAKE_INSTALL_PREFIX=$ROOTSYS \
-        -B /cernroot/build \
-        -S /cernroot/root \
-        &&\
-    cmake \
-        --build /cernroot/build \
-        --target install \
-    &&\
-    rm -rf cernroot
+      -DCMAKE_BUILD_TYPE=Release \
+      -DCMAKE_CXX_STANDARD=17 \
+      -DCMAKE_INSTALL_PREFIX=${__prefix} \
+      -Dgminimal=ON \
+      -Dgdml=ON \
+      -Dopengl=ON \
+      -Dpyroot=ON \
+      -Dgnuinstall=ON \
+      -Dxrootd=OFF \
+      -B build \
+      -S src \
+    && cmake --build build --target install \
+    && rm -rf build src
 
 ################################################################################
 # Install Xerces-C into container
@@ -113,16 +119,13 @@ RUN mkdir cernroot &&\
 #  - XERCESC set to version matching an archived location of its source
 #  - XercesC_DIR set to target installation location
 ################################################################################
-ENV XercesC_DIR /deps/xerces-c
-ARG XERCESC=3.2.3
-LABEL xercesc.version="${XERCESC}"
-RUN mkdir xerces-c && cd xerces-c &&\
-    wget http://archive.apache.org/dist/xerces/c/3/sources/xerces-c-${XERCESC}.tar.gz &&\
-    tar -zxvf xerces-c-*.tar.gz &&\
-    cd xerces* && mkdir build && cd build &&\
-    cmake -DCMAKE_INSTALL_PREFIX=$XercesC_DIR .. &&\
+LABEL xercesc.version="3.2.3"
+RUN mkdir src \
+    && ${__wget} http://archive.apache.org/dist/xerces/c/3/sources/xerces-c-${XERCESC}.tar.gz |\
+      ${__untar} \
+    cmake -B build -S src -DCMAKE_INSTALL_PREFIX=${__prefix} &&\
     make install &&\
-    cd ../../../ && rm -rf xerces-c
+    rm -rf src
 
 ###############################################################################
 # Install Geant4 into the container
