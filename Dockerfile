@@ -76,6 +76,11 @@ RUN apt-get update &&\
     && rm -rf /var/lib/apt/lists/* &&\
     python3 -m pip install --upgrade --no-cache-dir cmake
 
+# Our source-downloading method pipe wget to tar
+#   ${__ldmx_wget} <url> | ${__ldmx_untar}
+ENV __ldmx_wget wget -q -O -
+ENV __ldmx_untar tar -xz --strip-components=1 --directory src
+
 ###############################################################################
 # Install CERN's ROOT into the container
 #
@@ -112,15 +117,14 @@ RUN mkdir cernroot &&\
 #  - XercesC_DIR set to target installation location
 ################################################################################
 ENV XercesC_DIR /deps/xerces-c
-ARG XERCESC=3.2.3
-LABEL xercesc.version="${XERCESC}"
-RUN mkdir xerces-c && cd xerces-c &&\
-    wget http://archive.apache.org/dist/xerces/c/3/sources/xerces-c-${XERCESC}.tar.gz &&\
-    tar -zxvf xerces-c-*.tar.gz &&\
-    cd xerces* && mkdir build && cd build &&\
+LABEL xercesc.version="3.2.3"
+RUN mkdir src &&\
+    ${__ldmx_wget} http://archive.apache.org/dist/xerces/c/3/sources/xerces-c-3.2.3.tar.gz |\
+      ${__ldmx_untar}
+    cd src && mkdir build && cd build &&\
     cmake -DCMAKE_INSTALL_PREFIX=$XercesC_DIR .. &&\
     make install &&\
-    cd ../../../ && rm -rf xerces-c
+    cd ../../ && rm -rf src
 
 ###############################################################################
 # Install Geant4 into the container
@@ -160,16 +164,15 @@ RUN _geant4_remote="https://gitlab.cern.ch/geant4/geant4.git" &&\
 # Assumptions
 #  - BOOST version of boost release matches source archive being downloaded
 ###############################################################################
-ARG BOOST=1.76.0
-LABEL boost.version="${BOOST}"
-RUN mkdir /boost && cd /boost &&\
-    wget https://boostorg.jfrog.io/artifactory/main/release/1.76.0/source/boost_1_76_0.tar.gz &&\
-    tar -zxvf boost*.tar.gz &&\
-    cd boost_*/ &&\
+LABEL boost.version="1.76.0"
+RUN mkdir src &&\
+    ${__ldmx_wget} https://boostorg.jfrog.io/artifactory/main/release/1.76.0/source/boost_1_76_0.tar.gz |\
+      ${__ldmx_untar}
+    cd src &&\
     ./bootstrap.sh &&\
     ./b2 install &&\
     ldconfig &&\
-    cd / && rm -rf boost
+    cd .. && rm -r src
 
 ###############################################################################
 # Installing DD4hep within the container build
@@ -182,9 +185,10 @@ RUN mkdir /boost && cd /boost &&\
 #  - $DD4hep_DIR set to install path
 ###############################################################################
 ENV DD4hep_DIR /deps/dd4hep
-ARG DD4HEP=v01-16-01
-LABEL dd4hep.version="${DD4HEP}"
-RUN git clone -b ${DD4HEP} --single-branch https://github.com/AIDASoft/DD4hep.git &&\
+LABEL dd4hep.version="01-17"
+RUN mkdir src &&\
+    ${__ldmx_wget} https://github.com/AIDASoft/DD4hep/archive/refs/tags/v01-17.tar.gz |\
+      ${__ldmx_untar}
     export PYTHONPATH=$ROOTSYS/lib &&\
     export CLING_STANDARD_PCH=none &&\
     export LD_LIBRARY_PATH=$XercesC_DIR/lib:$ROOTSYS/lib:$LD_LIBRARY_PATH &&\
@@ -192,14 +196,14 @@ RUN git clone -b ${DD4HEP} --single-branch https://github.com/AIDASoft/DD4hep.gi
     cmake \
         -DCMAKE_INSTALL_PREFIX=$DD4hep_DIR \
         -DBUILD_TESTING=OFF \
-        -B DD4hep/build \
-        -S DD4hep \
+        -B src/build \
+        -S src \
     &&\
     cmake \
-        --build DD4hep/build \
+        --build src/build \
         --target install \
     &&\
-    rm -rf DD4hep
+    rm -r src
 
 ################################################################################
 # Install Eigen headers into container
