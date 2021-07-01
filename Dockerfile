@@ -120,7 +120,7 @@ ENV XercesC_DIR /deps/xerces-c
 LABEL xercesc.version="3.2.3"
 RUN mkdir src &&\
     ${__ldmx_wget} http://archive.apache.org/dist/xerces/c/3/sources/xerces-c-3.2.3.tar.gz |\
-      ${__ldmx_untar}
+      ${__ldmx_untar} &&\
     cd src && mkdir build && cd build &&\
     cmake -DCMAKE_INSTALL_PREFIX=$XercesC_DIR .. &&\
     make install &&\
@@ -167,7 +167,7 @@ RUN _geant4_remote="https://gitlab.cern.ch/geant4/geant4.git" &&\
 LABEL boost.version="1.76.0"
 RUN mkdir src &&\
     ${__ldmx_wget} https://boostorg.jfrog.io/artifactory/main/release/1.76.0/source/boost_1_76_0.tar.gz |\
-      ${__ldmx_untar}
+      ${__ldmx_untar} &&\
     cd src &&\
     ./bootstrap.sh &&\
     ./b2 install &&\
@@ -188,7 +188,7 @@ ENV DD4hep_DIR /deps/dd4hep
 LABEL dd4hep.version="01-17"
 RUN mkdir src &&\
     ${__ldmx_wget} https://github.com/AIDASoft/DD4hep/archive/refs/tags/v01-17.tar.gz |\
-      ${__ldmx_untar}
+      ${__ldmx_untar} &&\
     export PYTHONPATH=$ROOTSYS/lib &&\
     export CLING_STANDARD_PCH=none &&\
     export LD_LIBRARY_PATH=$XercesC_DIR/lib:$ROOTSYS/lib:$LD_LIBRARY_PATH &&\
