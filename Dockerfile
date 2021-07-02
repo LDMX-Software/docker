@@ -99,7 +99,7 @@ RUN mkdir src &&\
     ${__wget} http://archive.apache.org/dist/xerces/c/3/sources/xerces-c-3.2.3.tar.gz |\
       ${__untar} &&\
     cmake -B src/build -S src -DCMAKE_INSTALL_PREFIX=${__prefix} &&\
-    make install &&\
+    cmake --build src/build --target install &&\
     rm -rf src
 
 ###############################################################################
@@ -121,8 +121,8 @@ RUN mkdir src &&\
       -Dxrootd=OFF \
       -B build \
       -S src \
-    && cmake --build build --target install \
-    && rm -rf build src
+    && cmake --build build --target install &&\
+    rm -rf build src
 
 ###############################################################################
 # Geant4
@@ -145,10 +145,7 @@ RUN __owner="geant4" &&\
         -B src/build \
         -S src \
         &&\
-    cmake \
-        --build src/build \
-        --target install \
-    &&\
+    cmake --build src/build --target install &&\
     rm -rf src
 
 RUN ldconfig

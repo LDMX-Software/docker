@@ -21,6 +21,9 @@ set -e
 #       - LDMX_BASE/ldmx-sw/install is the installation location of ldmx-sw
 ###############################################################################
 
+# need the data paths configured by Geant4
+source /usr/local/bin/geant4.sh
+
 # add ldmx-sw and ldmx-analysis installs to the various paths
 export LDMX_SW_INSTALL=$LDMX_BASE/ldmx-sw/install
 export LD_LIBRARY_PATH=$LDMX_SW_INSTALL/lib:$LD_LIBRARY_PATH
