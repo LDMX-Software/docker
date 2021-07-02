@@ -79,20 +79,31 @@ ENV __untar tar -xz --strip-components=1 --directory src
 ENV __prefix /usr/local
 
 ###############################################################################
-# Install Boost
+# Boost
 ###############################################################################
 LABEL boost.version="1.76.0"
 RUN mkdir src &&\
     ${__wget} https://boostorg.jfrog.io/artifactory/main/release/1.76.0/source/boost_1_76_0.tar.gz |\
       ${__untar} &&\
     cd src &&\
-    ./bootstrap.sh --prefix ${__prefix} &&\
+    ./bootstrap.sh &&\
     ./b2 install &&\
     ldconfig &&\
     cd .. && rm -rf src
 
+################################################################################
+# Xerces-C 
+################################################################################
+LABEL xercesc.version="3.2.3"
+RUN mkdir src &&\
+    ${__wget} http://archive.apache.org/dist/xerces/c/3/sources/xerces-c-3.2.3.tar.gz |\
+      ${__untar} \
+    cmake -B build -S src -DCMAKE_INSTALL_PREFIX=${__prefix} &&\
+    make install &&\
+    rm -rf src
+
 ###############################################################################
-# Install CERN's ROOT into the container
+# CERN's ROOT
 ###############################################################################
 LABEL root.version="6.22.08"
 RUN mkdir src &&\
@@ -113,30 +124,13 @@ RUN mkdir src &&\
     && cmake --build build --target install \
     && rm -rf build src
 
-################################################################################
-# Install Xerces-C into container
+###############################################################################
+# Geant4
 #
 # Assumptions
-#  - XERCESC set to version matching an archived location of its source
-#  - XercesC_DIR set to target installation location
-################################################################################
-LABEL xercesc.version="3.2.3"
-RUN mkdir src &&\
-    ${__wget} http://archive.apache.org/dist/xerces/c/3/sources/xerces-c-${XERCESC}.tar.gz |\
-      ${__untar} \
-    cmake -B build -S src -DCMAKE_INSTALL_PREFIX=${__prefix} &&\
-    make install &&\
-    rm -rf src
-
+#  - GEANT4 defined to be a release of geant4 or LDMX's fork of geant4
 ###############################################################################
-# Install Geant4 into the container
-#
-# Assumptions
-#  - GEANT4 defined to be a branch/tag of geant4 or LDMX's fork of geant4
-#  - XercesC_DIR set to install of Xerces-C
-#  - G4DIR set to path where Geant4 should be installed
-###############################################################################
-ARG GEANT4=LDMX.10.2.3_v0.4
+ENV GEANT4=LDMX.10.2.3_v0.4
 LABEL geant4.version="${GEANT4}"
 RUN __owner="geant4" &&\
     echo "${GEANT4}" | grep -q "LDMX" && __owner="LDMX-Software" &&\
@@ -147,7 +141,6 @@ RUN __owner="geant4" &&\
         -DGEANT4_USE_GDML=ON \
         -DGEANT4_INSTALL_EXAMPLES=OFF \
         -DGEANT4_USE_OPENGL_X11=ON \
-        -DXERCESC_ROOT_DIR=$XercesC_DIR \
         -DCMAKE_INSTALL_PREFIX=${__prefix} \
         -B src/build \
         -S src \
@@ -162,9 +155,6 @@ RUN ldconfig
 
 ###############################################################################
 # Extra python packages for analysis
-#   
-# Assumptions
-#  - ROOTSYS is installation location of root
 ###############################################################################
 ENV PYTHONPATH /usr/local/lib
 ENV CLING_STANDARD_PCH none
