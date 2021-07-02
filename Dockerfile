@@ -97,8 +97,8 @@ RUN mkdir src &&\
 LABEL xercesc.version="3.2.3"
 RUN mkdir src &&\
     ${__wget} http://archive.apache.org/dist/xerces/c/3/sources/xerces-c-3.2.3.tar.gz |\
-      ${__untar} \
-    cmake -B build -S src -DCMAKE_INSTALL_PREFIX=${__prefix} &&\
+      ${__untar} &&\
+    cmake -B src/build -S src -DCMAKE_INSTALL_PREFIX=${__prefix} &&\
     make install &&\
     rm -rf src
 
