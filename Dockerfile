@@ -253,6 +253,7 @@ RUN git clone -b ${ACTS} --single-branch https://github.com/acts-project/acts &&
         -DACTS_BUILD_PLUGIN_DD4HEP=ON \
         -DACTS_BUILD_EXAMPLES=OFF \
         -DCMAKE_INSTALL_PREFIX=$ACTS_DIR \
+        -DCMAKE_CXX_STANDARD=17 \
         -B acts/build \
         -S acts \
     &&\
