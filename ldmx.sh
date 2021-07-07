@@ -25,7 +25,9 @@ set -e
 source /usr/local/bin/geant4.sh
 
 # add ldmx-sw and ldmx-analysis installs to the various paths
-export LDMX_SW_INSTALL=$LDMX_BASE/ldmx-sw/install
+if [ -z "${LDMX_SW_INSTALL}" ]; then
+  export LDMX_SW_INSTALL=$LDMX_BASE/ldmx-sw/install
+fi
 export LD_LIBRARY_PATH=$LDMX_SW_INSTALL/lib:$LD_LIBRARY_PATH
 export PYTHONPATH=$LDMX_SW_INSTALL/python:$PYTHONPATH
 export PATH=$LDMX_SW_INSTALL/bin:$PATH

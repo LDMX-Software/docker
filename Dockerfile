@@ -17,7 +17,6 @@ RUN apt-get update &&\
         fonts-freefont-ttf \
         g++-7 \
         gcc-7 \
-        git \
         libafterimage-dev \
         libcfitsio-dev \
         libfcgi-dev \
@@ -148,7 +147,8 @@ RUN __owner="geant4" &&\
     cmake --build src/build --target install &&\
     rm -rf src
 
-RUN ldconfig
+# Include our installed libraries in the system cache
+RUN ldconfig /usr/local/lib
 
 ###############################################################################
 # Extra python packages for analysis
