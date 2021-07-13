@@ -121,7 +121,8 @@ RUN mkdir src &&\
       -B build \
       -S src \
     && cmake --build build --target install &&\
-    rm -rf build src
+    rm -rf build src &&\
+    ln -s /usr/local/bin/thisroot.sh /etc/profile.d/cernroot.sh
 
 ###############################################################################
 # Geant4
@@ -145,7 +146,8 @@ RUN __owner="geant4" &&\
         -S src \
         &&\
     cmake --build src/build --target install &&\
-    rm -rf src
+    rm -rf src &&\
+    ln -s /usr/local/bin/geant4.sh /etc/profile.d/geant4.sh
 
 # Include our installed libraries in the system cache
 RUN ldconfig /usr/local/lib

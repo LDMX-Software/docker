@@ -18,11 +18,9 @@ set -e
 #   we will go to the mounted location that the user is running from.
 #
 #   Assumptions:
-#       - LDMX_BASE/ldmx-sw/install is the installation location of ldmx-sw
+#     The installation location of ldmx-sw is defined in LDMX_SW_INSTALL
+#     or it is located at LDMX_BASE/ldmx-sw/install.
 ###############################################################################
-
-# need the data paths configured by Geant4
-source /usr/local/bin/geant4.sh
 
 # add ldmx-sw and ldmx-analysis installs to the various paths
 if [ -z "${LDMX_SW_INSTALL}" ]; then
