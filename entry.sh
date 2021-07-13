@@ -8,6 +8,12 @@ set -e
 #   setup the ldmx-sw working environment, and then
 #   run whatever executable the user wants.
 #
+#   The setup of the working environment is done by copying or linking
+#   environment scripts into /etc/profile.d/ inside the image when it is 
+#   built. This forces those environment scripts to be sourced whenever
+#   a new bash terminal is created (which will happen for this entry
+#   script because of the sh-bang at the top).
+#
 #   A lot of executables require us to be in a specific location,
 #   so the first argument is required to be a directory we can go to.
 #   The rest of the arguments are passed to `eval` to be run as one command.
@@ -18,30 +24,9 @@ set -e
 #   we will go to the mounted location that the user is running from.
 #
 #   Assumptions:
-#     The installation location of ldmx-sw is defined in LDMX_SW_INSTALL
-#     or it is located at LDMX_BASE/ldmx-sw/install.
+#     All necessary environment set-up is completed automatically when
+#     launching a new bash terminal.
 ###############################################################################
-
-# add ldmx-sw and ldmx-analysis installs to the various paths
-if [ -z "${LDMX_SW_INSTALL}" ]; then
-  export LDMX_SW_INSTALL=$LDMX_BASE/ldmx-sw/install
-fi
-export LD_LIBRARY_PATH=$LDMX_SW_INSTALL/lib:$LD_LIBRARY_PATH
-export PYTHONPATH=$LDMX_SW_INSTALL/python:$PYTHONPATH
-export PATH=$LDMX_SW_INSTALL/bin:$PATH
-
-# add externals installed along side ldmx-sw
-# TODO this for loop might be very slow... might want to hard-code the externals path
-for _external_path in $LDMX_SW_INSTALL/external/*/lib
-do
-    export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$_external_path
-done
-
-# helps simplify any cmake nonsense
-export CMAKE_PREFIX_PATH=/usr/local/:$LDMX_SW_INSTALL
-
-# puts a config/cache directory for matplotlib to use
-export MPLCONFIGDIR=$LDMX_BASE/.config/matplotlib
 
 # go to first argument
 cd "$1"

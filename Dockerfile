@@ -169,8 +169,7 @@ RUN python3 -m pip install --upgrade --no-cache-dir \
 RUN rm -rf /tmp/* && apt-get clean && apt-get autoremove 
 
 #copy over necessary running script which sets up environment
-COPY ./ldmx.sh /home/
-RUN chmod 755 /home/ldmx.sh
+COPY ./ldmx-sw.sh /etc/profile.d/
 
 # add any ssl certificates to the container to trust
 COPY ./certs/ /usr/local/share/ca-certificates
@@ -178,4 +177,6 @@ RUN update-ca-certificates && ldconfig
 
 #run environment setup when docker container is launched and decide what to do from there
 #   will require the environment variable LDMX_BASE defined
-ENTRYPOINT ["/home/ldmx.sh"]
+COPY ./entry.sh /home/
+RUN chmod 755 /home/entry.sh
+ENTRYPOINT ["/home/entry.sh"]
