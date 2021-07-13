@@ -65,6 +65,7 @@ RUN apt-get update &&\
         unixodbc-dev \
         wget \
     && rm -rf /var/lib/apt/lists/* &&\
+    apt-get clean all &&\
     python3 -m pip install --upgrade --no-cache-dir cmake
 
 ###############################################################################
@@ -87,7 +88,6 @@ RUN mkdir src &&\
     cd src &&\
     ./bootstrap.sh &&\
     ./b2 install &&\
-    ldconfig &&\
     cd .. && rm -rf src
 
 ################################################################################
@@ -148,9 +148,6 @@ RUN __owner="geant4" &&\
     cmake --build src/build --target install &&\
     rm -rf src &&\
     ln -s /usr/local/bin/geant4.sh /etc/profile.d/geant4.sh
-
-# Include our installed libraries in the system cache
-RUN ldconfig /usr/local/lib
 
 ###############################################################################
 # Extra python packages for analysis
