@@ -6,7 +6,8 @@ MAINTAINER Tom Eichlersmith <eichl008@umn.edu>
 # First install any required dependencies from ubuntu repos
 #   TODO clean up this dependency list
 # Ongoing documentation for this list is in docs/ubuntu-packages.md
-RUN apt-get update &&\
+RUN echo ::group::apt installs &&\
+    apt-get update &&\
     DEBIAN_FRONTEND=noninteractive \
     apt-get install -y \
         binutils \
@@ -66,7 +67,8 @@ RUN apt-get update &&\
         wget \
     && rm -rf /var/lib/apt/lists/* &&\
     apt-get clean all &&\
-    python3 -m pip install --upgrade --no-cache-dir cmake
+    python3 -m pip install --upgrade --no-cache-dir cmake &&\
+    echo ::endgroup::
 
 ###############################################################################
 # Source-Code Downloading Method
@@ -82,30 +84,30 @@ ENV __prefix /usr/local
 # Boost
 ###############################################################################
 LABEL boost.version="1.76.0"
-RUN mkdir src &&\
+RUN echo ::group::boost && mkdir src &&\
     ${__wget} https://boostorg.jfrog.io/artifactory/main/release/1.76.0/source/boost_1_76_0.tar.gz |\
       ${__untar} &&\
     cd src &&\
     ./bootstrap.sh &&\
     ./b2 install &&\
-    cd .. && rm -rf src
+    cd .. && rm -rf src && echo ::endgroup::
 
 ################################################################################
 # Xerces-C 
 ################################################################################
 LABEL xercesc.version="3.2.3"
-RUN mkdir src &&\
+RUN echo ::group::Xerces-C && mkdir src &&\
     ${__wget} http://archive.apache.org/dist/xerces/c/3/sources/xerces-c-3.2.3.tar.gz |\
       ${__untar} &&\
     cmake -B src/build -S src -DCMAKE_INSTALL_PREFIX=${__prefix} &&\
     cmake --build src/build --target install &&\
-    rm -rf src
+    rm -rf src && echo ::endgroup::
 
 ###############################################################################
 # CERN's ROOT
 ###############################################################################
 LABEL root.version="6.22.08"
-RUN mkdir src &&\
+RUN echo ::group::ROOT && mkdir src &&\
     ${__wget} https://root.cern/download/root_v6.22.08.source.tar.gz |\
      ${__untar} &&\
     cmake \
@@ -121,8 +123,8 @@ RUN mkdir src &&\
       -B build \
       -S src \
     && cmake --build build --target install &&\
-    rm -rf build src &&\
-    ln -s /usr/local/bin/thisroot.sh /etc/profile.d/cernroot.sh
+    ln -s /usr/local/bin/thisroot.sh /etc/profile.d/cernroot.sh &&\
+    rm -rf build src && echo ::endgroup::
 
 ###############################################################################
 # Geant4
@@ -132,7 +134,7 @@ RUN mkdir src &&\
 ###############################################################################
 ENV GEANT4=LDMX.10.2.3_v0.4
 LABEL geant4.version="${GEANT4}"
-RUN __owner="geant4" &&\
+RUN echo ::group::Geant4 && __owner="geant4" &&\
     echo "${GEANT4}" | grep -q "LDMX" && __owner="LDMX-Software" &&\
     mkdir src &&\
     ${__wget} https://github.com/${__owner}/geant4/archive/${GEANT4}.tar.gz | ${__untar} &&\
@@ -146,31 +148,30 @@ RUN __owner="geant4" &&\
         -S src \
         &&\
     cmake --build src/build --target install &&\
-    rm -rf src &&\
-    ln -s /usr/local/bin/geant4.sh /etc/profile.d/geant4.sh
+    ln -s /usr/local/bin/geant4.sh /etc/profile.d/geant4.sh &&\
+    rm -rf src && echo ::endgroup::
 
 ###############################################################################
 # Extra python packages for analysis
 ###############################################################################
 ENV PYTHONPATH /usr/local/lib
 ENV CLING_STANDARD_PCH none
-RUN python3 -m pip install --upgrade --no-cache-dir \
+RUN echo ::group::Extra Python Packages &&\
+    python3 -m pip install --upgrade --no-cache-dir \
         Cython \
         uproot \
         numpy \
         matplotlib \
         xgboost \
-        sklearn
-
-# clean up source and build files from apt-get
-RUN rm -rf /tmp/* && apt-get clean && apt-get autoremove 
+        sklearn &&\
+    echo ::endgroup::
 
 #copy over necessary running script which sets up environment
 COPY ./ldmx-sw.sh /etc/profile.d/
 
 # add any ssl certificates to the container to trust
 COPY ./certs/ /usr/local/share/ca-certificates
-RUN update-ca-certificates && ldconfig
+RUN update-ca-certificates
 
 #run environment setup when docker container is launched and decide what to do from there
 #   will require the environment variable LDMX_BASE defined
