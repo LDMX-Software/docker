@@ -45,6 +45,7 @@ for _external_path in $LDMX_SW_INSTALL/external/*/lib
 do
   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$_external_path
 done
+unset _external_path
 
 # helps simplify any cmake nonsense
 export CMAKE_PREFIX_PATH=/usr/local/:$LDMX_SW_INSTALL
