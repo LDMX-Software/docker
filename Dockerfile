@@ -53,10 +53,6 @@ RUN apt-get update &&\
         libzstd-dev \
         locales \
         make \
-        python-dev \
-        python-pip \
-        python-numpy \
-        python-tk \
         python3-dev \
         python3-pip \
         python3-numpy \
