@@ -49,10 +49,6 @@ libz-dev | Yes | Data compression
 libzstd-dev | Yes | Data compression
 locales | Yes | Configuration of TPython and other python packages
 make | Yes | Building dependencies and ldmx-sw source
-python-dev | Yes | ROOT TPython
-python-pip | Yes | For downloading more python packages later
-python-numpy | Yes | ROOT TPython requires numpty
-python-tk | Yes | matplotlib requires python-tk for some plotting
 python3-dev | Yes | ROOT TPython and ldmx-sw ConfigurePython
 python3-pip | Yes | For downloading more python packages later
 python3-numpy | Yes | ROOT TPython requires numpy
