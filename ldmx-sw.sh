@@ -10,6 +10,9 @@
 #     or it is located at LDMX_BASE/ldmx-sw/install.
 ###############################################################################
 
+source /usr/local/bin/thisroot.sh
+source /usr/local/bin/geant4.sh
+
 # add ldmx-sw and ldmx-analysis installs to the various paths
 if [ -z "${LDMX_SW_INSTALL}" ]; then
   export LDMX_SW_INSTALL=$LDMX_BASE/ldmx-sw/install

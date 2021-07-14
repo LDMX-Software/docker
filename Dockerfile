@@ -121,8 +121,7 @@ RUN mkdir src &&\
       -B build \
       -S src \
     && cmake --build build --target install &&\
-    rm -rf build src &&\
-    ln -s /usr/local/bin/thisroot.sh /etc/profile.d/cernroot.sh
+    rm -rf build src
 
 ###############################################################################
 # Geant4
@@ -145,8 +144,7 @@ RUN __owner="geant4" &&\
         -B src/build \
         -S src \
         &&\
-    cmake --build src/build --target install &&\
-    ln -s /usr/local/bin/geant4.sh /etc/profile.d/geant4.sh &&\
+    cmake --build src/build --target install
     rm -rf src 
 
 ###############################################################################
@@ -164,6 +162,11 @@ RUN python3 -m pip install --upgrade --no-cache-dir \
 
 #copy over necessary running script which sets up environment
 COPY ./ldmx-sw.sh /etc/profile.d/
+
+# this forces /etc/profile and all scripts in /etc/profile.d
+#   to be sourced when running a bash script
+#   (which is what we do via our entrypoint script)
+ENV BASH_ENV /etc/profile
 
 # add any ssl certificates to the container to trust
 COPY ./certs/ /usr/local/share/ca-certificates
