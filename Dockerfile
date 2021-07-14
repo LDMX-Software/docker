@@ -169,9 +169,6 @@ RUN python3 -m pip install --upgrade --no-cache-dir \
 COPY ./certs/ /usr/local/share/ca-certificates
 RUN update-ca-certificates
 
-# copy over necessary running script which sets up environment
-COPY ./ldmx-container-env.sh /etc/
-
 #run environment setup when docker container is launched and decide what to do from there
 #   will require the environment variable LDMX_BASE defined
 COPY ./entry.sh /etc/
