@@ -6,8 +6,7 @@ MAINTAINER Tom Eichlersmith <eichl008@umn.edu>
 # First install any required dependencies from ubuntu repos
 #   TODO clean up this dependency list
 # Ongoing documentation for this list is in docs/ubuntu-packages.md
-RUN echo ::group::apt installs &&\
-    apt-get update &&\
+RUN apt-get update &&\
     DEBIAN_FRONTEND=noninteractive \
     apt-get install -y \
         binutils \
@@ -67,8 +66,7 @@ RUN echo ::group::apt installs &&\
         wget \
     && rm -rf /var/lib/apt/lists/* &&\
     apt-get clean all &&\
-    python3 -m pip install --upgrade --no-cache-dir cmake &&\
-    echo ::endgroup::
+    python3 -m pip install --upgrade --no-cache-dir cmake
 
 ###############################################################################
 # Source-Code Downloading Method
@@ -84,30 +82,30 @@ ENV __prefix /usr/local
 # Boost
 ###############################################################################
 LABEL boost.version="1.76.0"
-RUN echo ::group::boost && mkdir src &&\
+RUN mkdir src &&\
     ${__wget} https://boostorg.jfrog.io/artifactory/main/release/1.76.0/source/boost_1_76_0.tar.gz |\
       ${__untar} &&\
     cd src &&\
     ./bootstrap.sh &&\
     ./b2 install &&\
-    cd .. && rm -rf src && echo ::endgroup::
+    cd .. && rm -rf src
 
 ################################################################################
 # Xerces-C 
 ################################################################################
 LABEL xercesc.version="3.2.3"
-RUN echo ::group::Xerces-C && mkdir src &&\
+RUN mkdir src &&\
     ${__wget} http://archive.apache.org/dist/xerces/c/3/sources/xerces-c-3.2.3.tar.gz |\
       ${__untar} &&\
     cmake -B src/build -S src -DCMAKE_INSTALL_PREFIX=${__prefix} &&\
     cmake --build src/build --target install &&\
-    rm -rf src && echo ::endgroup::
+    rm -rf src
 
 ###############################################################################
 # CERN's ROOT
 ###############################################################################
 LABEL root.version="6.22.08"
-RUN echo ::group::ROOT && mkdir src &&\
+RUN mkdir src &&\
     ${__wget} https://root.cern/download/root_v6.22.08.source.tar.gz |\
      ${__untar} &&\
     cmake \
@@ -123,8 +121,8 @@ RUN echo ::group::ROOT && mkdir src &&\
       -B build \
       -S src \
     && cmake --build build --target install &&\
-    ln -s /usr/local/bin/thisroot.sh /etc/profile.d/cernroot.sh &&\
-    rm -rf build src && echo ::endgroup::
+    rm -rf build src &&\
+    ln -s /usr/local/bin/thisroot.sh /etc/profile.d/cernroot.sh
 
 ###############################################################################
 # Geant4
@@ -134,7 +132,7 @@ RUN echo ::group::ROOT && mkdir src &&\
 ###############################################################################
 ENV GEANT4=LDMX.10.2.3_v0.4
 LABEL geant4.version="${GEANT4}"
-RUN echo ::group::Geant4 && __owner="geant4" &&\
+RUN __owner="geant4" &&\
     echo "${GEANT4}" | grep -q "LDMX" && __owner="LDMX-Software" &&\
     mkdir src &&\
     ${__wget} https://github.com/${__owner}/geant4/archive/${GEANT4}.tar.gz | ${__untar} &&\
@@ -149,22 +147,20 @@ RUN echo ::group::Geant4 && __owner="geant4" &&\
         &&\
     cmake --build src/build --target install &&\
     ln -s /usr/local/bin/geant4.sh /etc/profile.d/geant4.sh &&\
-    rm -rf src && echo ::endgroup::
+    rm -rf src 
 
 ###############################################################################
 # Extra python packages for analysis
 ###############################################################################
 ENV PYTHONPATH /usr/local/lib
 ENV CLING_STANDARD_PCH none
-RUN echo ::group::Extra Python Packages &&\
-    python3 -m pip install --upgrade --no-cache-dir \
+RUN python3 -m pip install --upgrade --no-cache-dir \
         Cython \
         uproot \
         numpy \
         matplotlib \
         xgboost \
-        sklearn &&\
-    echo ::endgroup::
+        sklearn
 
 #copy over necessary running script which sets up environment
 COPY ./ldmx-sw.sh /etc/profile.d/
