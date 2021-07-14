@@ -160,13 +160,10 @@ RUN python3 -m pip install --upgrade --no-cache-dir \
         xgboost \
         sklearn
 
-#copy over necessary running script which sets up environment
+# copy over necessary running script which sets up environment
+#   putting our env script in this directory allows the entrypoint
+#   to simple '. /etc/profile' in order to setup the environment
 COPY ./ldmx-sw.sh /etc/profile.d/
-
-# this forces /etc/profile and all scripts in /etc/profile.d
-#   to be sourced when running a bash script
-#   (which is what we do via our entrypoint script)
-ENV BASH_ENV /etc/profile
 
 # add any ssl certificates to the container to trust
 COPY ./certs/ /usr/local/share/ca-certificates

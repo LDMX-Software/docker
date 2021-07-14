@@ -28,6 +28,8 @@ set -e
 #     launching a new bash terminal.
 ###############################################################################
 
+. /etc/profile
+
 # go to first argument
 cd "$1"
 
