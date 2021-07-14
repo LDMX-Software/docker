@@ -1,13 +1,14 @@
 #!/bin/sh
 
 ###############################################################################
-# Custom environment set-up for ldmx-sw
+# Custom environment set-up for ldmx-sw for inside the container
 #   We want to make things easier for the user by automatically including
 #   ldmx-sw in various environment variables.
 #
 #   Assumptions:
-#     The installation location of ldmx-sw is defined in LDMX_SW_INSTALL
+#   - The installation location of ldmx-sw is defined in LDMX_SW_INSTALL
 #     or it is located at LDMX_BASE/ldmx-sw/install.
+#   - The installation of external dependencies are put into /usr/local  
 ###############################################################################
 
 source /usr/local/bin/thisroot.sh

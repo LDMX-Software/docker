@@ -160,14 +160,12 @@ RUN python3 -m pip install --upgrade --no-cache-dir \
         xgboost \
         sklearn
 
-# copy over necessary running script which sets up environment
-#   putting our env script in this directory allows the entrypoint
-#   to simple '. /etc/profile' in order to setup the environment
-COPY ./ldmx-sw.sh /etc/profile.d/
-
 # add any ssl certificates to the container to trust
 COPY ./certs/ /usr/local/share/ca-certificates
 RUN update-ca-certificates
+
+# copy over necessary running script which sets up environment
+COPY ./ldmx-container-env.sh /home/
 
 #run environment setup when docker container is launched and decide what to do from there
 #   will require the environment variable LDMX_BASE defined
