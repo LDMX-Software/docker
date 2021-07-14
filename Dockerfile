@@ -78,6 +78,9 @@ ENV __wget wget -q -O -
 ENV __untar tar -xz --strip-components=1 --directory src
 ENV __prefix /usr/local
 
+# All init scripts in this directory will be run upon entry into container
+RUN mkdir /etc/ldmx-container-env.d/
+
 ###############################################################################
 # Boost
 ###############################################################################
@@ -121,6 +124,7 @@ RUN mkdir src &&\
       -B build \
       -S src \
     && cmake --build build --target install &&\
+    ln -s /usr/local/bin/thisroot.sh /etc/ldmx-container-env.d/thisroot.sh &&\
     rm -rf build src
 
 ###############################################################################
@@ -144,7 +148,8 @@ RUN __owner="geant4" &&\
         -B src/build \
         -S src \
         &&\
-    cmake --build src/build --target install
+    cmake --build src/build --target install &&\
+    ln -s /usr/local/bin/geant4.sh /etc/ldmx-container-env.d/geant4.sh &&\ 
     rm -rf src 
 
 ###############################################################################
@@ -165,10 +170,10 @@ COPY ./certs/ /usr/local/share/ca-certificates
 RUN update-ca-certificates
 
 # copy over necessary running script which sets up environment
-COPY ./ldmx-container-env.sh /home/
+COPY ./ldmx-container-env.sh /etc/
 
 #run environment setup when docker container is launched and decide what to do from there
 #   will require the environment variable LDMX_BASE defined
-COPY ./entry.sh /home/
-RUN chmod 755 /home/entry.sh
-ENTRYPOINT ["/home/entry.sh"]
+COPY ./entry.sh /etc/
+RUN chmod 755 /etc/entry.sh
+ENTRYPOINT ["/etc/entry.sh"]

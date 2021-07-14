@@ -8,11 +8,14 @@
 #   Assumptions:
 #   - The installation location of ldmx-sw is defined in LDMX_SW_INSTALL
 #     or it is located at LDMX_BASE/ldmx-sw/install.
-#   - The installation of external dependencies are put into /usr/local  
+#   - Any initialization scripts for external dependencies need to be
+#     symlinked into /etc/ldmx-container-env.d/
 ###############################################################################
 
-source /usr/local/bin/thisroot.sh
-source /usr/local/bin/geant4.sh
+for init_script in /etc/ldmx-container-env.d/*; do
+  . $(realpath ${init_script})
+done
+unset init_script
 
 # add ldmx-sw and ldmx-analysis installs to the various paths
 if [ -z "${LDMX_SW_INSTALL}" ]; then

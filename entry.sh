@@ -22,7 +22,7 @@ set -e
 ###############################################################################
 
 # Set-up computing environment
-. /home/ldmx-container-env.sh
+. /etc/ldmx-container-env.sh
 
 # go to first argument
 cd "$1"
