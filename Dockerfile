@@ -4,45 +4,29 @@ LABEL ubuntu.version="18.04"
 MAINTAINER Tom Eichlersmith <eichl008@umn.edu>
 
 # First install any required dependencies from ubuntu repos
-#   TODO clean up this dependency list
 # Ongoing documentation for this list is in docs/ubuntu-packages.md
 RUN apt-get update &&\
     DEBIAN_FRONTEND=noninteractive \
     apt-get install -y \
         binutils \
         ca-certificates \
-        davix-dev \
-        dcap-dev \
-        dpkg-dev \
-        fonts-freefont-ttf \
+        onts-freefont-ttf \
         g++-7 \
         gcc-7 \
-        libafterimage-dev \
-        libcfitsio-dev \
-        libfcgi-dev \
         libfftw3-dev \
         libfreetype6-dev \
         libftgl-dev \
-        libgfal2-dev \
         libgif-dev \
         libgl1-mesa-dev \
         libgl2ps-dev \
         libglew-dev \
         libglu-dev \
-        libgraphviz-dev \
-        libgsl-dev \
         libjpeg-dev \
         liblz4-dev \
         liblzma-dev \
-        libmysqlclient-dev \
         libpcre++-dev \
         libpng-dev \
-        libpq-dev \
-        libpythia8-dev \
-        libsqlite3-dev \
         libssl-dev \
-        libtbb-dev \
-        libtiff-dev \
         libx11-dev \
         libxext-dev \  
         libxft-dev \
@@ -58,7 +42,6 @@ RUN apt-get update &&\
         python3-numpy \
         python3-tk \
         srm-ifce-dev \
-        unixodbc-dev \
         wget \
     && rm -rf /var/lib/apt/lists/* &&\
     apt-get clean all &&\
