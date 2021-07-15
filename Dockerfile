@@ -1,6 +1,6 @@
 
-FROM ubuntu:18.04
-LABEL ubuntu.version="18.04"
+FROM ubuntu:20.04
+LABEL ubuntu.version="20.04"
 MAINTAINER Tom Eichlersmith <eichl008@umn.edu>
 
 # First install any required dependencies from ubuntu repos
@@ -56,9 +56,10 @@ RUN apt-get update &&\
 ENV __wget wget -q -O -
 ENV __untar tar -xz --strip-components=1 --directory src
 ENV __prefix /usr/local
+ENV __ldmx_env_script_d__ /etc/ldmx-container-end.d
 
 # All init scripts in this directory will be run upon entry into container
-RUN mkdir /etc/ldmx-container-env.d/
+RUN mkdir ${__ldmx_env_script_d__}
 
 ###############################################################################
 # Boost
@@ -103,7 +104,7 @@ RUN mkdir src &&\
       -B build \
       -S src \
     && cmake --build build --target install &&\
-    ln -s /usr/local/bin/thisroot.sh /etc/ldmx-container-env.d/thisroot.sh &&\
+    ln -s /usr/local/bin/thisroot.sh ${__ldmx_env_script_d__}/thisroot.sh &&\
     rm -rf build src
 
 ###############################################################################
@@ -128,7 +129,7 @@ RUN __owner="geant4" &&\
         -S src \
         &&\
     cmake --build src/build --target install &&\
-    ln -s /usr/local/bin/geant4.sh /etc/ldmx-container-env.d/geant4.sh &&\ 
+    ln -s /usr/local/bin/geant4.sh ${__ldmx_env_script_d__}/geant4.sh &&\ 
     rm -rf src 
 
 ###############################################################################
