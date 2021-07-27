@@ -41,9 +41,11 @@ RUN apt-get update &&\
         python3-pip \
         python3-numpy \
         python3-tk \
+        python-is-python3 \
         srm-ifce-dev \
         wget \
     && rm -rf /var/lib/apt/lists/* &&\
+    apt-get autoremove --purge &&\
     apt-get clean all &&\
     python3 -m pip install --upgrade --no-cache-dir cmake
 
