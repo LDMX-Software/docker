@@ -36,10 +36,16 @@ docker \ #base docker command
 
 ### Display Connection
 In order to connect the display, you need to add two more parameters to the above `docker run` command.
-This only works for Unix-based systems (Linux and MacOS), the windows connection procedure is [far more complicated](https://cuneyt.aliustaoglu.biz/en/running-gui-applications-in-docker-on-windows-linux-mac-hosts/).
+When running [docker inside of the Windoze Subsystem for Linux (WSL)](https://docs.docker.com/docker-for-windows/wsl/),
+you will also need to have an external X server running _outside_ WSL.
+Ubuntu has a good [tutorial on how to get graphical applications running inside WSL](https://wiki.ubuntu.com/WSL).
 
 0. Define how to interface wiith the display.
    - For Linux: `export LDMX_CONTAINER_DISPLAY=""`
    - For MacOS: `export LDMX_CONTAINER_DISPLAY="docker.for.mac.host.internal"`
+   - For WSL: `export LDMX_CONTAINER_DISPLAY=$(awk '/nameserver / ${print$2; exit}' /etc/resolv.conf 2>/dev/null)` [0]
 1. Define the `DISPLAY` environment variable for inside the container. `-e DISPLAY=${LDMX_CONTAINER_DISPLAY}:0`
 2. Mount the cache directory for the window manager for the container to share. `-v /tmp/.X11-unix:/tmp/.X11-unix`
+
+---
+[0] [WSL Graphical Apps on Ubuntu Wiki](https://wiki.ubuntu.com/WSL?&_ga=2.29286004.935441070.1627417257-513300802.1627417257#Running_Graphical_Applications)
