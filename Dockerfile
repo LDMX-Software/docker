@@ -136,6 +136,7 @@ RUN mkdir xerces-c && cd xerces-c &&\
 ###############################################################################
 ENV G4DIR /deps/geant4
 ARG GEANT4=LDMX.upKaons_mod
+#upKaons_mod now updated to Natalia's fixed upKaons
 LABEL geant4.version="${GEANT4}"
 RUN _geant4_remote="https://gitlab.cern.ch/geant4/geant4.git" &&\
     if echo "${GEANT4}" | grep -q "LDMX"; then \
