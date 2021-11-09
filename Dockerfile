@@ -1,6 +1,6 @@
 
-FROM ubuntu:20.04
-LABEL ubuntu.version="20.04"
+FROM ubuntu:18.04
+LABEL ubuntu.version="18.04"
 MAINTAINER Tom Eichlersmith <eichl008@umn.edu>
 
 # First install any required dependencies from ubuntu repos
@@ -41,6 +41,7 @@ RUN apt-get update &&\
         python3-pip \
         python3-numpy \
         python3-tk \
+        python-is-python3 \
         srm-ifce-dev \
         wget \
     && rm -rf /var/lib/apt/lists/* &&\
