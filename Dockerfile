@@ -140,7 +140,7 @@ RUN __owner="geant4" &&\
 #  - Dependencies installed to ${__prefix}
 #  - DD4HEP set to release name from GitHub repository
 ###############################################################################
-ENV DD4HEP=v01-14
+ENV DD4HEP=v01-18
 LABEL dd4hep.version="${DD4HEP}"
 RUN mkdir src &&\
     ${__ldmx_wget} https://github.com/AIDASoft/DD4hep/archive/refs/tags/${DD4HEP}.tar.gz |\
