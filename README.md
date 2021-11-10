@@ -26,7 +26,7 @@ A description of this setup process is given for both [docker](docs/use_with_doc
 
 Direct Dependecy of ldmx-sw | Version | Construction Process
 ---|---|---
-Ubuntu Server | 20.04 | Base Image
+Ubuntu Server | 18.04 | Base Image
 Python 3 | 3.6.9 | From Ubuntu Repos
 cmake | 3.18 | From python3 pip
 Boost | 1.76 | Built from source
