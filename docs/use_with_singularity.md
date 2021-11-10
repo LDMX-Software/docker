@@ -8,15 +8,10 @@
 0. Decide what tag you want to use: `export LDMX_DOCKER_TAG="ldmx/dev:my-tag"`
 1. Name the singularity image that will be built: `export LDMX_SINGULARITY_IMG="$(pwd -P)/ldmx_dev_my-tag.sif"`
 2. Pull down desired docker image and convert it to singularity style: `singularity build ${LDMX_SINGULARITY_IMG} docker://${LDMX_DOCKER_TAG}`
-3. Define a helpful bash function:
+    - You may need to point `singularity` to a larger directory using the `SINGULARITY_CACHEDIR` environment variable
+3. Define a helpful bash alias:
 ```bash
-function ldmx() {
-    _current_working_dir=${PWD##"${LDMX_BASE}/"} #store current working directory relative to ldmx base
-    cd ${LDMX_BASE} # go to ldmx base directory outside container
-    # actually run the singularity image stored in the base directory going to working directory inside container
-    singularity run --no-home --bind ${LDMX_BASE} --cleanenv --env LDMX_BASE=${LDMX_BASE} ${LDMX_SINGULARITY_IMG} ${_current_working_dir} "$@"
-    cd - &> /dev/null #go back outside the container
-}
+alias ldmx='singularity run --no-home --bind ${LDMX_BASE} --cleanenv --env LDMX_BASE=${LDMX_BASE} ${LDMX_SINGULARITY_IMG} $(pwd)'
 ```
 4. Define the directory that _ldmx-sw_ is in:
 ```
@@ -41,6 +36,13 @@ singularity \ #base singularity command
     --cleanenv \ #don't copy the environment variables into the container
     --env LDMX_BASE=${LDMX_BASE} \ #copy the one environment variable we need shared with the container
     ${LDMX_SINGULARITY_IMG} \ #full path to singularity image to make container out of
-    ${_current_working_dir} \ #go to the working directory after entering the container
-    "$@" #run the arguments given by the user as a command in the container
+    $(pwd) \ #go to the working directory after entering the container
 ```
+
+### Display Connection
+
+I've only been able to determine how to connect the display when on Linux systems.
+The connection procedure is similar to [docker](docs/use_with_docker.md#display-connection).
+
+1. Pass the `DISPLAY` environment variable to the container `--env LDMX_BASE=${LDMX_BASE},DISPLAY=:0`
+2. Mount the cache directory for the window manager `--bind ${LDMX_BASE},/tmp/.X11`

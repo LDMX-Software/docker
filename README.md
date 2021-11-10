@@ -26,23 +26,20 @@ A description of this setup process is given for both [docker](docs/use_with_doc
 
 Direct Dependecy of ldmx-sw | Version | Construction Process
 ---|---|---
-Ubuntu Server | 18.04 | Base Image
+Ubuntu Server | 20.04 | Base Image
 Python 3 | 3.6.9 | From Ubuntu Repos
 cmake | 3.18 | From python3 pip
-Boost | 1.74 | From custom PPA
-ROOT | 6.22/03 (branch v6-22-00-patches) | Built from source
+Boost | 1.76 | Built from source
 XercesC | 3.2.3 | Built from source
+ROOT | 6.22/08 | Built from source
 Geant4 | [LDMX.10.2.3\_v0.4](https://github.com/LDMX-Software/geant4/tree/LDMX.10.2.3_v0.4) | Built from source
-
-Other Large Package | Version | Reason | Construction Process
----|---|---|---
-Python 2 | 2.7.17 | Helpful for those who want to do python2-based analyses, built into ROOT TPython | From Ubuntu Repos
 
 A detailed list of all packages installed from ubuntu repositories is given [here](docs/ubuntu-packages.md).
 
 ### Python Packages for Analyses
-Installed in both Python 2 and Python 3.
+Installed in Python 3.
 - pip 
+- Cython
 - numpy
 - uproot
 - matplotlib

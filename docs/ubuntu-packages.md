@@ -1,6 +1,7 @@
 # Ubuntu Packages
 Here I try to list all of the installed ubuntu packages and give an explanation of why they are included.
-Lot's of these packages are installed into the [ROOT official docker container](https://github.com/root-project/root-docker/blob/master/ubuntu/Dockerfile) and so I have copied them here. I have looked into their purpose by a combination of googling the package name and looking at [ROOT's reason for them](https://root.cern/install/dependencies/). 
+Lot's of these packages are installed into the [ROOT official docker container](https://github.com/root-project/root-docker/blob/master/ubuntu/Dockerfile) and so I have copied them here. 
+I have looked into their purpose by a combination of googling the package name and looking at [ROOT's reason for them](https://root.cern/install/dependencies/). 
 
 Package | Necessary | Reason
 ---|---|---
@@ -12,7 +13,7 @@ dpkg-dev | Yes | Installation from PPA
 fonts-freefont-ttf | Yes | Fonts for plots
 g++-7 | Yes | Compiler with C++17 support
 gcc-7 | Yes | Compiler with C++17 support
-git | Yes | Downloading dependency sources
+git | No | **Old** Downloading dependency sources
 libafterimage-dev | Unknown | Unknown
 libcfitsio-dev | No | Reading and writing in [FITS](https://heasarc.gsfc.nasa.gov/docs/heasarc/fits.html) data format
 libfcgi-dev | No | Open extension of CGI for internet applications
@@ -49,10 +50,6 @@ libz-dev | Yes | Data compression
 libzstd-dev | Yes | Data compression
 locales | Yes | Configuration of TPython and other python packages
 make | Yes | Building dependencies and ldmx-sw source
-python-dev | Yes | ROOT TPython
-python-pip | Yes | For downloading more python packages later
-python-numpy | Yes | ROOT TPython requires numpty
-python-tk | Yes | matplotlib requires python-tk for some plotting
 python3-dev | Yes | ROOT TPython and ldmx-sw ConfigurePython
 python3-pip | Yes | For downloading more python packages later
 python3-numpy | Yes | ROOT TPython requires numpy

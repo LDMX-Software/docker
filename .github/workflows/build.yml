@@ -96,6 +96,7 @@ jobs:
         submodules: recursive
         path: ldmx-sw
         ref: ${{ steps.ldmx_sw_branch.outputs.branch }}
+
     - 
       name: Test the Build Image
       run: |
@@ -104,9 +105,8 @@ jobs:
           export _docker_parameters="-i -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE $_image_to_test"
           mkdir ldmx-sw/build
           docker run $_docker_parameters $(pwd)/ldmx-sw/build 'cmake .. && make install'
-          docker run $_docker_parameters $(pwd) ctest --verbose
-          docker run $_docker_parameters $(pwd) python test.py
           docker run $_docker_parameters $(pwd) python3 test.py
+          docker run $_docker_parameters $(pwd)/ldmx-sw/build ctest --verbose
     -
       name: Push Build to DockerHub
       run: _csv_list=${{ steps.generate_tag.outputs.push_tags }}; for tag in ${_csv_list//,/ }; do docker push $tag; done
