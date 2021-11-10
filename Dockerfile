@@ -134,6 +134,85 @@ RUN __owner="geant4" &&\
     rm -rf src 
 
 ###############################################################################
+# Installing DD4hep within the container build
+#
+# Assumptions
+#  - Dependencies installed to ${__prefix}
+#  - DD4HEP set to release name from GitHub repository
+###############################################################################
+ENV DD4HEP=v01-14
+LABEL dd4hep.version="${DD4HEP}"
+RUN mkdir src &&\
+    ${__ldmx_wget} https://github.com/AIDASoft/DD4hep/archive/refs/tags/${DD4HEP}.tar.gz |\
+      ${__ldmx_untar} &&\
+    export PYTHONPATH=${__prefix}/lib &&\
+    export CLING_STANDARD_PCH=none &&\
+    export LD_LIBRARY_PATH=${__prefix}/lib:$LD_LIBRARY_PATH &&\
+    export CMAKE_PREFIX_PATH=${__prefix} &&\
+    cmake \
+        -DCMAKE_INSTALL_PREFIX=${__prefix} \
+        -DBUILD_TESTING=OFF \
+        -B src/build \
+        -S src \
+    &&\
+    cmake \
+        --build src/build \
+        --target install \
+    &&\
+    rm -r src
+
+################################################################################
+# Install Eigen headers into container
+#
+# Assumptions
+#  - EIGEN set to release name from GitLab repository
+################################################################################
+ENV EIGEN=3.4.0
+LABEL eigen.version="${EIGEN}"
+RUN mkdir src &&\
+    ${__ldmx_wget} https://gitlab.com/libeigen/eigen/-/archive/${EIGEN}/eigen-${EIGEN}.tar.gz |\
+      ${__ldmx_untar} &&\
+    cmake \
+        -DCMAKE_INSTALL_PREFIX=${__prefix} \
+        -B src/build \
+        -S src \
+    &&\
+    cmake \
+        --build src/build \
+        --target install \
+    &&\
+    rm -rf src 
+
+###############################################################################
+# Install ACTS Common Tracking Software into the container
+#
+# Assumptions
+#  - Dependencies installed to ${__prefix}
+#  - ACTS set to release name of GitHub repository
+###############################################################################
+ENV ACTS=v14.1.0
+LABEL acts.version="${ACTS}"
+RUN mkdir src &&\
+    ${__ldmx_wget} https://github.com/acts-project/acts/archive/refs/tags/${ACTS}.tar.gz |\
+      ${__ldmx_untar} &&\
+    export PYTHONPATH=${__prefix}/lib &&\
+    export CLING_STANDARD_PCH=none &&\
+    export LD_LIBRARY_PATH=${__prefix}/lib:$LD_LIBRARY_PATH &&\
+    export CMAKE_PREFIX_PATH=${__prefix}:${CMAKE_PREFIX_PATH} &&\
+    cmake \
+        -DACTS_BUILD_EXAMPLES=OFF \
+        -DCMAKE_INSTALL_PREFIX=${__prefix} \
+        -DCMAKE_CXX_STANDARD=17 \
+        -B src/build \
+        -S src \
+    &&\
+    cmake \
+        --build src/build \
+        --target install \
+    &&\
+    rm -rf src
+
+###############################################################################
 # Extra python packages for analysis
 ###############################################################################
 ENV PYTHONPATH /usr/local/lib
