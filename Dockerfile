@@ -159,7 +159,8 @@ RUN mkdir src &&\
         --build src/build \
         --target install \
     &&\
-    rm -r src
+    rm -r src &&\
+    ln -s ${__prefix}/bin/thisdd4hep.sh ${__ldmx_env_script_d__}/thisdd4hep.sh
 
 ################################################################################
 # Install Eigen headers into container
@@ -210,7 +211,8 @@ RUN mkdir src &&\
         --build src/build \
         --target install \
     &&\
-    rm -rf src
+    rm -rf src &&\
+    ln -s ${__prefix}/bin/this_acts.sh ${__ldmx_env_script_d__}/this_acts.sh
 
 ###############################################################################
 # Extra python packages for analysis
