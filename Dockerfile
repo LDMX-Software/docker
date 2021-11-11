@@ -143,8 +143,8 @@ RUN __owner="geant4" &&\
 ENV DD4HEP=v01-18
 LABEL dd4hep.version="${DD4HEP}"
 RUN mkdir src &&\
-    ${__ldmx_wget} https://github.com/AIDASoft/DD4hep/archive/refs/tags/${DD4HEP}.tar.gz |\
-      ${__ldmx_untar} &&\
+    ${__wget} https://github.com/AIDASoft/DD4hep/archive/refs/tags/${DD4HEP}.tar.gz |\
+      ${__untar} &&\
     export PYTHONPATH=${__prefix}/lib &&\
     export CLING_STANDARD_PCH=none &&\
     export LD_LIBRARY_PATH=${__prefix}/lib:$LD_LIBRARY_PATH &&\
@@ -171,8 +171,8 @@ RUN mkdir src &&\
 ENV EIGEN=3.4.0
 LABEL eigen.version="${EIGEN}"
 RUN mkdir src &&\
-    ${__ldmx_wget} https://gitlab.com/libeigen/eigen/-/archive/${EIGEN}/eigen-${EIGEN}.tar.gz |\
-      ${__ldmx_untar} &&\
+    ${__wget} https://gitlab.com/libeigen/eigen/-/archive/${EIGEN}/eigen-${EIGEN}.tar.gz |\
+      ${__untar} &&\
     cmake \
         -DCMAKE_INSTALL_PREFIX=${__prefix} \
         -B src/build \
@@ -194,8 +194,8 @@ RUN mkdir src &&\
 ENV ACTS=v14.1.0
 LABEL acts.version="${ACTS}"
 RUN mkdir src &&\
-    ${__ldmx_wget} https://github.com/acts-project/acts/archive/refs/tags/${ACTS}.tar.gz |\
-      ${__ldmx_untar} &&\
+    ${__wget} https://github.com/acts-project/acts/archive/refs/tags/${ACTS}.tar.gz |\
+      ${__untar} &&\
     export PYTHONPATH=${__prefix}/lib &&\
     export CLING_STANDARD_PCH=none &&\
     export LD_LIBRARY_PATH=${__prefix}/lib:$LD_LIBRARY_PATH &&\
