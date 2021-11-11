@@ -145,10 +145,6 @@ LABEL dd4hep.version="${DD4HEP}"
 RUN mkdir src &&\
     ${__wget} https://github.com/AIDASoft/DD4hep/archive/refs/tags/${DD4HEP}.tar.gz |\
       ${__untar} &&\
-    export PYTHONPATH=${__prefix}/lib &&\
-    export CLING_STANDARD_PCH=none &&\
-    export LD_LIBRARY_PATH=${__prefix}/lib:$LD_LIBRARY_PATH &&\
-    export CMAKE_PREFIX_PATH=${__prefix} &&\
     cmake \
         -DCMAKE_INSTALL_PREFIX=${__prefix} \
         -DBUILD_TESTING=OFF \
@@ -159,8 +155,8 @@ RUN mkdir src &&\
         --build src/build \
         --target install \
     &&\
-    rm -r src &&\
-    ln -s ${__prefix}/bin/thisdd4hep.sh ${__ldmx_env_script_d__}/thisdd4hep.sh
+    ln -s ${__prefix}/bin/thisdd4hep.sh ${__ldmx_env_script_d__}/thisdd4hep.sh &&\
+    rm -r src
 
 ################################################################################
 # Install Eigen headers into container
@@ -196,10 +192,6 @@ LABEL acts.version="${ACTS}"
 RUN mkdir src &&\
     ${__wget} https://github.com/acts-project/acts/archive/refs/tags/${ACTS}.tar.gz |\
       ${__untar} &&\
-    export PYTHONPATH=${__prefix}/lib &&\
-    export CLING_STANDARD_PCH=none &&\
-    export LD_LIBRARY_PATH=${__prefix}/lib:$LD_LIBRARY_PATH &&\
-    export CMAKE_PREFIX_PATH=${__prefix}:${CMAKE_PREFIX_PATH} &&\
     cmake \
         -DACTS_BUILD_EXAMPLES=OFF \
         -DCMAKE_INSTALL_PREFIX=${__prefix} \
@@ -211,8 +203,8 @@ RUN mkdir src &&\
         --build src/build \
         --target install \
     &&\
-    rm -rf src &&\
-    ln -s ${__prefix}/bin/this_acts.sh ${__ldmx_env_script_d__}/this_acts.sh
+    ln -s ${__prefix}/bin/this_acts.sh ${__ldmx_env_script_d__}/this_acts.sh &&\
+    rm -rf src
 
 ###############################################################################
 # Extra python packages for analysis
