@@ -180,10 +180,6 @@ RUN mkdir src &&\
     &&\
     rm -rf src 
 
-# we need the entrypoint script for the software below because this software
-# depends on software installed previously above.
-ENV __cmake /etc/entry.sh . cmake
-
 ###############################################################################
 # Installing DD4hep within the container build
 #
@@ -196,13 +192,14 @@ LABEL dd4hep.version="${DD4HEP}"
 RUN mkdir src &&\
     ${__wget} https://github.com/AIDASoft/DD4hep/archive/refs/tags/${DD4HEP}.tar.gz |\
       ${__untar} &&\
-    ${__cmake} \
+    export LD_LIBRARY_PATH=/usr/local/lib:/usr/local/lib/root &&\
+    cmake \
         -DCMAKE_INSTALL_PREFIX=${__prefix} \
         -DBUILD_TESTING=OFF \
         -B src/build \
         -S src \
     &&\
-    ${__cmake} \
+    cmake \
         --build src/build \
         --target install \
     &&\
@@ -221,14 +218,15 @@ LABEL acts.version="${ACTS}"
 RUN mkdir src &&\
     ${__wget} https://github.com/acts-project/acts/archive/refs/tags/${ACTS}.tar.gz |\
       ${__untar} &&\
-    ${__cmake} \
+    export LD_LIBRARY_PATH=/usr/local/lib:/usr/local/lib/root &&\
+    cmake \
         -DACTS_BUILD_EXAMPLES=OFF \
         -DCMAKE_INSTALL_PREFIX=${__prefix} \
         -DCMAKE_CXX_STANDARD=17 \
         -B src/build \
         -S src \
     &&\
-    ${__cmake} \
+    cmake \
         --build src/build \
         --target install \
     &&\
