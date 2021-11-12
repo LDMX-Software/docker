@@ -133,31 +133,6 @@ RUN __owner="geant4" &&\
     ln -s /usr/local/bin/geant4.sh ${__ldmx_env_script_d__}/geant4.sh &&\ 
     rm -rf src 
 
-###############################################################################
-# Installing DD4hep within the container build
-#
-# Assumptions
-#  - Dependencies installed to ${__prefix}
-#  - DD4HEP set to release name from GitHub repository
-###############################################################################
-ENV DD4HEP=v01-18
-LABEL dd4hep.version="${DD4HEP}"
-RUN mkdir src &&\
-    ${__wget} https://github.com/AIDASoft/DD4hep/archive/refs/tags/${DD4HEP}.tar.gz |\
-      ${__untar} &&\
-    cmake \
-        -DCMAKE_INSTALL_PREFIX=${__prefix} \
-        -DBUILD_TESTING=OFF \
-        -B src/build \
-        -S src \
-    &&\
-    cmake \
-        --build src/build \
-        --target install \
-    &&\
-    ln -s ${__prefix}/bin/thisdd4hep.sh ${__ldmx_env_script_d__}/thisdd4hep.sh &&\
-    rm -r src
-
 ################################################################################
 # Install Eigen headers into container
 #
@@ -181,32 +156,6 @@ RUN mkdir src &&\
     rm -rf src 
 
 ###############################################################################
-# Install ACTS Common Tracking Software into the container
-#
-# Assumptions
-#  - Dependencies installed to ${__prefix}
-#  - ACTS set to release name of GitHub repository
-###############################################################################
-ENV ACTS=v14.1.0
-LABEL acts.version="${ACTS}"
-RUN mkdir src &&\
-    ${__wget} https://github.com/acts-project/acts/archive/refs/tags/${ACTS}.tar.gz |\
-      ${__untar} &&\
-    cmake \
-        -DACTS_BUILD_EXAMPLES=OFF \
-        -DCMAKE_INSTALL_PREFIX=${__prefix} \
-        -DCMAKE_CXX_STANDARD=17 \
-        -B src/build \
-        -S src \
-    &&\
-    cmake \
-        --build src/build \
-        --target install \
-    &&\
-    ln -s ${__prefix}/bin/this_acts.sh ${__ldmx_env_script_d__}/this_acts.sh &&\
-    rm -rf src
-
-###############################################################################
 # Extra python packages for analysis
 ###############################################################################
 ENV PYTHONPATH /usr/local/lib
@@ -228,3 +177,58 @@ RUN update-ca-certificates
 COPY ./entry.sh /etc/
 RUN chmod 755 /etc/entry.sh
 ENTRYPOINT ["/etc/entry.sh"]
+
+# we need the entrypoint script for the software below because this software
+# depends on software installed previously above.
+ENV __cmake /etc/entry.sh . cmake
+
+###############################################################################
+# Installing DD4hep within the container build
+#
+# Assumptions
+#  - Dependencies installed to ${__prefix}
+#  - DD4HEP set to release name from GitHub repository
+###############################################################################
+ENV DD4HEP=v01-18
+LABEL dd4hep.version="${DD4HEP}"
+RUN mkdir src &&\
+    ${__wget} https://github.com/AIDASoft/DD4hep/archive/refs/tags/${DD4HEP}.tar.gz |\
+      ${__untar} &&\
+    ${__cmake} \
+        -DCMAKE_INSTALL_PREFIX=${__prefix} \
+        -DBUILD_TESTING=OFF \
+        -B src/build \
+        -S src \
+    &&\
+    ${__cmake} \
+        --build src/build \
+        --target install \
+    &&\
+    ln -s ${__prefix}/bin/thisdd4hep.sh ${__ldmx_env_script_d__}/thisdd4hep.sh &&\
+    rm -r src
+
+###############################################################################
+# Install ACTS Common Tracking Software into the container
+#
+# Assumptions
+#  - Dependencies installed to ${__prefix}
+#  - ACTS set to release name of GitHub repository
+###############################################################################
+ENV ACTS=v14.1.0
+LABEL acts.version="${ACTS}"
+RUN mkdir src &&\
+    ${__wget} https://github.com/acts-project/acts/archive/refs/tags/${ACTS}.tar.gz |\
+      ${__untar} &&\
+    ${__cmake} \
+        -DACTS_BUILD_EXAMPLES=OFF \
+        -DCMAKE_INSTALL_PREFIX=${__prefix} \
+        -DCMAKE_CXX_STANDARD=17 \
+        -B src/build \
+        -S src \
+    &&\
+    ${__cmake} \
+        --build src/build \
+        --target install \
+    &&\
+    ln -s ${__prefix}/bin/this_acts.sh ${__ldmx_env_script_d__}/this_acts.sh &&\
+    rm -rf src
