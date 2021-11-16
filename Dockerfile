@@ -216,11 +216,13 @@ LABEL acts.version="${ACTS}"
 RUN mkdir src &&\
     ${__wget} https://github.com/acts-project/acts/archive/refs/tags/${ACTS}.tar.gz |\
       ${__untar} &&\
+    export DD4hep_DIR=${__prefix} &&\
     export LD_LIBRARY_PATH=/usr/local/lib:/usr/local/lib/root &&\
     cmake \
         -DACTS_BUILD_EXAMPLES=OFF \
         -DCMAKE_INSTALL_PREFIX=${__prefix} \
         -DCMAKE_CXX_STANDARD=17 \
+        -DACTS_BUILD_PLUGIN_DD4HEP=ON \
         -B src/build \
         -S src \
     &&\
