@@ -33,6 +33,9 @@ Boost | 1.76 | Built from source
 XercesC | 3.2.3 | Built from source
 ROOT | 6.22/08 | Built from source
 Geant4 | [LDMX.10.2.3\_v0.4](https://github.com/LDMX-Software/geant4/tree/LDMX.10.2.3_v0.4) | Built from source
+Eigen | 3.4.0 | Built from source
+DD4hep | 01-18 | Built from source
+ACTS | 14.1.0 | Built from source
 
 A detailed list of all packages installed from ubuntu repositories is given [here](docs/ubuntu-packages.md).
 
