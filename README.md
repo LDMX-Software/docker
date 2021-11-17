@@ -5,7 +5,7 @@
         <img src="https://img.shields.io/badge/License-GPLv3-blue.svg" />
     </a>
     <a href="https://github.com/LDMX-Software/docker/actions" alt="Actions">
-        <img src="https://github.com/LDMX-Software/docker/workflows/Build/badge.svg" />
+        <img src="https://github.com/LDMX-Software/docker/workflows/CI/badge.svg" />
     </a>
     <a href="https://hub.docker.com/r/ldmx/dev" alt="DockerHub">
         <img src="https://img.shields.io/github/v/release/LDMX-Software/docker" />
