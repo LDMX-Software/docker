@@ -103,7 +103,7 @@ RUN mkdir src &&\
 ###############################################################################
 # HighFive
 ###############################################################################
-LABLE highfive.version="2.3.1"
+LABEL highfive.version="2.3.1"
 RUN mkdir src &&\ 
     ${__wget} https://github.com/BlueBrain/HighFive/archive/refs/tags/v2.3.1.tar.gz |\
       ${__untar} &&\
