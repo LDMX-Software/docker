@@ -24,31 +24,9 @@ set -e
 #     symlinked into the directory ${__ldmx_env_script_d__}
 ###############################################################################
 
-# Set-up computing environment
-# WARNING: No check to see if there is anything in this directory
-for init_script in ${__ldmx_env_script_d__}/*; do
-  . $(realpath ${init_script})
-done
-unset init_script
-
-# add ldmx-sw and ldmx-analysis installs to the various paths
-if [ -z "${LDMX_SW_INSTALL}" ]; then
-  export LDMX_SW_INSTALL=$LDMX_BASE/ldmx-sw/install
-fi
-export LD_LIBRARY_PATH=$LDMX_SW_INSTALL/lib:$LD_LIBRARY_PATH
-export PYTHONPATH=$LDMX_SW_INSTALL/python:$PYTHONPATH
-export PATH=$LDMX_SW_INSTALL/bin:$PATH
-
-# add externals installed along side ldmx-sw
-# WARNING: No check to see if there is anything in this directory
-for _external_path in $LDMX_SW_INSTALL/external/*/lib
-do
-  export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$_external_path
-done
-unset _external_path
-
-# helps simplify any cmake nonsense
-export CMAKE_PREFIX_PATH=/usr/local/:$LDMX_SW_INSTALL
+export LD_LIBRARY_PATH=${LDMX_BASE}/.container-install/lib:${LD_LIBRARY_PATH}
+export PYTHONPATH=${LDMX_BASE}/.container-install/python:${PYTHONPATH}
+export PATH=${LDMX_BASE}/.container-install/bin:${PATH}
 
 # puts a config/cache directory for matplotlib to use
 export MPLCONFIGDIR=$LDMX_BASE/.config/matplotlib

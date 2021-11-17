@@ -56,11 +56,21 @@ RUN apt-get update &&\
 ###############################################################################
 ENV __wget wget -q -O -
 ENV __untar tar -xz --strip-components=1 --directory src
-ENV __prefix /usr/local
-ENV __ldmx_env_script_d__ /etc/ldmx-container-end.d
+ENV __prefix /usr
+ENV __ldmx_env_script_d__ /etc/ldmx-container-env.d
 
 # All init scripts in this directory will be run upon entry into container
 RUN mkdir ${__ldmx_env_script_d__}
+
+# add any ssl certificates to the container to trust
+COPY ./certs/ /usr/local/share/ca-certificates
+RUN update-ca-certificates
+
+#run environment setup when docker container is launched and decide what to do from there
+#   will require the environment variable LDMX_BASE defined
+COPY ./entry.sh /etc/
+RUN chmod 755 /etc/entry.sh
+ENTRYPOINT ["/etc/entry.sh"]
 
 ###############################################################################
 # Boost
@@ -72,86 +82,47 @@ RUN mkdir src &&\
     cd src &&\
     ./bootstrap.sh &&\
     ./b2 install &&\
+    ldconfig &&\
     cd .. && rm -rf src
 
-################################################################################
-# Xerces-C 
-################################################################################
-LABEL xercesc.version="3.2.3"
+###############################################################################
+# HDF5
+###############################################################################
+LABEL hdf5.version="1.12.1"
 RUN mkdir src &&\
-    ${__wget} http://archive.apache.org/dist/xerces/c/3/sources/xerces-c-3.2.3.tar.gz |\
+    ${__wget} https://github.com/HDFGroup/hdf5/archive/refs/tags/hdf5-1_12_1.tar.gz |\
       ${__untar} &&\
-    cmake -B src/build -S src -DCMAKE_INSTALL_PREFIX=${__prefix} &&\
-    cmake --build src/build --target install &&\
-    rm -rf src
+    cd src &&\
+    ./configure \
+      --prefix=${__prefix} \
+      --enable-cxx &&\
+    make install &&\
+    ldconfig &&\
+    cd .. && rm -rf src
 
 ###############################################################################
-# CERN's ROOT
+# HighFive
 ###############################################################################
-LABEL root.version="6.22.08"
-RUN mkdir src &&\
-    ${__wget} https://root.cern/download/root_v6.22.08.source.tar.gz |\
-     ${__untar} &&\
+LABLE highfive.version="2.3.1"
+RUN mkdir src &&\ 
+    ${__wget} https://github.com/BlueBrain/HighFive/archive/refs/tags/v2.3.1.tar.gz |\
+      ${__untar} &&\
     cmake \
-      -DCMAKE_BUILD_TYPE=Release \
-      -DCMAKE_CXX_STANDARD=17 \
-      -DCMAKE_INSTALL_PREFIX=${__prefix} \
-      -Dgminimal=ON \
-      -Dgdml=ON \
-      -Dopengl=ON \
-      -Dpyroot=ON \
-      -Dgnuinstall=ON \
-      -Dxrootd=OFF \
-      -B build \
+      -B src/build \
       -S src \
-    && cmake --build build --target install &&\
-    ln -s /usr/local/bin/thisroot.sh ${__ldmx_env_script_d__}/thisroot.sh &&\
-    rm -rf build src
-
-###############################################################################
-# Geant4
-#
-# Assumptions
-#  - GEANT4 defined to be a release of geant4 or LDMX's fork of geant4
-###############################################################################
-ENV GEANT4=LDMX.10.2.3_v0.4
-LABEL geant4.version="${GEANT4}"
-RUN __owner="geant4" &&\
-    echo "${GEANT4}" | grep -q "LDMX" && __owner="LDMX-Software" &&\
-    mkdir src &&\
-    ${__wget} https://github.com/${__owner}/geant4/archive/${GEANT4}.tar.gz | ${__untar} &&\
+      -DCMAKE_INSTALL_PREFIX=${__prefix} &&\
     cmake \
-        -DGEANT4_INSTALL_DATA=ON \
-        -DGEANT4_USE_GDML=ON \
-        -DGEANT4_INSTALL_EXAMPLES=OFF \
-        -DGEANT4_USE_OPENGL_X11=ON \
-        -DCMAKE_INSTALL_PREFIX=${__prefix} \
-        -B src/build \
-        -S src \
-        &&\
-    cmake --build src/build --target install &&\
-    ln -s /usr/local/bin/geant4.sh ${__ldmx_env_script_d__}/geant4.sh &&\ 
-    rm -rf src 
+      --build src/build \
+      --target install &&\
+    rm -rf src
 
 ###############################################################################
 # Extra python packages for analysis
 ###############################################################################
-ENV PYTHONPATH /usr/local/lib
-ENV CLING_STANDARD_PCH none
 RUN python3 -m pip install --upgrade --no-cache-dir \
-        Cython \
-        uproot \
+        h5py \
+        pandas \
         numpy \
         matplotlib \
         xgboost \
         sklearn
-
-# add any ssl certificates to the container to trust
-COPY ./certs/ /usr/local/share/ca-certificates
-RUN update-ca-certificates
-
-#run environment setup when docker container is launched and decide what to do from there
-#   will require the environment variable LDMX_BASE defined
-COPY ./entry.sh /etc/
-RUN chmod 755 /etc/entry.sh
-ENTRYPOINT ["/etc/entry.sh"]

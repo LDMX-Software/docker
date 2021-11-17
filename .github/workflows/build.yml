@@ -75,39 +75,5 @@ jobs:
       id: docker_build
       uses: docker/build-push-action@v2
       with:
-        push: false # don't push to docker hub yet
-        load: true # allow image to be availabe to the docker program later in this job
+        push: true 
         tags: ${{ steps.generate_tag.outputs.push_tags }}
-    -
-      name: Determine ldmx-sw Branch to Test
-      id: ldmx_sw_branch
-      run: |
-          _branch=""
-          if [ -f ldmx-sw-branch ]; then
-              _branch=$(cat ldmx-sw-branch)
-          fi
-          echo "Test against ldmx-sw/${_branch}"
-          echo ::set-output name=branch::${_branch}
-    -
-      name: Pull down ldmx-sw for testing
-      uses: actions/checkout@v2
-      with:
-        repository: LDMX-Software/ldmx-sw
-        submodules: recursive
-        path: ldmx-sw
-        ref: ${{ steps.ldmx_sw_branch.outputs.branch }}
-
-    - 
-      name: Test the Build Image
-      run: |
-          export LDMX_BASE=$(pwd)
-          export _image_to_test=${{ steps.generate_tag.outputs.main_tag }}
-          export _docker_parameters="-i -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE $_image_to_test"
-          mkdir ldmx-sw/build
-          docker run $_docker_parameters $(pwd)/ldmx-sw/build 'cmake .. && make install'
-          docker run $_docker_parameters $(pwd) python3 test.py
-          docker run $_docker_parameters $(pwd)/ldmx-sw/build ctest --verbose
-    -
-      name: Push Build to DockerHub
-      run: _csv_list=${{ steps.generate_tag.outputs.push_tags }}; for tag in ${_csv_list//,/ }; do docker push $tag; done
-      if: ${{ github.event_name != 'pull_request' }}
