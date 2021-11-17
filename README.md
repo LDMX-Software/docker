@@ -30,18 +30,17 @@ Ubuntu Server | 18.04 | Base Image
 Python 3 | 3.6.9 | From Ubuntu Repos
 cmake | 3.18 | From python3 pip
 Boost | 1.76 | Built from source
-XercesC | 3.2.3 | Built from source
-ROOT | 6.22/08 | Built from source
-Geant4 | [LDMX.10.2.3\_v0.4](https://github.com/LDMX-Software/geant4/tree/LDMX.10.2.3_v0.4) | Built from source
+HDF5 | 1.12.1 | Built from source
+HighFive | 2.3.1 | "Built" from source
 
 A detailed list of all packages installed from ubuntu repositories is given [here](docs/ubuntu-packages.md).
 
 ### Python Packages for Analyses
 Installed in Python 3.
 - pip 
-- Cython
+- h5py
 - numpy
-- uproot
+- pandas
 - matplotlib
 - xgboost
 - sklearn
