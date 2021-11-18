@@ -38,10 +38,10 @@ jobs:
       with:
         push: false # don't push to docker hub yet
         load: true # allow image to be availabe to the docker program later in this job
-        tags: build:edge
+        tags: image-build
     -
       name: Package Image
-      run: docker export build:edge > ldmx-dev.tar
+      run: docker save image-build > ldmx-dev.tar
     - 
       name: Upload Newly Built Image
       uses: actions/upload-artifact@v2
@@ -72,7 +72,7 @@ jobs:
         name: ldmx-dev-${{ github.sha }}
     - 
       name: Import Image into Docker
-      run: docker import ldmx-dev.tar image:test
+      run: docker load ldmx-dev.tar image-test
     -
       name: Download Build Context for Test Script
       uses: actions/checkout@v2
@@ -88,7 +88,7 @@ jobs:
       name: Test the Image
       run: |
           export LDMX_BASE=$(pwd)
-          export _docker_parameters="-i -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE image:test"
+          export _docker_parameters="-i -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE image-test"
           mkdir ldmx-sw/build
           docker run $_docker_parameters $(pwd)/ldmx-sw/build 'cmake .. && make install'
           docker run $_docker_parameters $(pwd) python3 test.py
@@ -150,11 +150,11 @@ jobs:
         name: ldmx-dev-${{ github.sha }}
     - 
       name: Import Image into Docker
-      run: docker import ldmx-dev.tar image:push
+      run: docker load ldmx-dev.tar image-push
     -
       name: Push Build to DockerHub
       run: |
         for tag in ${{ steps.generate_tag.outputs.push_tags }}; do 
-          docker tag image:push $tag
+          docker tag image-push $tag
           docker push $tag 
         done
