@@ -57,10 +57,20 @@ RUN apt-get update &&\
 ENV __wget wget -q -O -
 ENV __untar tar -xz --strip-components=1 --directory src
 ENV __prefix /usr/local
-ENV __ldmx_env_script_d__ /etc/ldmx-container-end.d
+ENV __ldmx_env_script_d__ /etc/ldmx-container-env.d
 
 # All init scripts in this directory will be run upon entry into container
 RUN mkdir ${__ldmx_env_script_d__}
+
+# add any ssl certificates to the container to trust
+COPY ./certs/ /usr/local/share/ca-certificates
+RUN update-ca-certificates
+
+#run environment setup when docker container is launched and decide what to do from there
+#   will require the environment variable LDMX_BASE defined
+COPY ./entry.sh /etc/
+RUN chmod 755 /etc/entry.sh
+ENTRYPOINT ["/etc/entry.sh"]
 
 ###############################################################################
 # Boost
@@ -146,12 +156,80 @@ RUN python3 -m pip install --upgrade --no-cache-dir \
         xgboost \
         sklearn
 
-# add any ssl certificates to the container to trust
-COPY ./certs/ /usr/local/share/ca-certificates
-RUN update-ca-certificates
+################################################################################
+# Install Eigen headers into container
+#
+# Assumptions
+#  - EIGEN set to release name from GitLab repository
+################################################################################
+ENV EIGEN=3.4.0
+LABEL eigen.version="${EIGEN}"
+RUN mkdir src &&\
+    ${__wget} https://gitlab.com/libeigen/eigen/-/archive/${EIGEN}/eigen-${EIGEN}.tar.gz |\
+      ${__untar} &&\
+    cmake \
+        -DCMAKE_INSTALL_PREFIX=${__prefix} \
+        -B src/build \
+        -S src \
+    &&\
+    cmake \
+        --build src/build \
+        --target install \
+    &&\
+    rm -rf src 
 
-#run environment setup when docker container is launched and decide what to do from there
-#   will require the environment variable LDMX_BASE defined
-COPY ./entry.sh /etc/
-RUN chmod 755 /etc/entry.sh
-ENTRYPOINT ["/etc/entry.sh"]
+###############################################################################
+# Installing DD4hep within the container build
+#
+# Assumptions
+#  - Dependencies installed to ${__prefix}
+#  - DD4HEP set to release name from GitHub repository
+###############################################################################
+ENV DD4HEP=v01-18
+LABEL dd4hep.version="${DD4HEP}"
+RUN mkdir src &&\
+    ${__wget} https://github.com/AIDASoft/DD4hep/archive/refs/tags/${DD4HEP}.tar.gz |\
+      ${__untar} &&\
+    export LD_LIBRARY_PATH=/usr/local/lib:/usr/local/lib/root &&\
+    cmake \
+        -DCMAKE_INSTALL_PREFIX=${__prefix} \
+        -DBUILD_TESTING=OFF \
+        -B src/build \
+        -S src \
+    &&\
+    cmake \
+        --build src/build \
+        --target install \
+    &&\
+    ln -s ${__prefix}/bin/thisdd4hep.sh ${__ldmx_env_script_d__}/thisdd4hep.sh &&\
+    rm -r src
+
+###############################################################################
+# Install ACTS Common Tracking Software into the container
+#
+# Assumptions
+#  - Dependencies installed to ${__prefix}
+#  - ACTS set to release name of GitHub repository
+###############################################################################
+ENV ACTS=v14.1.0
+LABEL acts.version="${ACTS}"
+RUN mkdir src &&\
+    ${__wget} https://github.com/acts-project/acts/archive/refs/tags/${ACTS}.tar.gz |\
+      ${__untar} &&\
+    export DD4hep_DIR=${__prefix} &&\
+    export LD_LIBRARY_PATH=/usr/local/lib:/usr/local/lib/root &&\
+    cmake \
+        -DACTS_BUILD_EXAMPLES=OFF \
+        -DCMAKE_INSTALL_PREFIX=${__prefix} \
+        -DCMAKE_CXX_STANDARD=17 \
+        -DACTS_BUILD_PLUGIN_DD4HEP=ON \
+        -B src/build \
+        -S src \
+    &&\
+    cmake \
+        --build src/build \
+        --target install \
+    &&\
+    ln -s ${__prefix}/bin/this_acts.sh ${__ldmx_env_script_d__}/this_acts.sh &&\
+    rm -rf src
+
