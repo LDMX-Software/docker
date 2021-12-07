@@ -9,12 +9,12 @@ binutils | Yes | Adding PPA and linking libraries
 ca-certificates | Yes | Installing certificates to trust in container
 davix-dev | No | Remote I/O, file transfer and file management
 dcap-dev | Unknown | C-API to the [DCache Access Protocol](https://dcache.org/old/manuals/libdcap.shtml)
-dpkg-dev | Yes | Installation from PPA
+dpkg-dev | No | **Old** Installation from PPA
 fonts-freefont-ttf | Yes | Fonts for plots
 g++-7 | Yes | Compiler with C++17 support
 gcc-7 | Yes | Compiler with C++17 support
 git | No | **Old** Downloading dependency sources
-libafterimage-dev | Unknown | Unknown
+libafterimage-dev | Yes | ROOT GUI depends on these for common shapes
 libcfitsio-dev | No | Reading and writing in [FITS](https://heasarc.gsfc.nasa.gov/docs/heasarc/fits.html) data format
 libfcgi-dev | No | Open extension of CGI for internet applications
 libfftw3-dev | Yes | Computing discrete fourier transform
