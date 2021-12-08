@@ -108,6 +108,7 @@ RUN mkdir src &&\
       -DCMAKE_CXX_STANDARD=17 \
       -DCMAKE_INSTALL_PREFIX=${__prefix} \
       -Dgminimal=ON \
+      -Dasimage=ON \
       -Dgdml=ON \
       -Dopengl=ON \
       -Dpyroot=ON \
