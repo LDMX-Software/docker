@@ -90,9 +90,15 @@ jobs:
           export LDMX_BASE=$(pwd)
           export _docker_parameters="-i -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE new-build"
           mkdir ldmx-sw/build
+          echo "::group::Build ldmx-sw"
           docker run $_docker_parameters $(pwd)/ldmx-sw/build 'cmake .. && make install'
+          echo "::endgroup::"
+          echo "::group::Run python test script"
           docker run $_docker_parameters $(pwd) python3 test.py
+          echo "::endgroup::"
+          echo "::group::ldmx-sw test program"
           docker run $_docker_parameters $(pwd)/ldmx-sw/build ctest --verbose
+          echo "::endgroup::"
 
   push:
     needs: test
