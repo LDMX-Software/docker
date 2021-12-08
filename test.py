@@ -2,8 +2,16 @@
 import numpy
 
 import ROOT
-from ROOT import TTree
-from ROOT import TBranch
+
+# test printing an empty canvas
+#   ROOT can still be built but not have a fully functional graphics lib
+ROOT.gROOT.SetBatch(1)
+c = ROOT.TCanvas('c','Test Canvas')
+c.SaveAs('/tmp/test.png')
+import os, sys
+if not os.path.exists('/tmp/test.png') :
+    print('Could not print an empty canvas in ROOT.')
+    sys.exit(1)
 
 import uproot
 
