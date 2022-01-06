@@ -13,8 +13,10 @@ dpkg-dev | No | **Old** Installation from PPA
 fonts-freefont-ttf | Yes | Fonts for plots
 g++-7 | Yes | Compiler with C++17 support
 gcc-7 | Yes | Compiler with C++17 support
+gdb | No | Supporting debugging LDMX-sw programs within the container
 git | No | **Old** Downloading dependency sources
 libafterimage-dev | Yes | ROOT GUI depends on these for common shapes
+libasan4-dbg | No | Runtime components for the compiler based instrumentation tools that come with GCC
 libcfitsio-dev | No | Reading and writing in [FITS](https://heasarc.gsfc.nasa.gov/docs/heasarc/fits.html) data format
 libfcgi-dev | No | Open extension of CGI for internet applications
 libfftw3-dev | Yes | Computing discrete fourier transform
