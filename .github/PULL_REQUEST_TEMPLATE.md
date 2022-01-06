@@ -20,14 +20,15 @@ ldmx-container-pull local temp-tag
 cd ldmx-sw
 mkdir build
 cd build
-ldmx cmake -DBUILD_TESTS=ON ..
+ldmx cmake ..
 ldmx make install
 ```
 - [ ] I was able to test run a small simulation and reconstruction inside this container
 ```
 # outline of test instructions
-cd $LDMX_BASE
-ldmx run_test
+cd $LDMX_BASE/ldmx-sw/build
+ldmx ctest
+cd ..
 for c in `ls ldmx-sw/*/test/*.py`; ldmx fire $c; done
 ```
 - [ ] I was able to successfully use the new packages. Explain what you did to test them below:
