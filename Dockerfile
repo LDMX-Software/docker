@@ -13,7 +13,9 @@ RUN apt-get update &&\
         fonts-freefont-ttf \
         g++-7 \
         gcc-7 \
+        gdb \
         libafterimage-dev \
+        libasan4-dbg \
         libfftw3-dev \
         libfreetype6-dev \
         libftgl-dev \
