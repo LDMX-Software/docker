@@ -14,8 +14,8 @@ RUN apt-get update &&\
         g++-7 \
         gcc-7 \
         gdb \
-        libasan4-dbg \
         libafterimage-dev \
+        libasan4-dbg \
         libfftw3-dev \
         libfreetype6-dev \
         libftgl-dev \
