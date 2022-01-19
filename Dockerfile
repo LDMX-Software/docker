@@ -120,6 +120,7 @@ RUN mkdir src &&\
 # Extra python packages for analysis
 ###############################################################################
 RUN python3 -m pip install --upgrade --no-cache-dir \
+        pytest \
         h5py \
         pandas \
         numpy \
