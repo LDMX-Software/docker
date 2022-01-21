@@ -83,6 +83,8 @@ RUN mkdir src &&\
     ${__wget} https://boostorg.jfrog.io/artifactory/main/release/1.76.0/source/boost_1_76_0.tar.gz |\
       ${__untar} &&\
     cd src &&\
+    # Configure Boost.Python to look for the Python version we have.
+    sed -i 's/using python ;/using python : 3.6 ;/' libs/python/build/Jamfile &&\
     ./bootstrap.sh &&\
     ./b2 install &&\
     cd .. && rm -rf src
