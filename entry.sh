@@ -36,7 +36,7 @@ if [ -z "${LDMX_SW_INSTALL}" ]; then
   export LDMX_SW_INSTALL=$LDMX_BASE/ldmx-sw/install
 fi
 export LD_LIBRARY_PATH=$LDMX_SW_INSTALL/lib:$LD_LIBRARY_PATH
-export PYTHONPATH=$LDMX_SW_INSTALL/python:$PYTHONPATH
+export PYTHONPATH=$LDMX_SW_INSTALL/python:$LDMX_SW_INSTALL/libn:$PYTHONPATH
 export PATH=$LDMX_SW_INSTALL/bin:$PATH
 
 # add externals installed along side ldmx-sw
