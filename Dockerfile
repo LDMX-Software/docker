@@ -87,15 +87,35 @@ RUN mkdir src &&\
     ./b2 install &&\
     cd .. && rm -rf src
 
-################################################################################
-# Xerces-C 
-################################################################################
-LABEL xercesc.version="3.2.3"
+###############################################################################
+# HDF5
+###############################################################################
+LABEL hdf5.version="1.12.1"
 RUN mkdir src &&\
-    ${__wget} http://archive.apache.org/dist/xerces/c/3/sources/xerces-c-3.2.3.tar.gz |\
+    ${__wget} https://github.com/HDFGroup/hdf5/archive/refs/tags/hdf5-1_12_1.tar.gz |\
       ${__untar} &&\
-    cmake -B src/build -S src -DCMAKE_INSTALL_PREFIX=${__prefix} &&\
-    cmake --build src/build --target install &&\
+    cd src &&\
+    ./configure \
+      --prefix=${__prefix} \
+      --enable-cxx &&\
+    make install &&\
+    ldconfig &&\
+    cd .. && rm -rf src
+
+###############################################################################
+# HighFive
+###############################################################################
+LABEL highfive.version="2.3.1"
+RUN mkdir src &&\ 
+    ${__wget} https://github.com/BlueBrain/HighFive/archive/refs/tags/v2.3.1.tar.gz |\
+      ${__untar} &&\
+    cmake \
+      -B src/build \
+      -S src \
+      -DCMAKE_INSTALL_PREFIX=${__prefix} &&\
+    cmake \
+      --build src/build \
+      --target install &&\
     rm -rf src
 
 ###############################################################################
@@ -123,31 +143,6 @@ RUN mkdir src &&\
     rm -rf build src
 
 ###############################################################################
-# Geant4
-#
-# Assumptions
-#  - GEANT4 defined to be a release of geant4 or LDMX's fork of geant4
-###############################################################################
-ENV GEANT4=LDMX.10.2.3_v0.4
-LABEL geant4.version="${GEANT4}"
-RUN __owner="geant4" &&\
-    echo "${GEANT4}" | grep -q "LDMX" && __owner="LDMX-Software" &&\
-    mkdir src &&\
-    ${__wget} https://github.com/${__owner}/geant4/archive/${GEANT4}.tar.gz | ${__untar} &&\
-    cmake \
-        -DGEANT4_INSTALL_DATA=ON \
-        -DGEANT4_USE_GDML=ON \
-        -DGEANT4_INSTALL_EXAMPLES=OFF \
-        -DGEANT4_USE_OPENGL_X11=ON \
-        -DCMAKE_INSTALL_PREFIX=${__prefix} \
-        -B src/build \
-        -S src \
-        &&\
-    cmake --build src/build --target install &&\
-    ln -s /usr/local/bin/geant4.sh ${__ldmx_env_script_d__}/geant4.sh &&\ 
-    rm -rf src 
-
-###############################################################################
 # Extra python packages for analysis
 ###############################################################################
 ENV PYTHONPATH /usr/local/lib
@@ -158,82 +153,7 @@ RUN python3 -m pip install --upgrade --no-cache-dir \
         numpy \
         matplotlib \
         xgboost \
-        sklearn
-
-################################################################################
-# Install Eigen headers into container
-#
-# Assumptions
-#  - EIGEN set to release name from GitLab repository
-################################################################################
-ENV EIGEN=3.4.0
-LABEL eigen.version="${EIGEN}"
-RUN mkdir src &&\
-    ${__wget} https://gitlab.com/libeigen/eigen/-/archive/${EIGEN}/eigen-${EIGEN}.tar.gz |\
-      ${__untar} &&\
-    cmake \
-        -DCMAKE_INSTALL_PREFIX=${__prefix} \
-        -B src/build \
-        -S src \
-    &&\
-    cmake \
-        --build src/build \
-        --target install \
-    &&\
-    rm -rf src 
-
-###############################################################################
-# Installing DD4hep within the container build
-#
-# Assumptions
-#  - Dependencies installed to ${__prefix}
-#  - DD4HEP set to release name from GitHub repository
-###############################################################################
-ENV DD4HEP=v01-18
-LABEL dd4hep.version="${DD4HEP}"
-RUN mkdir src &&\
-    ${__wget} https://github.com/AIDASoft/DD4hep/archive/refs/tags/${DD4HEP}.tar.gz |\
-      ${__untar} &&\
-    export LD_LIBRARY_PATH=/usr/local/lib:/usr/local/lib/root &&\
-    cmake \
-        -DCMAKE_INSTALL_PREFIX=${__prefix} \
-        -DBUILD_TESTING=OFF \
-        -B src/build \
-        -S src \
-    &&\
-    cmake \
-        --build src/build \
-        --target install \
-    &&\
-    ln -s ${__prefix}/bin/thisdd4hep.sh ${__ldmx_env_script_d__}/thisdd4hep.sh &&\
-    rm -r src
-
-###############################################################################
-# Install ACTS Common Tracking Software into the container
-#
-# Assumptions
-#  - Dependencies installed to ${__prefix}
-#  - ACTS set to release name of GitHub repository
-###############################################################################
-ENV ACTS=v14.1.0
-LABEL acts.version="${ACTS}"
-RUN mkdir src &&\
-    ${__wget} https://github.com/acts-project/acts/archive/refs/tags/${ACTS}.tar.gz |\
-      ${__untar} &&\
-    export DD4hep_DIR=${__prefix} &&\
-    export LD_LIBRARY_PATH=/usr/local/lib:/usr/local/lib/root &&\
-    cmake \
-        -DACTS_BUILD_EXAMPLES=OFF \
-        -DCMAKE_INSTALL_PREFIX=${__prefix} \
-        -DCMAKE_CXX_STANDARD=17 \
-        -DACTS_BUILD_PLUGIN_DD4HEP=ON \
-        -B src/build \
-        -S src \
-    &&\
-    cmake \
-        --build src/build \
-        --target install \
-    &&\
-    ln -s ${__prefix}/bin/this_acts.sh ${__ldmx_env_script_d__}/this_acts.sh &&\
-    rm -rf src
+        sklearn \
+        h5py \
+        pandas
 
