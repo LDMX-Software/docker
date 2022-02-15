@@ -215,10 +215,10 @@ RUN mkdir src &&\
 #  - Dependencies installed to ${__prefix}
 #  - ACTS set to release name of GitHub repository
 ###############################################################################
-ENV ACTS=v14.1.0
+ENV ACTS=ldmx_trk_v1.0
 LABEL acts.version="${ACTS}"
 RUN mkdir src &&\
-    ${__wget} https://github.com/acts-project/acts/archive/refs/tags/${ACTS}.tar.gz |\
+    ${__wget} https://github.com/pbutti/acts/archive/refs/tags/${ACTS}.tar.gz |\
       ${__untar} &&\
     export DD4hep_DIR=${__prefix} &&\
     export LD_LIBRARY_PATH=/usr/local/lib:/usr/local/lib/root &&\
