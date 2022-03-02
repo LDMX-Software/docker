@@ -32,6 +32,8 @@ cmake | 3.18 | From python3 pip
 Boost | 1.76 | Built from source
 HDF5 | 1.12.1 | Built from source
 HighFive | 2.3.1 | "Built" from source
+[XercesC](http://xerces.apache.org/xerces-c/) | 3.2.3 | Built from source
+[Geant4](https://geant4.web.cern.ch/node/1) | [LDMX.10.2.3\_v0.4](https://github.com/LDMX-Software/geant4/tree/LDMX.10.2.3_v0.4) | Built from source
 
 A detailed list of all packages installed from ubuntu repositories is given [here](docs/ubuntu-packages.md).
 
