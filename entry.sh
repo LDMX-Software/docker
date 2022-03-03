@@ -24,6 +24,9 @@ set -e
 #     symlinked into the directory ${__ldmx_env_script_d__}
 ###############################################################################
 
+# Set-up computing environment
+. /usr/local/bin/thisroot.sh
+
 if [[ -z $LDMX_CONTAINER_INSTALL ]]; then
   export LDMX_CONTAINER_INSTALL=${LDMX_BASE}/.container-install
 fi
