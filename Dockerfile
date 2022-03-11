@@ -155,5 +155,6 @@ RUN python3 -m pip install --upgrade --no-cache-dir \
         xgboost \
         sklearn \
         h5py \
+        pytest \
         pandas
 
