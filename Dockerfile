@@ -215,7 +215,7 @@ RUN mkdir src &&\
 #  - Dependencies installed to ${__prefix}
 #  - ACTS set to release name of GitHub repository
 ###############################################################################
-ENV ACTS=v19.1.0
+ENV ACTS=v18.0.0
 LABEL acts.version="${ACTS}"
 RUN mkdir src &&\
     ${__wget} https://github.com/acts-project/acts/archive/refs/tags/${ACTS}.tar.gz |\
