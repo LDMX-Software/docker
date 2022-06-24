@@ -130,10 +130,8 @@ RUN mkdir src &&\
 ###############################################################################
 ENV GEANT4=10.7.3
 LABEL geant4.version="${GEANT4}"
-RUN __owner="geant4" &&\
-    echo "${GEANT4}" | grep -q "LDMX" && __owner="LDMX-Software" &&\
-    mkdir src &&\
-    ${__wget} https://github.com/${__owner}/geant4/archive/${GEANT4}.tar.gz | ${__untar} &&\
+RUN mkdir src &&\
+    ${__wget} https://github.com/Geant4/geant4/archive/refs/tags/v10.7.3.tar.gz | ${__untar} &&\
     cmake \
         -DGEANT4_INSTALL_DATA=ON \
         -DGEANT4_USE_GDML=ON \
