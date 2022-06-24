@@ -128,7 +128,7 @@ RUN mkdir src &&\
 # Assumptions
 #  - GEANT4 defined to be a release of geant4 or LDMX's fork of geant4
 ###############################################################################
-ENV GEANT4=geant4-10.7-release
+ENV GEANT4=10.7.3
 LABEL geant4.version="${GEANT4}"
 RUN __owner="geant4" &&\
     echo "${GEANT4}" | grep -q "LDMX" && __owner="LDMX-Software" &&\
