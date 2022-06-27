@@ -48,60 +48,9 @@ jobs:
       with:
         name: ldmx-dev-${{ github.sha }}
         path: ldmx-dev.tar
-
-  test:
-    needs: build
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        ldmx_sw_branch: [ trunk, v3.0.2, v3.1.0 ]
-    defaults:
-      run:
-        shell: bash
-    steps:
-    -
-      name: Setup QEMU
-      uses: docker/setup-qemu-action@v1
-    -
-      name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v1
-    -
-      name: Download Image
-      uses: actions/download-artifact@v2
-      with:
-        name: ldmx-dev-${{ github.sha }}
-    - 
-      name: Import Image into Docker
-      run: docker load --input ldmx-dev.tar
-    -
-      name: Download Build Context for Test Script
-      uses: actions/checkout@v2
-    -
-      name: Pull down ldmx-sw for testing
-      uses: actions/checkout@v2
-      with:
-        repository: LDMX-Software/ldmx-sw
-        submodules: recursive
-        path: ldmx-sw
-        ref: ${{ matrix.ldmx_sw_branch }}
-    - 
-      name: Test the Image
-      run: |
-          export LDMX_BASE=$(pwd)
-          export _docker_parameters="-i -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE new-build"
-          mkdir ldmx-sw/build
-          echo "::group::Build ldmx-sw"
-          docker run $_docker_parameters $(pwd)/ldmx-sw/build 'cmake .. && make install'
-          echo "::endgroup::"
-          echo "::group::Run python test script"
-          docker run $_docker_parameters $(pwd) python3 test.py
-          echo "::endgroup::"
-          echo "::group::ldmx-sw test program"
-          docker run $_docker_parameters $(pwd)/ldmx-sw/build ctest --verbose
-          echo "::endgroup::"
-
+        
   push:
-    needs: test
+    needs: build
     runs-on: ubuntu-latest
     defaults:
       run:
