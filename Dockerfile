@@ -49,6 +49,7 @@ RUN apt-get update &&\
     && rm -rf /var/lib/apt/lists/* &&\
     apt-get autoremove --purge &&\
     apt-get clean all &&\
+    python3 -m pip install --upgrade pip &&\
     python3 -m pip install --upgrade --no-cache-dir cmake
 
 ###############################################################################
