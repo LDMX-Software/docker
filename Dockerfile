@@ -128,12 +128,12 @@ RUN mkdir src &&\
 # Assumptions
 #  - GEANT4 defined to be a release of geant4 or LDMX's fork of geant4
 ###############################################################################
-ENV GEANT4=LDMX.10.2.3_v0.4
+ENV GEANT4=upKaons
 LABEL geant4.version="${GEANT4}"
 RUN __owner="geant4" &&\
-    echo "${GEANT4}" | grep -q "LDMX" && __owner="LDMX-Software" &&\
+#    echo "${GEANT4}" | grep -q "LDMX" && __owner="LDMX-Software" &&\
     mkdir src &&\
-    ${__wget} https://github.com/${__owner}/geant4/archive/${GEANT4}.tar.gz | ${__untar} &&\
+    ${__wget} https://github.com/LDMX-Software/geant4/archive/${GEANT4}.tar.gz | ${__untar} &&\
     cmake \
         -DGEANT4_INSTALL_DATA=ON \
         -DGEANT4_USE_GDML=ON \
