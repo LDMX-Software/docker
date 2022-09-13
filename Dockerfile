@@ -49,6 +49,7 @@ RUN apt-get update &&\
     && rm -rf /var/lib/apt/lists/* &&\
     apt-get autoremove --purge &&\
     apt-get clean all &&\
+    python3 -m pip install --upgrade pip &&\
     python3 -m pip install --upgrade --no-cache-dir cmake
 
 ###############################################################################
@@ -83,6 +84,8 @@ RUN mkdir src &&\
     ${__wget} https://boostorg.jfrog.io/artifactory/main/release/1.76.0/source/boost_1_76_0.tar.gz |\
       ${__untar} &&\
     cd src &&\
+    # Configure Boost.Python to look for the Python version we have.
+    sed -i 's/using python ;/using python : 3.6 ;/' libs/python/build/Jamfile &&\
     ./bootstrap.sh &&\
     ./b2 install &&\
     cd .. && rm -rf src
@@ -207,33 +210,3 @@ RUN mkdir src &&\
     &&\
     ln -s ${__prefix}/bin/thisdd4hep.sh ${__ldmx_env_script_d__}/thisdd4hep.sh &&\
     rm -r src
-
-###############################################################################
-# Install ACTS Common Tracking Software into the container
-#
-# Assumptions
-#  - Dependencies installed to ${__prefix}
-#  - ACTS set to release name of GitHub repository
-###############################################################################
-ENV ACTS=v14.1.0
-LABEL acts.version="${ACTS}"
-RUN mkdir src &&\
-    ${__wget} https://github.com/acts-project/acts/archive/refs/tags/${ACTS}.tar.gz |\
-      ${__untar} &&\
-    export DD4hep_DIR=${__prefix} &&\
-    export LD_LIBRARY_PATH=/usr/local/lib:/usr/local/lib/root &&\
-    cmake \
-        -DACTS_BUILD_EXAMPLES=OFF \
-        -DCMAKE_INSTALL_PREFIX=${__prefix} \
-        -DCMAKE_CXX_STANDARD=17 \
-        -DACTS_BUILD_PLUGIN_DD4HEP=ON \
-        -B src/build \
-        -S src \
-    &&\
-    cmake \
-        --build src/build \
-        --target install \
-    &&\
-    ln -s ${__prefix}/bin/this_acts.sh ${__ldmx_env_script_d__}/this_acts.sh &&\
-    rm -rf src
-

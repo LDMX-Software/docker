@@ -35,7 +35,6 @@ Direct Dependecy of ldmx-sw | Version | Construction Process
 [Geant4](https://geant4.web.cern.ch/node/1) | [LDMX.10.2.3\_v0.4](https://github.com/LDMX-Software/geant4/tree/LDMX.10.2.3_v0.4) | Built from source
 [Eigen](https://eigen.tuxfamily.org/index.php?title=Main_Page) | 3.4.0 | Built from source
 [DD4hep](https://github.com/AIDASoft/DD4hep) | 01-18 | Built from source
-[ACTS](https://github.com/acts-project/acts) | 14.1.0 | Built from source
 
 A detailed list of all packages installed from ubuntu repositories is given [here](docs/ubuntu-packages.md).
 
