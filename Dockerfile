@@ -91,6 +91,37 @@ RUN mkdir src &&\
     cd .. && rm -rf src
 
 ################################################################################
+# HDF5
+################################################################################
+LABEL hdf5.version="1.13.2"
+RUN mkdir src &&\
+    ${__wget} https://github.com/HDFGroup/hdf5/archive/refs/tags/hdf5-1_13_2.tar.gz |\
+      ${__untar} &&\
+    cd src &&\
+    ./configure \
+      --prefix=${__prefix} \
+      --enable-cxx &&\
+    make install &&\
+    ldconfig &&\
+    cd .. && rm -rf src
+
+################################################################################
+# HighFive
+################################################################################
+LABEL highfive.version="2.4.1"
+RUN mkdir src &&\
+    ${__wget} https://github.com/BlueBrain/HighFive/archive/refs/tags/v2.4.1.tar.gz |\
+      ${__untar} &&\
+    cmake \
+      -B src/build \
+      -S src \
+      -DCMAKE_INSTALL_PREFIX=${__prefix} &&\
+    cmake \
+      --build src/build \
+      --target install &&\
+    rm -rf src
+
+################################################################################
 # Xerces-C 
 ################################################################################
 LABEL xercesc.version="3.2.3"
@@ -158,6 +189,9 @@ ENV CLING_STANDARD_PCH none
 RUN python3 -m pip install --upgrade --no-cache-dir \
         Cython \
         uproot \
+        pytest \
+        h5py \
+        pandas \
         numpy \
         matplotlib \
         xgboost \
