@@ -117,6 +117,7 @@ RUN mkdir src &&\
       -S src \
       -DHIGHFIVE_EXAMPLES=OFF \
       -DHIGHFIVE_BUILD_DOCS=OFF \
+      -DHIGHFIVE_UNIT_TESTS=OFF \
       -DHIGHFIVE_USE_INSTALL_DEPS=ON \
       -DCMAKE_INSTALL_PREFIX=${__prefix} &&\
     cmake \
