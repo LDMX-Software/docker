@@ -92,18 +92,24 @@ RUN mkdir src &&\
 
 ################################################################################
 # HDF5
+#    cmake \
+#      -S src \
+#      -B src/build \
+#      -DCMAKE_INSTALL_PREFIX=${__prefix} &&\
+#    cmake \
+#      --build src/build \
+#      --target install &&\
 ################################################################################
-LABEL hdf5.version="1.13.2"
+LABEL hdf5.version="1.12.1"
 RUN mkdir src &&\
-    ${__wget} https://github.com/HDFGroup/hdf5/archive/refs/tags/hdf5-1_13_2.tar.gz |\
+    ${__wget} https://github.com/HDFGroup/hdf5/archive/refs/tags/hdf5-1_12_1.tar.gz |\
       ${__untar} &&\
     cd src &&\
-    ./configure \
-      --prefix=${__prefix} \
-      --enable-cxx &&\
+    ./configure --prefix=${__prefix} &&\
     make install &&\
+    cd .. &&\
     ldconfig &&\
-    cd .. && rm -rf src
+    rm -rf src
 
 ################################################################################
 # HighFive
@@ -118,7 +124,7 @@ RUN mkdir src &&\
       -DHIGHFIVE_EXAMPLES=OFF \
       -DHIGHFIVE_BUILD_DOCS=OFF \
       -DHIGHFIVE_UNIT_TESTS=OFF \
-      -DHIGHFIVE_USE_INSTALL_DEPS=ON \
+      -DHIGHFIVE_USE_INSTALL_DEPS=OFF \
       -DCMAKE_INSTALL_PREFIX=${__prefix} &&\
     cmake \
       --build src/build \
