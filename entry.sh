@@ -33,7 +33,7 @@ unset init_script
 
 # add ldmx-sw and ldmx-analysis installs to the various paths
 if [ -z "${LDMX_SW_INSTALL}" ]; then
-  export LDMX_SW_INSTALL=$LDMX_BASE/ldmx-sw/install
+  export LDMX_SW_INSTALL=$LDMX_BASE/.container-install
 fi
 export LD_LIBRARY_PATH=$LDMX_SW_INSTALL/lib:$LD_LIBRARY_PATH
 export PYTHONPATH=$LDMX_SW_INSTALL/python:$LDMX_SW_INSTALL/lib:$PYTHONPATH
