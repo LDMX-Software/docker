@@ -1,6 +1,8 @@
 
 FROM ubuntu:18.04
 LABEL ubuntu.version="18.04"
+#FROM ubuntu:22.04
+#LABEL ubuntu.version="22.04"
 MAINTAINER Tom Eichlersmith <eichl008@umn.edu>
 
 # First install any required dependencies from ubuntu repos
@@ -11,8 +13,10 @@ RUN apt-get update &&\
         binutils \
         ca-certificates \
         fonts-freefont-ttf \
-        g++-7 \
-        gcc-7 \
+#        g++-7 \
+#        gcc-7 \
+        g++ \
+        gcc \
         gdb \
         libafterimage-dev \
         libasan4-dbg \
@@ -46,6 +50,10 @@ RUN apt-get update &&\
         python3-tk \
         srm-ifce-dev \
         wget \
+	git \
+	gfortran \
+	libgsl-dev \
+	liblog4cpp5-dev \
     && rm -rf /var/lib/apt/lists/* &&\
     apt-get autoremove --purge &&\
     apt-get clean all &&\
@@ -102,6 +110,45 @@ RUN mkdir src &&\
     rm -rf src
 
 ###############################################################################
+# LHAPDF
+###############################################################################
+LABEL lhapdf.version="6.5.2"
+ENV PYTHON_VERSION=3
+RUN mkdir src &&\
+    ${__wget} https://lhapdf.hepforge.org/downloads/?f=LHAPDF-6.5.2.tar.gz |\
+     ${__untar} &&\
+    cd src &&\
+    ./configure --prefix=${__prefix} &&\
+    make -j$(nproc) &&\
+    make -j$(nproc) install &&\
+    cd ../ &&\
+    rm -rf src
+
+###############################################################################
+# PYTHIA6
+###############################################################################
+LABEL pythia.version="6.428"
+RUN mkdir src && \
+    ${__wget} https://root.cern.ch/download/pythia6.tar.gz |\
+     ${__untar} &&\
+    wget --no-check-certificate https://pythia.org/download/pythia6/pythia6428.f &&\
+    mv pythia6428.f src/pythia6428.f && rm -rf src/pythia6416.f &&\
+    cd src/ &&\
+    sed -i 's/int py/extern int py/g' pythia6_common_address.c && \
+    sed -i 's/extern int pyuppr/int pyuppr/g' pythia6_common_address.c && \
+    sed -i 's/char py/extern char py/g' pythia6_common_address.c && \
+    echo 'void MAIN__() {}' >main.c && \
+    gcc -c -m64 -fPIC -shared main.c -lgfortran && \
+    gcc -c -m64 -fPIC -shared pythia6_common_address.c -lgfortran && \
+    gfortran -c -m64 -fPIC -shared pythia*.f && \
+    gfortran -c -m64 -fPIC -shared -fno-second-underscore tpythia6_called_from_cc.F && \
+    gfortran -m64 -shared -Wl,-soname,libPythia6.so -o libPythia6.so main.o  pythia*.o tpythia*.o &&\
+    mkdir -p ${__prefix}/pythia6 && cp -r * ${__prefix}/pythia6/ &&\
+    cd ../ && rm -rf src
+
+RUN ls ${__prefix}/pythia6
+
+###############################################################################
 # CERN's ROOT
 ###############################################################################
 LABEL root.version="6.22.08"
@@ -119,9 +166,13 @@ RUN mkdir src &&\
       -Dpyroot=ON \
       -Dgnuinstall=ON \
       -Dxrootd=OFF \
+      -Dgsl_shared=ON \
+      -Dmathmore=ON \
+      -Dpythia6=ON \
+      -DPYTHIA6_LIBRARY=${__prefix}/pythia6/libPythia6.so \
       -B build \
       -S src \
-    && cmake --build build --target install &&\
+    && cmake --build build --target install -j$(nproc)&&\
     ln -s /usr/local/bin/thisroot.sh ${__ldmx_env_script_d__}/thisroot.sh &&\
     rm -rf build src
 
@@ -136,18 +187,22 @@ LABEL geant4.version="${GEANT4}"
 RUN __owner="geant4" &&\
     echo "${GEANT4}" | grep -q "LDMX" && __owner="LDMX-Software" &&\
     mkdir src &&\
-    ${__wget} https://github.com/${__owner}/geant4/archive/${GEANT4}.tar.gz | ${__untar} &&\
-    cmake \
+    ${__wget} https://github.com/${__owner}/geant4/archive/${GEANT4}.tar.gz | ${__untar}
+
+#RUN git clone --branch $GEANT4 https://github.com/LDMX-Software/geant4.git && cd geant4
+
+RUN cmake \
         -DGEANT4_INSTALL_DATA=ON \
         -DGEANT4_USE_GDML=ON \
         -DGEANT4_INSTALL_EXAMPLES=OFF \
         -DGEANT4_USE_OPENGL_X11=ON \
         -DCMAKE_INSTALL_PREFIX=${__prefix} \
+	-DVERBOSE=1 \
         -B src/build \
         -S src \
         &&\
     cmake --build src/build --target install &&\
-    ln -s /usr/local/bin/geant4.sh ${__ldmx_env_script_d__}/geant4.sh &&\ 
+    ln -s /usr/local/bin/geant4.sh ${__ldmx_env_script_d__}/geant4.sh &&\
     rm -rf src 
 
 ###############################################################################
@@ -207,6 +262,34 @@ RUN mkdir src &&\
     cmake \
         --build src/build \
         --target install \
+#	-j$(nproc) \
     &&\
     ln -s ${__prefix}/bin/thisdd4hep.sh ${__ldmx_env_script_d__}/thisdd4hep.sh &&\
     rm -r src
+
+
+###############################################################################
+# GENIE
+###############################################################################
+LABEL genie.version=3.02.00
+ENV GENIE_VERSION=3_02_00
+ENV GENIE_REWEIGHT_VERSION=1_02_00
+ENV GENIE_BASE=${__prefix}/GENIE
+ENV GENIE=$GENIE_BASE/Generator
+ENV GENIE_REWEIGHT=$GENIE_BASE/Reweight
+
+RUN apt-get install -y liblog4cpp5-dev
+
+RUN mkdir -p /usr/local/root
+RUN ln -s /usr/local/lib/root /usr/local/root/lib
+ENV ROOTSYS=/usr/local/root
+RUN ls $ROOTSYS/lib
+#RUN bash -c 'source /usr/local/bin/thisroot.sh'
+
+ENV CMAKE_CXX_STANDARD=17
+
+RUN mkdir -p $GENIE_BASE
+RUN git clone --branch R-$GENIE_VERSION https://github.com/GENIE-MC/Generator.git $GENIE_BASE/Generator
+RUN cd $GENIE && \
+    ./configure --enable-lhapdf6 --disable-lhapdf5 --disable-pythia8 --with-pythia6-lib=${__prefix}/pythia6 && \
+    make -j$(nproc)
