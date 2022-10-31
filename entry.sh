@@ -39,6 +39,11 @@ export LD_LIBRARY_PATH=$LDMX_SW_INSTALL/lib:$LD_LIBRARY_PATH
 export PYTHONPATH=$LDMX_SW_INSTALL/python:$LDMX_SW_INSTALL/lib:$PYTHONPATH
 export PATH=$LDMX_SW_INSTALL/bin:$PATH
 
+#add what we need for GENIE 
+export GENIE=/usr/local/GENIE/Generator
+export LD_LIBRARY_PATH=$GENIE/lib:/usr/local/pythia6:$LD_LIBRARY_PATH
+export PATH=$GENIE/bin:$PATH
+
 # add externals installed along side ldmx-sw
 # WARNING: No check to see if there is anything in this directory
 for _external_path in $LDMX_SW_INSTALL/external/*/lib

@@ -69,16 +69,6 @@ ENV __ldmx_env_script_d__ /etc/ldmx-container-env.d
 # All init scripts in this directory will be run upon entry into container
 RUN mkdir ${__ldmx_env_script_d__}
 
-# add any ssl certificates to the container to trust
-COPY ./certs/ /usr/local/share/ca-certificates
-RUN update-ca-certificates
-
-#run environment setup when docker container is launched and decide what to do from there
-#   will require the environment variable LDMX_BASE defined
-COPY ./entry.sh /etc/
-RUN chmod 755 /etc/entry.sh
-ENTRYPOINT ["/etc/entry.sh"]
-
 ###############################################################################
 # Boost
 ###############################################################################
@@ -129,8 +119,6 @@ RUN mkdir src && \
     mkdir -p ${__prefix}/pythia6 && cp -r * ${__prefix}/pythia6/ &&\
     cd ../ && rm -rf src
 
-RUN ls ${__prefix}/pythia6
-
 ###############################################################################
 # CERN's ROOT
 ###############################################################################
@@ -152,7 +140,7 @@ RUN mkdir src &&\
       -Dgsl_shared=ON \ 
       -Dmathmore=ON \   
       -Dpythia6=ON \    
-      -DPYTHIA6_LIBRARY=${__prefix}/pythia6/libPythia6.so \ 
+      -DPYTHIA6_LIBRARY=${__prefix}/pythia6/libPythia6.so \
       -B build \
       -S src \
     && cmake --build build --target install -j$(nproc)&&\
@@ -270,10 +258,15 @@ RUN mkdir src &&\
 # Needed for GENIE
 #
 ###############################################################################
+
+RUN apt-get update &&\
+    apt-get install -y autoconf automake libtool
+
 RUN mkdir src &&\
     ${__wget} https://sourceforge.net/projects/log4cpp/files/latest/download |\
     ${__untar} &&\
     cd src/log4cpp &&\
+    ./autogen.sh &&\
     ./configure &&\
     make check &&\
     make install -j$(nproc) &&\
@@ -290,20 +283,32 @@ LABEL genie.version=3.02.00
 ENV GENIE_VERSION=3_02_00
 ENV GENIE_REWEIGHT_VERSION=1_02_00
 
+ENV GENIE=/usr/local/GENIE/Generator
+
 RUN mkdir -p /usr/local/root &&\
     ln -s /usr/local/lib/root /usr/local/root/lib &&\
     export ROOTSYS=/usr/local/root &&\
-    mkdir src &&\
-    cd src &&\
+    mkdir -p /usr/local/GENIE &&\
+    cd /usr/local/GENIE &&\
     git clone --branch R-$GENIE_VERSION https://github.com/GENIE-MC/Generator.git &&\
     cd Generator &&\
     export LD_LIBRARY_PATH=/usr/local/lib:/usr/local/lib/root &&\
-    export GENIE=`pwd` &&\
-    ./configure --prefix=${__prefix} \
-                --enable-lhapdf6 --disable-lhapdf5 \
+    ./configure --enable-lhapdf6 --disable-lhapdf5 \
                 --enable-gfortran --with-gfortran-lib=/usr/x86_64-linux-gnu/ \
-                --disable-pythia8 --with-pythia6-lib=${__prefix}/pythia6 && \
-    make -j$(nproc) &&\
-    make -j$(nproc) install &&\
-    cd ../../ &&\
-    rm -r src
+                --disable-pythia8 --with-pythia6-lib=${__prefix}/pythia6 \
+                --enable-test && \
+    make -j$(nproc)
+
+####################################################################################
+# Move these to the end so if the inputs change, no need to completely rebuild...
+####################################################################################
+
+# add any ssl certificates to the container to trust
+COPY ./certs/ /usr/local/share/ca-certificates
+RUN update-ca-certificates
+
+#run environment setup when docker container is launched and decide what to do from there
+#   will require the environment variable LDMX_BASE defined
+COPY ./entry.sh /etc/
+RUN chmod 755 /etc/entry.sh
+ENTRYPOINT ["/etc/entry.sh"]
