@@ -46,6 +46,9 @@ RUN apt-get update &&\
         python3-tk \
         srm-ifce-dev \
         wget \
+	git \
+	gfortran \
+	libgsl-dev \
     && rm -rf /var/lib/apt/lists/* &&\
     apt-get autoremove --purge &&\
     apt-get clean all &&\
@@ -65,16 +68,6 @@ ENV __ldmx_env_script_d__ /etc/ldmx-container-env.d
 
 # All init scripts in this directory will be run upon entry into container
 RUN mkdir ${__ldmx_env_script_d__}
-
-# add any ssl certificates to the container to trust
-COPY ./certs/ /usr/local/share/ca-certificates
-RUN update-ca-certificates
-
-#run environment setup when docker container is launched and decide what to do from there
-#   will require the environment variable LDMX_BASE defined
-COPY ./entry.sh /etc/
-RUN chmod 755 /etc/entry.sh
-ENTRYPOINT ["/etc/entry.sh"]
 
 ###############################################################################
 # Boost
@@ -102,6 +95,31 @@ RUN mkdir src &&\
     rm -rf src
 
 ###############################################################################
+# PYTHIA6
+#
+# Needed for GENIE. Needs to be linked with ROOT.
+# 
+###############################################################################
+LABEL pythia.version="6.428"
+RUN mkdir src && \
+    ${__wget} https://root.cern.ch/download/pythia6.tar.gz |\
+     ${__untar} &&\
+    wget --no-check-certificate https://pythia.org/download/pythia6/pythia6428.f &&\
+    mv pythia6428.f src/pythia6428.f && rm -rf src/pythia6416.f &&\
+    cd src/ &&\
+    sed -i 's/int py/extern int py/g' pythia6_common_address.c && \
+    sed -i 's/extern int pyuppr/int pyuppr/g' pythia6_common_address.c && \
+    sed -i 's/char py/extern char py/g' pythia6_common_address.c && \
+    echo 'void MAIN__() {}' >main.c && \
+    gcc -c -m64 -fPIC -shared main.c -lgfortran && \
+    gcc -c -m64 -fPIC -shared pythia6_common_address.c -lgfortran && \
+    gfortran -c -m64 -fPIC -shared pythia*.f && \
+    gfortran -c -m64 -fPIC -shared -fno-second-underscore tpythia6_called_from_cc.F && \
+    gfortran -m64 -shared -Wl,-soname,libPythia6.so -o libPythia6.so main.o  pythia*.o tpythia*.o &&\
+    mkdir -p ${__prefix}/pythia6 && cp -r * ${__prefix}/pythia6/ &&\
+    cd ../ && rm -rf src
+
+###############################################################################
 # CERN's ROOT
 ###############################################################################
 LABEL root.version="6.22.08"
@@ -119,9 +137,13 @@ RUN mkdir src &&\
       -Dpyroot=ON \
       -Dgnuinstall=ON \
       -Dxrootd=OFF \
+      -Dgsl_shared=ON \ 
+      -Dmathmore=ON \   
+      -Dpythia6=ON \    
+      -DPYTHIA6_LIBRARY=${__prefix}/pythia6/libPythia6.so \
       -B build \
       -S src \
-    && cmake --build build --target install &&\
+    && cmake --build build --target install -j$(nproc)&&\
     ln -s /usr/local/bin/thisroot.sh ${__ldmx_env_script_d__}/thisroot.sh &&\
     rm -rf build src
 
@@ -207,6 +229,86 @@ RUN mkdir src &&\
     cmake \
         --build src/build \
         --target install \
+#	-j$(nproc) \
     &&\
     ln -s ${__prefix}/bin/thisdd4hep.sh ${__ldmx_env_script_d__}/thisdd4hep.sh &&\
     rm -r src
+
+###############################################################################
+# LHAPDF
+#
+# Needed for GENIE
+#
+###############################################################################
+LABEL lhapdf.version="6.5.2"
+ENV PYTHON_VERSION=3
+RUN mkdir src &&\
+    ${__wget} https://lhapdf.hepforge.org/downloads/?f=LHAPDF-6.5.2.tar.gz |\
+     ${__untar} &&\
+    cd src &&\
+    ./configure --prefix=${__prefix} &&\
+    make -j$(nproc) &&\
+    make -j$(nproc) install &&\
+    cd ../ &&\
+    rm -rf src
+
+###############################################################################
+# Installing log4cpp
+#
+# Needed for GENIE
+#
+###############################################################################
+
+RUN apt-get update &&\
+    apt-get install -y autoconf automake libtool
+
+RUN mkdir src &&\
+    ${__wget} https://sourceforge.net/projects/log4cpp/files/latest/download |\
+    ${__untar} &&\
+    cd src/log4cpp &&\
+    ./autogen.sh &&\
+    ./configure &&\
+    make check &&\
+    make install -j$(nproc) &&\
+    cd ../.. &&\
+    rm -r src
+
+###############################################################################
+# GENIE
+#
+# Needed for ... GENIE :)
+#
+###############################################################################
+LABEL genie.version=3.02.00
+ENV GENIE_VERSION=3_02_00
+ENV GENIE_REWEIGHT_VERSION=1_02_00
+
+ENV GENIE=/usr/local/GENIE/Generator
+
+RUN mkdir -p /usr/local/root &&\
+    ln -s /usr/local/lib/root /usr/local/root/lib &&\
+    export ROOTSYS=/usr/local/root &&\
+    mkdir -p /usr/local/GENIE &&\
+    cd /usr/local/GENIE &&\
+    git clone --branch R-$GENIE_VERSION https://github.com/GENIE-MC/Generator.git &&\
+    cd Generator &&\
+    export LD_LIBRARY_PATH=/usr/local/lib:/usr/local/lib/root &&\
+    ./configure --enable-lhapdf6 --disable-lhapdf5 \
+                --enable-gfortran --with-gfortran-lib=/usr/x86_64-linux-gnu/ \
+                --disable-pythia8 --with-pythia6-lib=${__prefix}/pythia6 \
+                --enable-test && \
+    make -j$(nproc)
+
+####################################################################################
+# Move these to the end so if the inputs change, no need to completely rebuild...
+####################################################################################
+
+# add any ssl certificates to the container to trust
+COPY ./certs/ /usr/local/share/ca-certificates
+RUN update-ca-certificates
+
+#run environment setup when docker container is launched and decide what to do from there
+#   will require the environment variable LDMX_BASE defined
+COPY ./entry.sh /etc/
+RUN chmod 755 /etc/entry.sh
+ENTRYPOINT ["/etc/entry.sh"]
