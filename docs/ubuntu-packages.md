@@ -5,6 +5,8 @@ I have looked into their purpose by a combination of googling the package name a
 
 Package | Necessary | Reason
 ---|---|---
+autoconf | Yes | Configuration of log4cpp build, needed for GENIE
+automake | Yes | Configuration of log4cpp build, needed for GENIE
 binutils | Yes | Adding PPA and linking libraries
 ca-certificates | Yes | Installing certificates to trust in container
 davix-dev | No | Remote I/O, file transfer and file management
@@ -14,6 +16,8 @@ fonts-freefont-ttf | Yes | Fonts for plots
 g++-7 | Yes | Compiler with C++17 support
 gcc-7 | Yes | Compiler with C++17 support
 gdb | No | Supporting debugging LDMX-sw programs within the container
+gfortran | Yes | FORTRAN compiler; needed for compiling Pythia6, which in turn is needed
+for GENIE
 git | No | **Old** Downloading dependency sources
 libafterimage-dev | Yes | ROOT GUI depends on these for common shapes
 libasan4-dbg | No | Runtime components for the compiler based instrumentation tools that come with GCC
@@ -29,7 +33,8 @@ libgl2ps-dev | Yes | Convert OpenGL image to PostScript file
 libglew-dev | Yes | [GLEW](http://glew.sourceforge.net/) library for helping use OpenGL
 libglu-dev | Yes | [OpenGL Utility Library](https://www.opengl.org/resources/libraries/)
 libgraphviz-dev | No | Graph visualization library
-libgsl-dev | No | GNU Scientific library for numerical calculations
+libgsl-dev | Yes | GNU Scientific library for numerical calculations;
+needed for GENIE
 libjpeg-dev | Yes | Saving plots as JPEGs
 liblz4-dev | Yes | Data compression
 liblzma-dev | Yes | Data compression
@@ -42,6 +47,7 @@ libsqlite3-dev | No | Interact with SQL database
 libssl-dev | Yes | Securely interact with other computers and encrypt files
 libtbb-dev | No | Multi-threading
 libtiff-dev | No | Save plots as TIFF image files
+libtool | Yes | Needed for log4cpp build, in turn needed for GENIE
 libx11-dev | Yes | Low-level window management with X11
 libxext-dev | Yes | Low-level window management
 libxft-dev | Yes | Low-level window management

@@ -3,17 +3,22 @@ FROM ubuntu:18.04
 LABEL ubuntu.version="18.04"
 MAINTAINER Tom Eichlersmith <eichl008@umn.edu>
 
+ARG NPROC=1
+
 # First install any required dependencies from ubuntu repos
 # Ongoing documentation for this list is in docs/ubuntu-packages.md
 RUN apt-get update &&\
     DEBIAN_FRONTEND=noninteractive \
     apt-get install -y \
+        autoconf \
+        automake \
         binutils \
         ca-certificates \
         fonts-freefont-ttf \
         g++-7 \
         gcc-7 \
         gdb \
+        gfortran \
         libafterimage-dev \
         libasan4-dbg \
         libfftw3-dev \
@@ -24,12 +29,14 @@ RUN apt-get update &&\
         libgl2ps-dev \
         libglew-dev \
         libglu-dev \
+        libgsl-dev \
         libjpeg-dev \
         liblz4-dev \
         liblzma-dev \
         libpcre++-dev \
         libpng-dev \
         libssl-dev \
+        libtool \
         libx11-dev \
         libxext-dev \  
         libxft-dev \
@@ -47,8 +54,6 @@ RUN apt-get update &&\
         srm-ifce-dev \
         wget \
 	git \
-	gfortran \
-	libgsl-dev \
     && rm -rf /var/lib/apt/lists/* &&\
     apt-get autoremove --purge &&\
     apt-get clean all &&\
@@ -80,7 +85,7 @@ RUN mkdir src &&\
     # Configure Boost.Python to look for the Python version we have.
     sed -i 's/using python ;/using python : 3.6 ;/' libs/python/build/Jamfile &&\
     ./bootstrap.sh &&\
-    ./b2 install &&\
+    ./b2 -j$NPROC install &&\
     cd .. && rm -rf src
 
 ################################################################################
@@ -91,7 +96,7 @@ RUN mkdir src &&\
     ${__wget} http://archive.apache.org/dist/xerces/c/3/sources/xerces-c-3.2.3.tar.gz |\
       ${__untar} &&\
     cmake -B src/build -S src -DCMAKE_INSTALL_PREFIX=${__prefix} &&\
-    cmake --build src/build --target install &&\
+    cmake --build src/build --target install -j$NPROC &&\
     rm -rf src
 
 ###############################################################################
@@ -143,7 +148,7 @@ RUN mkdir src &&\
       -DPYTHIA6_LIBRARY=${__prefix}/pythia6/libPythia6.so \
       -B build \
       -S src \
-    && cmake --build build --target install -j$(nproc)&&\
+    && cmake --build build --target install -j$NPROC &&\
     ln -s /usr/local/bin/thisroot.sh ${__ldmx_env_script_d__}/thisroot.sh &&\
     rm -rf build src
 
@@ -168,7 +173,7 @@ RUN __owner="geant4" &&\
         -B src/build \
         -S src \
         &&\
-    cmake --build src/build --target install &&\
+    cmake --build src/build --target install -j$NPROC &&\
     ln -s /usr/local/bin/geant4.sh ${__ldmx_env_script_d__}/geant4.sh &&\ 
     rm -rf src 
 
@@ -204,6 +209,7 @@ RUN mkdir src &&\
     cmake \
         --build src/build \
         --target install \
+        -j$NPROC \
     &&\
     rm -rf src 
 
@@ -229,7 +235,7 @@ RUN mkdir src &&\
     cmake \
         --build src/build \
         --target install \
-#	-j$(nproc) \
+	-j$NPROC \
     &&\
     ln -s ${__prefix}/bin/thisdd4hep.sh ${__ldmx_env_script_d__}/thisdd4hep.sh &&\
     rm -r src
@@ -247,8 +253,7 @@ RUN mkdir src &&\
      ${__untar} &&\
     cd src &&\
     ./configure --prefix=${__prefix} &&\
-    make -j$(nproc) &&\
-    make -j$(nproc) install &&\
+    make -j$NPROC install &&\
     cd ../ &&\
     rm -rf src
 
@@ -258,10 +263,6 @@ RUN mkdir src &&\
 # Needed for GENIE
 #
 ###############################################################################
-
-RUN apt-get update &&\
-    apt-get install -y autoconf automake libtool
-
 RUN mkdir src &&\
     ${__wget} https://sourceforge.net/projects/log4cpp/files/latest/download |\
     ${__untar} &&\
@@ -269,7 +270,7 @@ RUN mkdir src &&\
     ./autogen.sh &&\
     ./configure &&\
     make check &&\
-    make install -j$(nproc) &&\
+    make install -j$NPROC &&\
     cd ../.. &&\
     rm -r src
 
@@ -297,7 +298,7 @@ RUN mkdir -p /usr/local/root &&\
                 --enable-gfortran --with-gfortran-lib=/usr/x86_64-linux-gnu/ \
                 --disable-pythia8 --with-pythia6-lib=${__prefix}/pythia6 \
                 --enable-test && \
-    make -j$(nproc)
+    make -j$NPROC install
 
 ####################################################################################
 # Move these to the end so if the inputs change, no need to completely rebuild...
