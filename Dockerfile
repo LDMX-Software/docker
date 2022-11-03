@@ -102,6 +102,16 @@ RUN mkdir src &&\
 # PYTHIA6
 #
 # Needed for GENIE. Needs to be linked with ROOT.
+#
+# Looks complicated? Tell me about it.
+# Core of what's done follows from here: https://root-forum.cern.ch/t/root-with-pythia6-and-pythia8/19211
+# (1) Download pythia6 build tarball from ROOT. Known to lead to a build that can work with ROOT.
+# (2) Download the latest Pythia6 (6.4.2.8) from Pythia. Yes, it's still ancient.
+# (3) Declare extern some definitions that need to be extern via sed. Compiler/linker warns. Hard-won solution.
+# (4) Build with C and FORTRAN the various pieces.
+# (5) Put everything in a directory in the install area, and cleanup.
+#
+# (Ideally GENIE works with Pythia8? But not sure that works yet despite the adverts that it does.)
 # 
 ###############################################################################
 LABEL pythia.version="6.428"
@@ -290,7 +300,8 @@ RUN mkdir -p /usr/local/root &&\
     export ROOTSYS=/usr/local/root &&\
     mkdir -p /usr/local/GENIE/Generator &&\
     cd /usr/local/GENIE &&\
-    wget -q -O - https://github.com/GENIE-MC/Generator/archive/refs/tags/R-${GENIE_VERSION}.tar.gz | tar -xz -C Generator --strip-components 1 &&\
+    wget -q -O - https://github.com/GENIE-MC/Generator/archive/refs/tags/R-${GENIE_VERSION}.tar.gz |\
+    tar -xz -C Generator --strip-components 1 &&\
     cd Generator &&\
     export LD_LIBRARY_PATH=/usr/local/lib:/usr/local/lib/root &&\
     ./configure --enable-lhapdf6 --disable-lhapdf5 \
