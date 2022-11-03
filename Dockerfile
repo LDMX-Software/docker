@@ -53,7 +53,6 @@ RUN apt-get update &&\
         python3-tk \
         srm-ifce-dev \
         wget \
-	git \
     && rm -rf /var/lib/apt/lists/* &&\
     apt-get autoremove --purge &&\
     apt-get clean all &&\
@@ -291,7 +290,7 @@ RUN mkdir -p /usr/local/root &&\
     export ROOTSYS=/usr/local/root &&\
     mkdir -p /usr/local/GENIE &&\
     cd /usr/local/GENIE &&\
-    git clone --branch R-$GENIE_VERSION https://github.com/GENIE-MC/Generator.git &&\
+    wget -q -O - https://github.com/GENIE-MC/Generator/archive/refs/tags/R-${GENIE_VERSION}.tar.gz | tar -xz &&\
     cd Generator &&\
     export LD_LIBRARY_PATH=/usr/local/lib:/usr/local/lib/root &&\
     ./configure --enable-lhapdf6 --disable-lhapdf5 \
