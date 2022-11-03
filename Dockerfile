@@ -288,15 +288,16 @@ ENV GENIE=/usr/local/GENIE/Generator
 RUN mkdir -p /usr/local/root &&\
     ln -s /usr/local/lib/root /usr/local/root/lib &&\
     export ROOTSYS=/usr/local/root &&\
-    mkdir -p /usr/local/GENIE &&\
+    mkdir -p /usr/local/GENIE/Generator &&\
     cd /usr/local/GENIE &&\
-    wget -q -O - https://github.com/GENIE-MC/Generator/archive/refs/tags/R-${GENIE_VERSION}.tar.gz | tar -xz &&\
+    wget -q -O - https://github.com/GENIE-MC/Generator/archive/refs/tags/R-${GENIE_VERSION}.tar.gz | tar -xz -C Generator --strip-components 1 &&\
     cd Generator &&\
     export LD_LIBRARY_PATH=/usr/local/lib:/usr/local/lib/root &&\
     ./configure --enable-lhapdf6 --disable-lhapdf5 \
                 --enable-gfortran --with-gfortran-lib=/usr/x86_64-linux-gnu/ \
                 --disable-pythia8 --with-pythia6-lib=${__prefix}/pythia6 \
                 --enable-test && \
+    make -j$NPROC && \
     make -j$NPROC install
 
 ####################################################################################

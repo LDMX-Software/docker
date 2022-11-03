@@ -40,7 +40,6 @@ export PYTHONPATH=$LDMX_SW_INSTALL/python:$LDMX_SW_INSTALL/lib:$PYTHONPATH
 export PATH=$LDMX_SW_INSTALL/bin:$PATH
 
 #add what we need for GENIE 
-export GENIE=/usr/local/GENIE/Generator
 export LD_LIBRARY_PATH=$GENIE/lib:/usr/local/pythia6:$LD_LIBRARY_PATH
 export PATH=$GENIE/bin:$PATH
 
