@@ -196,6 +196,8 @@ RUN python3 -m pip install --upgrade --no-cache-dir \
         uproot \
         numpy \
         matplotlib \
+	mplhep \
+	pandas \
         xgboost \
         sklearn
 
