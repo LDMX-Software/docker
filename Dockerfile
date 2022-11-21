@@ -1,6 +1,6 @@
 
-FROM ubuntu:18.04
-LABEL ubuntu.version="18.04"
+FROM ubuntu:22.04 AS base
+LABEL ubuntu.version="22.04"
 MAINTAINER Tom Eichlersmith <eichl008@umn.edu>
 
 ARG NPROC=1
@@ -10,17 +10,27 @@ ARG NPROC=1
 RUN apt-get update &&\
     DEBIAN_FRONTEND=noninteractive \
     apt-get install -y \
+        apt-utils \
         autoconf \
         automake \
+        bc \
         binutils \
         ca-certificates \
+        cmake \
+        curl \
+        dialog \
+        diffutils \
+        findutils \
         fonts-freefont-ttf \
-        g++-7 \
-        gcc-7 \
+        g++ \
+        gcc \
         gdb \
         gfortran \
+        gnupg2 \
+        less \
         libafterimage-dev \
-        libasan4-dbg \
+        libasan8 \
+        libboost-all-dev \
         libfftw3-dev \
         libfreetype6-dev \
         libftgl-dev \
@@ -33,10 +43,13 @@ RUN apt-get update &&\
         libjpeg-dev \
         liblz4-dev \
         liblzma-dev \
+        libnss-myhostname \
         libpcre++-dev \
         libpng-dev \
         libssl-dev \
         libtool \
+        libvte-2.9[0-9]-common \
+        libvte-common \
         libx11-dev \
         libxext-dev \  
         libxft-dev \
@@ -45,19 +58,25 @@ RUN apt-get update &&\
         libxpm-dev \
         libz-dev \
         libzstd-dev \
+        lsof \
         locales \
         make \
+        ncurses-base \
+        passwd \
+        pinentry-curses \
+        procps \
         python3-dev \
         python3-pip \
         python3-numpy \
         python3-tk \
+        sudo \
         srm-ifce-dev \
+        time \
+        util-linux \
         wget \
     && rm -rf /var/lib/apt/lists/* &&\
     apt-get autoremove --purge &&\
-    apt-get clean all &&\
-    python3 -m pip install --upgrade pip &&\
-    python3 -m pip install --upgrade --no-cache-dir cmake
+    apt-get clean all
 
 ###############################################################################
 # Source-Code Downloading Method
@@ -73,26 +92,13 @@ ENV __ldmx_env_script_d__ /etc/ldmx-container-env.d
 # All init scripts in this directory will be run upon entry into container
 RUN mkdir ${__ldmx_env_script_d__}
 
-###############################################################################
-# Boost
-###############################################################################
-LABEL boost.version="1.76.0"
-RUN mkdir src &&\
-    ${__wget} https://boostorg.jfrog.io/artifactory/main/release/1.76.0/source/boost_1_76_0.tar.gz |\
-      ${__untar} &&\
-    cd src &&\
-    # Configure Boost.Python to look for the Python version we have.
-    sed -i 's/using python ;/using python : 3.6 ;/' libs/python/build/Jamfile &&\
-    ./bootstrap.sh &&\
-    ./b2 -j$NPROC install &&\
-    cd .. && rm -rf src
-
 ################################################################################
 # Xerces-C 
+#   Used by Geant4 to parse GDML
 ################################################################################
-LABEL xercesc.version="3.2.3"
+LABEL xercesc.version="3.2.4"
 RUN mkdir src &&\
-    ${__wget} http://archive.apache.org/dist/xerces/c/3/sources/xerces-c-3.2.3.tar.gz |\
+    ${__wget} http://archive.apache.org/dist/xerces/c/3/sources/xerces-c-3.2.4.tar.gz |\
       ${__untar} &&\
     cmake -B src/build -S src -DCMAKE_INSTALL_PREFIX=${__prefix} &&\
     cmake --build src/build --target install -j$NPROC &&\
@@ -132,6 +138,8 @@ RUN mkdir src && \
     gfortran -m64 -shared -Wl,-soname,libPythia6.so -o libPythia6.so main.o  pythia*.o tpythia*.o &&\
     mkdir -p ${__prefix}/pythia6 && cp -r * ${__prefix}/pythia6/ &&\
     cd ../ && rm -rf src
+
+FROM dev AS blah
 
 ###############################################################################
 # CERN's ROOT
