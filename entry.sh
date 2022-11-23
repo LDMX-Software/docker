@@ -20,16 +20,7 @@ set -e
 #   Assumptions:
 #   - The installation location of ldmx-sw is defined in LDMX_SW_INSTALL
 #     or it is located at LDMX_BASE/ldmx-sw/install.
-#   - Any initialization scripts for external dependencies need to be
-#     symlinked into the directory ${__ldmx_env_script_d__}
 ###############################################################################
-
-# Set-up computing environment
-# WARNING: No check to see if there is anything in this directory
-for init_script in ${__ldmx_env_script_d__}/*; do
-  . $(realpath ${init_script})
-done
-unset init_script
 
 # add ldmx-sw and ldmx-analysis installs to the various paths
 if [ -z "${LDMX_SW_INSTALL}" ]; then
