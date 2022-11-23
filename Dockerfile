@@ -41,6 +41,7 @@ RUN apt-get update &&\
         libglu-dev \
         libgsl-dev \
         libjpeg-dev \
+        liblog4cpp5-dev \
         liblz4-dev \
         liblzma-dev \
         libnss-myhostname \
@@ -87,10 +88,15 @@ RUN apt-get update &&\
 ENV __wget wget -q -O -
 ENV __untar tar -xz --strip-components=1 --directory src
 ENV __prefix /usr/local
-ENV __ldmx_env_script_d__ /etc/ldmx-container-env.d
 
-# All init scripts in this directory will be run upon entry into container
-RUN mkdir ${__ldmx_env_script_d__}
+# this directory is where folks should "install" code compiled with the container
+#    i.e. folks should mount a local install directory to /externals so that the
+#    container can see those files and those files can be found from these env vars
+ENV EXTERNAL_INSTALL_DIR=/externals
+ENV PATH="${EXTERNAL_INSTALL_DIR}/bin:${PATH}"
+ENV LD_LIBRARY_PATH="${EXTERNAL_INSTALL_DIR}/lib"
+ENV PYTHONPATH="${EXTERNAL_INSTALL_DIR}/lib:${EXTERNAL_INSTALL_DIR}/python:${EXTERNAL_INSTALL_DIR}/lib/python"
+ENV CMAKE_PREFIX_PATH="${EXTERNAL_INSTALL_DIR}:${__prefix}" 
 
 ################################################################################
 # Xerces-C 
@@ -110,10 +116,12 @@ RUN mkdir src &&\
 # Needed for GENIE. Needs to be linked with ROOT.
 #
 # Looks complicated? Tell me about it.
-# Core of what's done follows from here: https://root-forum.cern.ch/t/root-with-pythia6-and-pythia8/19211
+# Core of what's done follows from here: 
+#   https://root-forum.cern.ch/t/root-with-pythia6-and-pythia8/19211
 # (1) Download pythia6 build tarball from ROOT. Known to lead to a build that can work with ROOT.
 # (2) Download the latest Pythia6 (6.4.2.8) from Pythia. Yes, it's still ancient.
-# (3) Declare extern some definitions that need to be extern via sed. Compiler/linker warns. Hard-won solution.
+# (3) Declare extern some definitions that need to be extern via sed. 
+#     Compiler/linker warns. Hard-won solution.
 # (4) Build with C and FORTRAN the various pieces.
 # (5) Put everything in a directory in the install area, and cleanup.
 #
@@ -122,8 +130,7 @@ RUN mkdir src &&\
 ###############################################################################
 LABEL pythia.version="6.428"
 RUN mkdir src && \
-    ${__wget} https://root.cern.ch/download/pythia6.tar.gz |\
-     ${__untar} &&\
+    ${__wget} https://root.cern.ch/download/pythia6.tar.gz | ${__untar} &&\
     wget --no-check-certificate https://pythia.org/download/pythia6/pythia6428.f &&\
     mv pythia6428.f src/pythia6428.f && rm -rf src/pythia6416.f &&\
     cd src/ &&\
@@ -139,10 +146,27 @@ RUN mkdir src && \
     mkdir -p ${__prefix}/pythia6 && cp -r * ${__prefix}/pythia6/ &&\
     cd ../ && rm -rf src
 
-FROM dev AS blah
-
 ###############################################################################
 # CERN's ROOT
+#  Needed for GENIE, DD4hep, and serialization within the Framework
+#
+# We have a very specific configuration of the ROOT build system
+# - Use C++17 so that ROOT doesn't re-define C++17 STL classes in its headers
+#   We want to use C++17 in Framework and ROOT's redefinitions prevent that.
+# - Use gnuinstall=ON and CMAKE_INSTALL_LIBDIR=lib to make ROOT be a system install
+# - Start with a minimal build (gminimal) and then enable things from there.
+# - Need asimage and opengl built for the ROOT GUIs to be functional.
+# - Want gdml support for potential DD4hep-based geometry development
+# - Want pyroot to support some PyROOT-based analyses
+# - Turn off xrootd since its build fails for some reason (and we don't need it)
+# - gsl_shared, mathmore, and pytia6 are all used by GENIE
+#
+# After building and installing, we write a ld conf file to include ROOT's
+# libraries in the linker cache, then rebuild the linker cache so that
+# downstream libraries in this Dockerfile can link to ROOT easily.
+#
+# We promote the environment variables defined in thisroot.sh to this
+# Dockerfile so that thisroot.sh doesn't need to be sourced.
 ###############################################################################
 LABEL root.version="6.22.08"
 RUN mkdir src &&\
@@ -152,12 +176,13 @@ RUN mkdir src &&\
       -DCMAKE_BUILD_TYPE=Release \
       -DCMAKE_CXX_STANDARD=17 \
       -DCMAKE_INSTALL_PREFIX=${__prefix} \
+      -DCMAKE_INSTALL_LIBDIR=lib \
+      -Dgnuinstall=ON \
       -Dgminimal=ON \
       -Dasimage=ON \
       -Dgdml=ON \
       -Dopengl=ON \
       -Dpyroot=ON \
-      -Dgnuinstall=ON \
       -Dxrootd=OFF \
       -Dgsl_shared=ON \ 
       -Dmathmore=ON \   
@@ -166,16 +191,28 @@ RUN mkdir src &&\
       -B build \
       -S src \
     && cmake --build build --target install -j$NPROC &&\
-    ln -s /usr/local/bin/thisroot.sh ${__ldmx_env_script_d__}/thisroot.sh &&\
-    rm -rf build src
+    rm -rf build src &&\
+    ldconfig
+ENV ROOTSYS=${__prefix}
+ENV PYTHONPATH=${ROOTSYS}/lib:${PYTHONPATH}
+ENV JUPYTER_PATH=${ROOTSYS}/etc/notebook:${JUPYTER_PATH}
+ENV JUPYTER_CONFIG_DIR=${ROOTSYS}/etc/notebook:${JUPYTER_CONFIG_DIR}
+ENV CLING_STANDARD_PCH=none
 
 ###############################################################################
 # Geant4
 #
+# - The normal ENV variables can be ommitted since we are installing to
+#   a system path. We just need to copy the environment variables defining
+#   the location of datasets. 
+# - We configure Geant4 to always install the data to a specific path so 
+#   the environment variables don't need to change if the version changes.
+#
 # Assumptions
 #  - GEANT4 defined to be a release of geant4 or LDMX's fork of geant4
 ###############################################################################
-ENV GEANT4=LDMX.10.2.3_v0.4
+ENV GEANT4=LDMX.10.2.3_v0.5
+ENV G4DATADIR="${__prefix}/share/geant4/data"
 LABEL geant4.version="${GEANT4}"
 RUN __owner="geant4" &&\
     echo "${GEANT4}" | grep -q "LDMX" && __owner="LDMX-Software" &&\
@@ -183,6 +220,7 @@ RUN __owner="geant4" &&\
     ${__wget} https://github.com/${__owner}/geant4/archive/${GEANT4}.tar.gz | ${__untar} &&\
     cmake \
         -DGEANT4_INSTALL_DATA=ON \
+        -DGEANT4_INSTALL_DATADIR=${G4DATADIR} \
         -DGEANT4_USE_GDML=ON \
         -DGEANT4_INSTALL_EXAMPLES=OFF \
         -DGEANT4_USE_OPENGL_X11=ON \
@@ -191,23 +229,18 @@ RUN __owner="geant4" &&\
         -S src \
         &&\
     cmake --build src/build --target install -j$NPROC &&\
-    ln -s /usr/local/bin/geant4.sh ${__ldmx_env_script_d__}/geant4.sh &&\ 
     rm -rf src 
-
-###############################################################################
-# Extra python packages for analysis
-###############################################################################
-ENV PYTHONPATH /usr/local/lib
-ENV CLING_STANDARD_PCH none
-RUN python3 -m pip install --upgrade --no-cache-dir \
-        Cython \
-        uproot \
-        numpy \
-        matplotlib \
-        mplhep \
-        pandas \
-        xgboost \
-        scikit-learn
+ENV G4NEUTRONHPDATA="${G4DATADIR}/G4NDL4.6"
+ENV G4LEDATA="${G4DATADIR}/G4EMLOW7.13"
+ENV G4LEVELGAMMADATA="${G4DATADIR}/PhotonEvaporation5.7"
+ENV G4RADIOACTIVEDATA="${G4DATADIR}/RadioactiveDecay5.6"
+ENV G4PARTICLEXSDATA="${G4DATADIR}/G4PARTICLEXS3.1.1"
+ENV G4PIIDATA="${G4DATADIR}/G4PII1.3"
+ENV G4REALSURFACEDATA="${G4DATADIR}/RealSurface2.2"
+ENV G4SAIDXSDATA="${G4DATADIR}/G4SAIDDATA2.0"
+ENV G4ABLADATA="${G4DATADIR}/G4ABLA3.1"
+ENV G4INCLDATA="${G4DATADIR}/G4INCL1.0"
+ENV G4ENSDFSTATEDATA="${G4DATADIR}/G4ENSDFSTATE2.3"
 
 ################################################################################
 # Install Eigen headers into container
@@ -235,16 +268,16 @@ RUN mkdir src &&\
 ###############################################################################
 # Installing DD4hep within the container build
 #
-# Assumptions
-#  - Dependencies installed to ${__prefix}
-#  - DD4HEP set to release name from GitHub repository
+# - Dependencies installed to ${__prefix}
+# - DD4HEP set to release name from GitHub repository
+# - Environment variables with 'DD4hep' in the name are copied from the
+#   generated thisdd4hep.sh script
 ###############################################################################
-ENV DD4HEP=v01-18
+ENV DD4HEP=v01-23
 LABEL dd4hep.version="${DD4HEP}"
 RUN mkdir src &&\
     ${__wget} https://github.com/AIDASoft/DD4hep/archive/refs/tags/${DD4HEP}.tar.gz |\
       ${__untar} &&\
-    export LD_LIBRARY_PATH=/usr/local/lib:/usr/local/lib/root &&\
     cmake \
         -DCMAKE_INSTALL_PREFIX=${__prefix} \
         -DBUILD_TESTING=OFF \
@@ -254,76 +287,87 @@ RUN mkdir src &&\
     cmake \
         --build src/build \
         --target install \
-	-j$NPROC \
+        -j$NPROC \
     &&\
-    ln -s ${__prefix}/bin/thisdd4hep.sh ${__ldmx_env_script_d__}/thisdd4hep.sh &&\
     rm -r src
+ENV DD4hepINSTALL="${__prefix}"
+ENV DD4hep_ROOT="${__prefix}"
+ENV DD4hep_DIR="${__prefix}"
 
 ###############################################################################
 # LHAPDF
 #
 # Needed for GENIE
 #
+# - We disable the python subpackage because it is based on Python2 whose
+#   executable has been removed from Ubuntu 22.04.
 ###############################################################################
-LABEL lhapdf.version="6.5.2"
-ENV PYTHON_VERSION=3
+LABEL lhapdf.version="6.5.3"
 RUN mkdir src &&\
-    ${__wget} https://lhapdf.hepforge.org/downloads/?f=LHAPDF-6.5.2.tar.gz |\
-     ${__untar} &&\
+    ${__wget} https://lhapdf.hepforge.org/downloads/?f=LHAPDF-6.5.3.tar.gz |\
+      ${__untar} &&\
     cd src &&\
-    ./configure --prefix=${__prefix} &&\
+    ./configure --disable-python --prefix=${__prefix} &&\
     make -j$NPROC install &&\
     cd ../ &&\
     rm -rf src
 
-###############################################################################
-# Installing log4cpp
-#
-# Needed for GENIE
-#
-###############################################################################
-RUN mkdir src &&\
-    ${__wget} https://sourceforge.net/projects/log4cpp/files/latest/download |\
-    ${__untar} &&\
-    cd src/log4cpp &&\
-    ./autogen.sh &&\
-    ./configure &&\
-    make check &&\
-    make install -j$NPROC &&\
-    cd ../.. &&\
-    rm -r src
+FROM base AS blah
 
 ###############################################################################
 # GENIE
 #
 # Needed for ... GENIE :)
 #
+# - GENIE looks in ${ROOTSYS}/lib for various ROOT libraries it depends on.
+#   This is annoying because root installs its libs to ${ROOTSYS}/lib/root
+#   when the gnuinstall parameter is ON. We fixed this by forcing ROOT to
+#   install its libs to ${ROOTSYS}/lib even with gnuinstall ON.
+# - liblog4cpp5-dev from the Ubuntu 22.04 repos seems to be functional
+# - GENIE's binaries link to pythia6 at runtime so we need to add the pythia6
+#   library directory into the linker cache
+# - GENIE reads its configuration from files written into its source tree
+#   (and not installed), so we need to keep its source tree around
 ###############################################################################
 LABEL genie.version=3.02.00
 ENV GENIE_VERSION=3_02_00
-ENV GENIE_REWEIGHT_VERSION=1_02_00
+#ENV GENIE_REWEIGHT_VERSION=1_02_00
 
-ENV GENIE=/usr/local/GENIE/Generator
+ENV __untar_to="tar -xz --strip-components=1 --directory"
+ENV GENIE=/usr/local/src/GENIE/Generator
 
-RUN mkdir -p /usr/local/root &&\
-    ln -s /usr/local/lib/root /usr/local/root/lib &&\
-    export ROOTSYS=/usr/local/root &&\
-    mkdir -p /usr/local/GENIE/Generator &&\
-    cd /usr/local/GENIE &&\
-    wget -q -O - https://github.com/GENIE-MC/Generator/archive/refs/tags/R-${GENIE_VERSION}.tar.gz |\
-    tar -xz -C Generator --strip-components 1 &&\
-    cd Generator &&\
-    export LD_LIBRARY_PATH=/usr/local/lib:/usr/local/lib/root &&\
-    ./configure --enable-lhapdf6 --disable-lhapdf5 \
-                --enable-gfortran --with-gfortran-lib=/usr/x86_64-linux-gnu/ \
-                --disable-pythia8 --with-pythia6-lib=${__prefix}/pythia6 \
-                --enable-test && \
+RUN mkdir -p ${GENIE} &&\
+    ${__wget} https://github.com/GENIE-MC/Generator/archive/refs/tags/R-${GENIE_VERSION}.tar.gz |\
+      ${__untar_to} ${GENIE} &&\
+    cd ${GENIE} &&\
+    ./configure \
+      --enable-lhapdf6 \
+      --disable-lhapdf5 \
+      --enable-gfortran \
+      --with-gfortran-lib=/usr/x86_64-linux-gnu/ \
+      --disable-pythia8 \
+      --with-pythia6-lib=${__prefix}/pythia6 \
+      --enable-test \
+    && \
     make -j$NPROC && \
-    make -j$NPROC install
+    make -j$NPROC install &&\
+    echo "${__prefix}/pythia6/" > /etc/ld.so.conf.d/pythia6.conf
 
-####################################################################################
-# Move these to the end so if the inputs change, no need to completely rebuild...
-####################################################################################
+###############################################################################
+# Generate the linker cache
+#    This should go AFTER all compiled dependencies so that the ld cache 
+#    contains all of them.
+#    Ubuntu includes /usr/local/lib in the linker cache generation by default,
+#    so dependencies just need to write a ld conf file if their libs do not
+#    get installed to that directory (e.g. ROOT)
+###############################################################################
+RUN ldconfig -v
+
+###############################################################################
+# Extra python packages for analysis
+###############################################################################
+COPY ./python_packages.txt /etc/python_packages.txt
+RUN python3 -m pip install --no-cache-dir --requirement /etc/python_packages.txt
 
 # add any ssl certificates to the container to trust
 COPY ./certs/ /usr/local/share/ca-certificates
@@ -334,3 +378,4 @@ RUN update-ca-certificates
 COPY ./entry.sh /etc/
 RUN chmod 755 /etc/entry.sh
 ENTRYPOINT ["/etc/entry.sh"]
+
