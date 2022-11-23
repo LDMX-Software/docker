@@ -1,5 +1,5 @@
 
-FROM ubuntu:22.04 AS base
+FROM ubuntu:22.04
 LABEL ubuntu.version="22.04"
 MAINTAINER Tom Eichlersmith <eichl008@umn.edu>
 
@@ -312,8 +312,6 @@ RUN mkdir src &&\
     cd ../ &&\
     rm -rf src
 
-FROM base AS blah
-
 ###############################################################################
 # GENIE
 #
@@ -328,6 +326,13 @@ FROM base AS blah
 #   library directory into the linker cache
 # - GENIE reads its configuration from files written into its source tree
 #   (and not installed), so we need to keep its source tree around
+#
+# Some errors from the build configuration
+# - The 'quota: not found' error can be ignored. It is just saving a snapshot
+#   of the build environment.
+# - The 'cant exec git' error is resolved within the perl script which
+#   deduces the version from the files in the .git directory if git is
+#   not installed.
 ###############################################################################
 LABEL genie.version=3.02.00
 ENV GENIE_VERSION=3_02_00
