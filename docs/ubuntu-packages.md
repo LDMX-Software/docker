@@ -29,7 +29,7 @@ git | No | **Old** Downloading dependency sources
 less | Yes | Necessary for distrobox support
 libafterimage-dev | Yes | ROOT GUI depends on these for common shapes
 libasan8 | No | Runtime components for the compiler based instrumentation tools that come with GCC
-libboost-all-dev | Yes | Direct ldmx-sw dependency, v1.74 available in Ubuntu 22.04 repos
+libboost-all-dev | Yes | Direct ldmx-sw dependency, v1.74 available in Ubuntu 22.04 repos, v1.71 required by ACTS
 libcfitsio-dev | No | Reading and writing in [FITS](https://heasarc.gsfc.nasa.gov/docs/heasarc/fits.html) data format
 libfcgi-dev | No | Open extension of CGI for internet applications
 libfftw3-dev | Yes | Computing discrete fourier transform
@@ -44,6 +44,7 @@ libglu-dev | Yes | [OpenGL Utility Library](https://www.opengl.org/resources/lib
 libgraphviz-dev | No | Graph visualization library
 libgsl-dev | Yes | GNU Scientific library for numerical calculations; needed for GENIE
 libjpeg-dev | Yes | Saving plots as JPEGs
+liblog4cpp5-dev | Yes | Dependency of GENIE
 liblz4-dev | Yes | Data compression
 liblzma-dev | Yes | Data compression
 libmysqlclient-dev | No | Interact with SQL database
