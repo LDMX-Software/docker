@@ -22,6 +22,7 @@ RUN apt-get update &&\
         dialog \
         diffutils \
         findutils \
+        fish \
         fonts-freefont-ttf \
         g++ \
         gcc \
@@ -76,6 +77,7 @@ RUN apt-get update &&\
         time \
         util-linux \
         wget \
+        zsh \
     && rm -rf /var/lib/apt/lists/* &&\
     apt-get autoremove --purge &&\
     apt-get clean all
