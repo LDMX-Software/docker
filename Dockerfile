@@ -145,7 +145,8 @@ RUN mkdir src && \
     gfortran -c -m64 -fPIC -shared -fno-second-underscore tpythia6_called_from_cc.F && \
     gfortran -m64 -shared -Wl,-soname,libPythia6.so -o libPythia6.so main.o  pythia*.o tpythia*.o &&\
     mkdir -p ${__prefix}/pythia6 && cp -r * ${__prefix}/pythia6/ &&\
-    cd ../ && rm -rf src
+    cd ../ && rm -rf src &&\
+    echo "${__prefix}/pythia6/" > /etc/ld.so.conf.d/pythia6.conf
 
 ###############################################################################
 # CERN's ROOT
@@ -355,8 +356,7 @@ RUN mkdir -p ${GENIE} &&\
       --enable-test \
     && \
     make -j$NPROC && \
-    make -j$NPROC install &&\
-    echo "${__prefix}/pythia6/" > /etc/ld.so.conf.d/pythia6.conf
+    make -j$NPROC install
 
 ###############################################################################
 # Generate the linker cache
