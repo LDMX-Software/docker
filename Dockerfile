@@ -16,6 +16,7 @@ RUN apt-get update &&\
         bc \
         binutils \
         ca-certificates \
+        clang-format \
         cmake \
         curl \
         dialog \

@@ -11,6 +11,7 @@ automake | Yes | Configuration of log4cpp build, needed for GENIE
 binutils | Yes | Adding PPA and linking libraries
 bc | Yes | Necessary for distrobox support
 ca-certificates | Yes | Installing certificates to trust in container
+clang-format | Yes | LDMX C++ code formatting
 curl | Yes | Necessary for distrobox support
 cmake | Yes | Make configuration, v3.22.1 available in Ubuntu 22.04 repos
 dialog | Yes | Necessary for distrobox support
