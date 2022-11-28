@@ -86,7 +86,8 @@ RUN apt-get update &&\
 #   Adapted from acts-project/machines
 ###############################################################################
 ENV __wget wget -q -O -
-ENV __untar tar -xz --strip-components=1 --directory src
+ENV __untar_to="tar -xz --strip-components=1 --directory"
+ENV __untar="${__untar_to} src"
 ENV __prefix /usr/local
 
 # this directory is where folks should "install" code compiled with the container
@@ -338,7 +339,6 @@ LABEL genie.version=3.02.00
 ENV GENIE_VERSION=3_02_00
 #ENV GENIE_REWEIGHT_VERSION=1_02_00
 
-ENV __untar_to="tar -xz --strip-components=1 --directory"
 ENV GENIE=/usr/local/src/GENIE/Generator
 
 RUN mkdir -p ${GENIE} &&\
