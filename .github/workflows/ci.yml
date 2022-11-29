@@ -148,7 +148,7 @@ jobs:
             _push_tags="$_push_tags ${_repo}:sha-${GITHUB_SHA::8}"
           fi
           echo "Generated Tags: ${_push_tags}"
-          echo ::set-output name=push_tags::${_push_tags}
+          echo "push_tags=${_push_tags}" >> $GITHUB_OUTPUT
     -
       name: Download Image
       uses: actions/download-artifact@v3
