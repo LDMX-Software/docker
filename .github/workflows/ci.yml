@@ -30,6 +30,13 @@ jobs:
       name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
     - 
+      name: Cache Docker Layers on GitHub
+      uses: actions/cache@v3
+      with:
+        path: /tmp/.buildx-cache
+        key: ${{ runner.os }}-buildx-${{ github.sha }}
+        restore-keys: ${{ runner.os }}-buildx
+    - 
       name: Get Build Context
       uses: actions/checkout@v3
     -
@@ -38,6 +45,8 @@ jobs:
       with:
         push: false # don't push to docker hub yet
         load: true # allow image to be availabe to the docker program later in this job
+        cache-from: type=local,src=/tmp/.buildx-cache
+        cache-to: type=local,dest=/tmp/.buildx-cache
         tags: new-build
     -
       name: Package Image
