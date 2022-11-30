@@ -63,7 +63,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        ldmx_sw_branch: [ trunk, v3.0.2, v3.1.0 ]
+        ldmx_sw_branch: [ trunk, v3.0.0, v3.0.2, v3.1.0, v3.1.13 ]
     defaults:
       run:
         shell: bash
@@ -93,12 +93,26 @@ jobs:
         submodules: recursive
         path: ldmx-sw
         ref: ${{ matrix.ldmx_sw_branch }}
+        fetch-depth: 0
     - 
       name: Test the Image
       run: |
           export LDMX_BASE=$(pwd)
           export _docker_parameters="-i -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE new-build"
           mkdir ldmx-sw/build
+          curl https://raw.githubusercontent.com/Ariel-Rodriguez/sh-semversion-2/main/semver2.sh \
+            -o semver.sh
+          #I can't figure out how to get the tag of a submodule after the specific method of cloning
+          #  GitHub actions uses, for this reason I'm just going to use the ldmx-sw tag
+          #_curr=$(git -C ldmx-sw/Framework fetch && git -C ldmx-sw/Framework describe --tags)
+          _curr=$(git -C ldmx-sw describe --tags)
+          _order=$(sh semver.sh ${_curr} v3.2.0)
+          if [ "$?" == "-1" ]; then
+            # need to update Framework for patches with newer compiler
+            echo "::group::Updating Framework from ${_curr}"
+            git -C ldmx-sw/Framework checkout v1.3.1
+            echo "::endgroup::"
+          fi
           echo "::group::Build ldmx-sw"
           docker run $_docker_parameters $(pwd)/ldmx-sw/build 'cmake .. && make install'
           echo "::endgroup::"
