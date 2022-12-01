@@ -332,6 +332,18 @@ RUN mkdir -p ${GENIE} &&\
     make -j$NPROC install
 
 ###############################################################################
+# Catch2
+#   We hold ourselves back to v2 of Catch2
+###############################################################################
+LABEL catch2.version=2.13.8
+RUN mkdir -p src &&\
+    ${__wget} https://github.com/catchorg/Catch2/archive/refs/tags/v2.13.8.tar.gz |\
+      ${__untar} &&\
+    cmake -B src/build -S src &&\
+    cmake --build src/build --target install -- -j$NPROC &&\
+    rm -rf src
+
+###############################################################################
 # Generate the linker cache
 #    This should go AFTER all compiled dependencies so that the ld cache 
 #    contains all of them.
