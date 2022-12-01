@@ -153,7 +153,7 @@ RUN mkdir src && \
 
 ###############################################################################
 # CERN's ROOT
-#  Needed for GENIE, DD4hep, and serialization within the Framework
+#  Needed for GENIE and serialization within the Framework
 #
 # We have a very specific configuration of the ROOT build system
 # - Use C++17 so that ROOT doesn't re-define C++17 STL classes in its headers
@@ -161,7 +161,6 @@ RUN mkdir src && \
 # - Use gnuinstall=ON and CMAKE_INSTALL_LIBDIR=lib to make ROOT be a system install
 # - Start with a minimal build (gminimal) and then enable things from there.
 # - Need asimage and opengl built for the ROOT GUIs to be functional.
-# - Want gdml support for potential DD4hep-based geometry development
 # - Want pyroot to support some PyROOT-based analyses
 # - Turn off xrootd since its build fails for some reason (and we don't need it)
 # - gsl_shared, mathmore, and pytia6 are all used by GENIE
@@ -269,35 +268,6 @@ RUN mkdir src &&\
         -j$NPROC \
     &&\
     rm -rf src 
-
-###############################################################################
-# Installing DD4hep within the container build
-#
-# - Dependencies installed to ${__prefix}
-# - DD4HEP set to release name from GitHub repository
-# - Environment variables with 'DD4hep' in the name are copied from the
-#   generated thisdd4hep.sh script
-###############################################################################
-ENV DD4HEP=v01-23
-LABEL dd4hep.version="${DD4HEP}"
-RUN mkdir src &&\
-    ${__wget} https://github.com/AIDASoft/DD4hep/archive/refs/tags/${DD4HEP}.tar.gz |\
-      ${__untar} &&\
-    cmake \
-        -DCMAKE_INSTALL_PREFIX=${__prefix} \
-        -DBUILD_TESTING=OFF \
-        -B src/build \
-        -S src \
-    &&\
-    cmake \
-        --build src/build \
-        --target install \
-        -j$NPROC \
-    &&\
-    rm -r src
-ENV DD4hepINSTALL="${__prefix}"
-ENV DD4hep_ROOT="${__prefix}"
-ENV DD4hep_DIR="${__prefix}"
 
 ###############################################################################
 # LHAPDF
