@@ -62,6 +62,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         ldmx_sw_branch: [ trunk, v3.0.0, v3.0.2, v3.1.0, v3.1.13 ]
     defaults:
