@@ -333,11 +333,10 @@ RUN mkdir -p ${GENIE} &&\
 
 ###############################################################################
 # Catch2
-#   We hold ourselves back to v2 of Catch2
 ###############################################################################
-LABEL catch2.version=2.13.8
+LABEL catch2.version=3.2.0
 RUN mkdir -p src &&\
-    ${__wget} https://github.com/catchorg/Catch2/archive/refs/tags/v2.13.8.tar.gz |\
+    ${__wget} https://github.com/catchorg/Catch2/archive/refs/tags/v3.2.0.tar.gz |\
       ${__untar} &&\
     cmake -B src/build -S src &&\
     cmake --build src/build --target install -- -j$NPROC &&\
