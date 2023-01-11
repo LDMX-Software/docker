@@ -108,7 +108,7 @@ jobs:
           #_curr=$(git -C ldmx-sw/Framework fetch && git -C ldmx-sw/Framework describe --tags)
           _curr=$(git -C ldmx-sw describe --tags)
           _order=$(sh semver.sh ${_curr} v3.2.0)
-          if [ "$?" == "-1" ]; then
+          if [ "${_order}" == "-1" ]; then
             # need to update Framework for patches with newer compiler
             echo "::group::Updating Framework from ${_curr}"
             git -C ldmx-sw/Framework checkout v1.3.1

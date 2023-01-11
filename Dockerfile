@@ -24,8 +24,8 @@ RUN apt-get update &&\
         findutils \
         fish \
         fonts-freefont-ttf \
-        g++ \
-        gcc \
+        g++-9 \
+        gcc-9 \
         gdb \
         gfortran \
         gnupg2 \
