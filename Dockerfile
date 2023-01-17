@@ -31,7 +31,7 @@ RUN apt-get update &&\
         gnupg2 \
         less \
         libafterimage-dev \
-        libasan8 \
+        libasan5 \
         libboost-all-dev \
         libfftw3-dev \
         libfreetype6-dev \
