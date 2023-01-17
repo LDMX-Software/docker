@@ -82,6 +82,10 @@ RUN apt-get update &&\
     apt-get autoremove --purge &&\
     apt-get clean all
 
+# make sure downstream libraries use GCC 9
+ENV CC=/usr/bin/gcc-9
+ENV CXX=/usr/bin/g++-9
+
 ###############################################################################
 # Source-Code Downloading Method
 #   mkdir src && ${__wget} <url-to-tar.gz-source-archive> | ${__untar}
