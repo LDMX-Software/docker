@@ -51,12 +51,32 @@ do
 done
 unset _external_path
 
+
 # helps simplify any cmake nonsense
 export CMAKE_PREFIX_PATH=/usr/local/:$LDMX_SW_INSTALL
 
 # puts a config/cache directory for matplotlib to use
 export MPLCONFIGDIR=$LDMX_BASE/.config/matplotlib
 
+# FLUKA Environment
+# From env_FLUKA.sh
+export PATH=$PATH:/usr/local/fluka/bin
+export FLUKA_PATH=$(realpath $(dirname $(which fluka))/..)
+if [ ! -d "$FLUKA_PATH" ]; then
+   echo "!!! fluka not found. FLUKA_REPO=$FLUKA_PATH. Add your fluka_repo/bin to the PATH. !!!";
+fi
+
+export FLUKADATA=$FLUKA_PATH/data
+if [ ! -d "$FLUKADATA" ]; then
+   echo "!!! fluka data repo not found. FLUKADATA=$FLUKADATA. Add your fluka_repo/bin to the PATH. !!!";
+fi
+
+export FLUKA_LIB_DIR=$FLUKA_PATH/lib
+if [ ! -d "$FLUKA_LIB_DIR" ]; then
+   echo "!!! fluka lib repo not found. FLUKA_LIB_DIR=$FLUKA_LIB_DIR. Add your fluka_repo/bin to the PATH. !!!";
+fi
+
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$FLUKA_LIB_DIR
 # go to first argument
 cd "$1"
 

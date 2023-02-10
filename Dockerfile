@@ -321,6 +321,8 @@ RUN mkdir -p /usr/local/root &&\
 COPY ./certs/ /usr/local/share/ca-certificates
 RUN update-ca-certificates
 
+COPY fluka_4-3.1.x86-Linux-gfor7_amd64.deb /
+RUN apt-get install /fluka_4-3.1.x86-Linux-gfor7_amd64.deb
 #run environment setup when docker container is launched and decide what to do from there
 #   will require the environment variable LDMX_BASE defined
 COPY ./entry.sh /etc/
