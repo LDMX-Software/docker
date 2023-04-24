@@ -24,14 +24,14 @@ RUN apt-get update &&\
         findutils \
         fish \
         fonts-freefont-ttf \
-        g++-9 \
-        gcc-9 \
+        g++ \
+        gcc \
         gdb \
         gfortran \
         gnupg2 \
         less \
         libafterimage-dev \
-        libasan5 \
+        libasan8 \
         libboost-all-dev \
         libfftw3-dev \
         libfreetype6-dev \
@@ -81,10 +81,6 @@ RUN apt-get update &&\
     && rm -rf /var/lib/apt/lists/* &&\
     apt-get autoremove --purge &&\
     apt-get clean all
-
-# make sure downstream libraries use GCC 9
-ENV CC=/usr/bin/gcc-9
-ENV CXX=/usr/bin/g++-9
 
 ###############################################################################
 # Source-Code Downloading Method
