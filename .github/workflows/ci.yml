@@ -64,7 +64,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ldmx_sw_branch: [ trunk, v3.0.0, v3.0.2, v3.1.0, v3.1.13 ]
+        ldmx_sw_branch: [ trunk, v3.0.0, v3.0.2, v3.1.13, v3.2.0, v3.2.4 ]
     defaults:
       run:
         shell: bash
@@ -103,15 +103,14 @@ jobs:
           mkdir ldmx-sw/build
           curl https://raw.githubusercontent.com/Ariel-Rodriguez/sh-semversion-2/main/semver2.sh \
             -o semver.sh
-          #I can't figure out how to get the tag of a submodule after the specific method of cloning
-          #  GitHub actions uses, for this reason I'm just going to use the ldmx-sw tag
-          #_curr=$(git -C ldmx-sw/Framework fetch && git -C ldmx-sw/Framework describe --tags)
+          # get ldmx-sw version
           _curr=$(git -C ldmx-sw describe --tags)
-          _order=$(sh semver.sh ${_curr} v3.2.0)
+          # check against ldmx-sw release which patches Catch2
+          _order=$(sh semver.sh ${_curr} v3.2.5)
           if [ "${_order}" == "-1" ]; then
-            # need to update Framework for patches with newer compiler
-            echo "::group::Updating Framework from ${_curr}"
-            git -C ldmx-sw/Framework checkout v1.3.1
+            # need to prevent tests from compiling
+            echo "::group::Don't compile tests for ${_curr}"
+            sed -i 's|build_test()|#build_test()|' ldmx-sw/CMakeLists.txt
             echo "::endgroup::"
           fi
           echo "::group::Build ldmx-sw"
@@ -120,8 +119,14 @@ jobs:
           echo "::group::Run python test script"
           docker run $_docker_parameters $(pwd) python3 test.py
           echo "::endgroup::"
-          echo "::group::ldmx-sw test program"
-          docker run $_docker_parameters $(pwd)/ldmx-sw/build ctest --verbose
+          if [ "${_order}" != "-1" ]; then
+            echo "::group::ldmx-sw test program"
+            docker run $_docker_parameters $(pwd)/ldmx-sw/build ctest --verbose
+            echo "::endgroup::"
+          fi
+          echo "::group::run a basic inclusive sim"
+          docker run $_docker_parameters $(pwd) \
+            'LDMX_RUN_NUMBER=1 LDMX_NUM_EVENTS=10 fire ldmx-sw/.github/validation_samples/inclusive/config.py'
           echo "::endgroup::"
 
   push:
