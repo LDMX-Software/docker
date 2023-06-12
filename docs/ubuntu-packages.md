@@ -8,18 +8,19 @@ Package | Necessary | Reason
 apt-utils | Yes | Necessary for distrobox support
 autoconf | Yes | Configuration of log4cpp build, needed for GENIE
 automake | Yes | Configuration of log4cpp build, needed for GENIE
-binutils | Yes | Adding PPA and linking libraries
 bc | Yes | Necessary for distrobox support
+binutils | Yes | Adding PPA and linking libraries
 ca-certificates | Yes | Installing certificates to trust in container
 clang-format | Yes | LDMX C++ code formatting
-curl | Yes | Necessary for distrobox support
 cmake | Yes | Make configuration, v3.22.1 available in Ubuntu 22.04 repos
+curl | Yes | Necessary for distrobox support
 dialog | Yes | Necessary for distrobox support
 diffutils | Yes | Necessary for distrobox support
 davix-dev | No | Remote I/O, file transfer and file management
 dcap-dev | Unknown | C-API to the [DCache Access Protocol](https://dcache.org/old/manuals/libdcap.shtml)
 dpkg-dev | No | **Old** Installation from PPA
 findutils | Yes | Necessary for distrobox support
+fish | Yes | Shell necessary for distrobox support
 fonts-freefont-ttf | Yes | Fonts for plots
 g++ | Yes | Compiler with C++17 support, v11 available in Ubuntu 22.04 repos
 gcc | Yes | Compiler with C++17 support, v11 available in Ubuntu 22.04 repos
