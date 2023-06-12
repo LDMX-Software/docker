@@ -17,7 +17,6 @@ RUN apt-get update &&\
         binutils \
         ca-certificates \
         clang-format \
-        cmake \
         curl \
         dialog \
         diffutils \
@@ -80,7 +79,9 @@ RUN apt-get update &&\
         zsh \
     && rm -rf /var/lib/apt/lists/* &&\
     apt-get autoremove --purge &&\
-    apt-get clean all
+    apt-get clean all &&\
+    python3 -m pip install --no-cache-dir \
+      cmake~=3.26.0
 
 ###############################################################################
 # Source-Code Downloading Method
@@ -341,6 +342,25 @@ RUN mkdir -p src &&\
     cmake -B src/build -S src &&\
     cmake --build src/build --target install -- -j$NPROC &&\
     rm -rf src
+
+###############################################################################
+# ONNX Runtime
+#  Used for running inference within ldmx-sw
+###############################################################################
+LABEL onnx.verison=1.15.0
+RUN mkdir -p src &&\
+    ${__wget} https://github.com/microsoft/onnxruntime/archive/refs/tags/v1.15.0.tar.gz |\
+      ${__untar} &&\
+    cd src &&\
+    ./build.sh \
+      --config RelWithDebInfo \
+      --build_shared_lib \
+      --compile_no_warning_as_error \
+      --skip_submodule_sync \
+      --skip_tests \
+      --allow_running_as_root \
+    && cmake --build build/Linux/RelWithDebInfo --target install &&\
+    cd .. && rm -rf src
 
 ###############################################################################
 # Generate the linker cache
