@@ -123,11 +123,11 @@ jobs:
             echo "::group::ldmx-sw test program"
             docker run $_docker_parameters $(pwd)/ldmx-sw/build ctest --verbose
             echo "::endgroup::"
+            echo "::group::run a basic inclusive sim"
+            docker run $_docker_parameters $(pwd) \
+              'LDMX_RUN_NUMBER=1 LDMX_NUM_EVENTS=10 fire ldmx-sw/.github/validation_samples/inclusive/config.py'
+            echo "::endgroup::"
           fi
-          echo "::group::run a basic inclusive sim"
-          docker run $_docker_parameters $(pwd) \
-            'LDMX_RUN_NUMBER=1 LDMX_NUM_EVENTS=10 fire ldmx-sw/.github/validation_samples/inclusive/config.py'
-          echo "::endgroup::"
 
   push:
     needs: test
