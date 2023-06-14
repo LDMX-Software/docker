@@ -351,7 +351,7 @@ RUN mkdir -p src &&\
 #  from source as tested on my local machine and it requires updating
 #  cmake to 3.26 using pip
 ###############################################################################
-LABEL onnx.version=1.15.0
+LABEL onnx.version=1.2.0
 #RUN mkdir -p src &&\
 #    ${__wget} https://github.com/microsoft/onnxruntime/archive/refs/tags/v1.15.0.tar.gz |\
 #      ${__untar} &&\
@@ -374,7 +374,7 @@ RUN ARCH=$(uname -m) &&\
     fi &&\
     mkdir -p src &&\
     release_stub="https://github.com/microsoft/onnxruntime/releases/download" &&\
-    onnx_version="1.15.0" &&\
+    onnx_version="1.2.0" &&\
     ${__wget} ${release_stub}/v${onnx_version}/onnxruntime-linux-${onnx_arch}-${onnx_version}.tgz |\
       ${__untar} &&\
     install -D -m 0644 -t ${__prefix}/lib src/lib/* &&\
