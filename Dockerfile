@@ -350,6 +350,9 @@ RUN mkdir -p src &&\
 #  The commented out RUN command below is what I would do to build
 #  from source as tested on my local machine and it requires updating
 #  cmake to 3.26 using pip
+#  The current verison of ONNX in use in ldmx-sw only has amd pre-builds,
+#  so I don't think it will be able to be used in arm architecture images.
+#  For this reason, I am omitting it until future development is done.
 ###############################################################################
 LABEL onnx.version=1.2.0
 #RUN mkdir -p src &&\
@@ -366,11 +369,12 @@ LABEL onnx.version=1.2.0
 #    && cmake --build build/Linux/RelWithDebInfo --target install &&\
 #    cd .. && rm -rf src
 # download pre-built binaries for the correct ARCH
-RUN ARCH=$(uname -m) &&\
-    if [ "$ARCH" == "x86_64" ]; then \
+RUN set -x ;\
+    ARCH="$(uname -m)" &&\
+    if [ "x86_64" = "$ARCH" ]; then \
       onnx_arch="x64"; \
     else \
-      onnx_arch="aarch64"; \
+      exit 0; \
     fi &&\
     mkdir -p src &&\
     release_stub="https://github.com/microsoft/onnxruntime/releases/download" &&\
