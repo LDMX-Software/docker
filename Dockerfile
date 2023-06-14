@@ -17,6 +17,7 @@ RUN apt-get update &&\
         binutils \
         ca-certificates \
         clang-format \
+        cmake \
         curl \
         dialog \
         diffutils \
@@ -79,9 +80,7 @@ RUN apt-get update &&\
         zsh \
     && rm -rf /var/lib/apt/lists/* &&\
     apt-get autoremove --purge &&\
-    apt-get clean all &&\
-    python3 -m pip install --no-cache-dir \
-      cmake~=3.26.0
+    apt-get clean all
 
 ###############################################################################
 # Source-Code Downloading Method
@@ -349,7 +348,8 @@ RUN mkdir -p src &&\
 #  We don't have time to build onnxruntime from source due to the
 #  6hr time limit of GitHub actions :(
 #  The commented out RUN command below is what I would do to build
-#  from source as tested on my local machine
+#  from source as tested on my local machine and it requires updating
+#  cmake to 3.26 using pip
 ###############################################################################
 LABEL onnx.version=1.15.0
 #RUN mkdir -p src &&\
