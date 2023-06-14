@@ -368,9 +368,9 @@ LABEL onnx.version=1.15.0
 # download pre-built binaries for the correct ARCH
 RUN ARCH=$(uname -m) &&\
     if [ "$ARCH" == "x86_64" ]; then \
-      onnx_arch="x64" \
+      onnx_arch="x64"; \
     else \
-      onnx_arch="aarch64" \
+      onnx_arch="aarch64"; \
     fi &&\
     mkdir -p src &&\
     release_stub="https://github.com/microsoft/onnxruntime/releases/download" &&\
