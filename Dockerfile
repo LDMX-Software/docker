@@ -346,21 +346,40 @@ RUN mkdir -p src &&\
 ###############################################################################
 # ONNX Runtime
 #  Used for running inference within ldmx-sw
+#  We don't have time to build onnxruntime from source due to the
+#  6hr time limit of GitHub actions :(
+#  The commented out RUN command below is what I would do to build
+#  from source as tested on my local machine
 ###############################################################################
-LABEL onnx.verison=1.15.0
-RUN mkdir -p src &&\
-    ${__wget} https://github.com/microsoft/onnxruntime/archive/refs/tags/v1.15.0.tar.gz |\
+LABEL onnx.version=1.15.0
+#RUN mkdir -p src &&\
+#    ${__wget} https://github.com/microsoft/onnxruntime/archive/refs/tags/v1.15.0.tar.gz |\
+#      ${__untar} &&\
+#    cd src &&\
+#    ./build.sh \
+#      --config RelWithDebInfo \
+#      --build_shared_lib \
+#      --compile_no_warning_as_error \
+#      --skip_submodule_sync \
+#      --skip_tests \
+#      --allow_running_as_root \
+#    && cmake --build build/Linux/RelWithDebInfo --target install &&\
+#    cd .. && rm -rf src
+# download pre-built binaries for the correct ARCH
+RUN ARCH=$(uname -m) &&\
+    if [ "$ARCH" == "x86_64" ]; then \
+      onnx_arch="x64" \
+    else \
+      onnx_arch="aarch64" \
+    fi &&\
+    mkdir -p src &&\
+    release_stub="https://github.com/microsoft/onnxruntime/releases/download" &&\
+    onnx_version="1.15.0" &&\
+    ${__wget} ${release_stub}/v${onnx_version}/onnxruntime-linux-${onnx_arch}-${onnx_version}.tgz |\
       ${__untar} &&\
-    cd src &&\
-    ./build.sh \
-      --config RelWithDebInfo \
-      --build_shared_lib \
-      --compile_no_warning_as_error \
-      --skip_submodule_sync \
-      --skip_tests \
-      --allow_running_as_root \
-    && cmake --build build/Linux/RelWithDebInfo --target install &&\
-    cd .. && rm -rf src
+    install -D -m 0644 -t ${__prefix}/lib src/lib/* &&\
+    install -D -m 0644 -t ${__prefix}/include src/include/* &&\
+    rm -rf src
 
 ###############################################################################
 # Generate the linker cache
