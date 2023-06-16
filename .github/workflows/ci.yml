@@ -98,6 +98,7 @@ jobs:
     - 
       name: Test the Image
       run: |
+          set -x
           export LDMX_BASE=$(pwd)
           export _docker_parameters="-i -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE new-build"
           mkdir ldmx-sw/build
