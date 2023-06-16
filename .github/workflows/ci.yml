@@ -98,11 +98,12 @@ jobs:
     - 
       name: Test the Image
       run: |
-          set -x
+          echo "::group::Init Environment"
           export LDMX_BASE=$(pwd)
           export _docker_parameters="-i -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE new-build"
           mkdir ldmx-sw/build
           interop_patches=".github/interop/${{ matrix.ldmx_sw_branch }}" 
+          echo "::endgroup::"
           if [ -d ${interop_patches} ]; then
             echo "::group::Found ldmx-sw patches for ${{ matrix.ldmx_sw_branch }}"
             for patch in ${interop_patches}/*; do
