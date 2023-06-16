@@ -101,16 +101,13 @@ jobs:
           export LDMX_BASE=$(pwd)
           export _docker_parameters="-i -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE new-build"
           mkdir ldmx-sw/build
-          curl https://raw.githubusercontent.com/Ariel-Rodriguez/sh-semversion-2/main/semver2.sh \
-            -o semver.sh
-          # get ldmx-sw version
-          _curr=$(git -C ldmx-sw describe --tags)
-          # check against ldmx-sw release which patches Catch2
-          _order=$(sh semver.sh ${_curr} v3.2.5)
-          if [ "${_order}" == "-1" ]; then
-            # need to prevent tests from compiling
-            echo "::group::Don't compile tests for ${_curr}"
-            sed -i 's|build_test()|#build_test()|' ldmx-sw/CMakeLists.txt
+          interop_patches="docker/.github/interop/${{ matrix.ldmx_sw_branch }}" 
+          if [ -d ${interop_patches} ]; then
+            echo "::group::Found ldmx-sw patches for ${{ matrix.ldmx_sw_branch }}"
+            for patch in ${interop_patches}/*; do
+              echo "running ${patch}"
+              ./${patch}
+            done
             echo "::endgroup::"
           fi
           echo "::group::Build ldmx-sw"
@@ -119,7 +116,7 @@ jobs:
           echo "::group::Run python test script"
           docker run $_docker_parameters $(pwd) python3 test.py
           echo "::endgroup::"
-          if [ "${_order}" != "-1" ]; then
+          if [ ! -d ${interop_patches} ]; then
             echo "::group::ldmx-sw test program"
             docker run $_docker_parameters $(pwd)/ldmx-sw/build ctest --verbose
             echo "::endgroup::"
