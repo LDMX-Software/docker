@@ -21,3 +21,15 @@ still load this into docker (without intermediate files) with
 ```
 unzip -p <ldmx-dev-SHA.zip> | docker load
 ```
+
+## Legacy Interop
+For some past versions of ldmx-sw, we need to modify the code slightly 
+in order for it to be able to be built by the newer containers. For
+this reason, we have a set of (interop)[../interop] scripts. If there
+is a directory corresponding to the version being tested, then the
+CI will run the scripts in that directory before attempting to build
+and install ldmx-sw.
+
+If there are interop patches, we assume that the testing is also
+not functional so neither the test program nor a test simulation
+are run.
