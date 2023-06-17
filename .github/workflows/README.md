@@ -15,3 +15,9 @@ Runner | Command
 docker | [`docker load --input <tar-ball>`](https://docs.docker.com/engine/reference/commandline/load/)
 singularity | [`singularity build <new-sif> docker-archive://<tar-ball>`](https://sylabs.io/guides/3.1/user-guide/singularity_and_docker.html#locally-available-images-stored-archives)
 
+Downloading the artifact with `gh` results in the tar ball, but downloading
+it from the website results in a zipped version of the tar ball. One can
+still load this into docker (without intermediate files) with
+```
+unzip -p <ldmx-dev-SHA.zip> | docker load
+```
