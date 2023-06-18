@@ -72,6 +72,7 @@ RUN apt-get update &&\
         python3-pip \
         python3-numpy \
         python3-tk \
+        clang-tidy \
         sudo \
         srm-ifce-dev \
         time \
