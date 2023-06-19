@@ -37,6 +37,7 @@ Direct Dependecy of ldmx-sw | Version | Construction Process
 [LHAPDF](https://lhapdf.hepforge.org/) | 6.5.3 | Built from source
 [GENIE](http://www.genie-mc.org/) | 3.02.00 | Built from source
 [Catch2](https://github.com/catchorg/Catch2) | 3.3.1 | Built from source
+[ONNX Runtime](https://github.com/microsoft/onnxruntime) | 1.15.0 | Download pre-built binaries
 
 A detailed list of all packages installed from ubuntu repositories is given [here](docs/ubuntu-packages.md).
 
