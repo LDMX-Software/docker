@@ -157,8 +157,10 @@ jobs:
       name: Test the Image
       run: |
           echo "::group::Init Environment"
+          # extract a single tag to run tests with
+          tag=$(jq -r .tags[0] <<<"${DOCKER_METADATA_OUTPUT_JSON}")
           export LDMX_BASE=$(pwd)
-          export _docker_parameters="-i -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE new-build"
+          export _docker_parameters="-i -e LDMX_BASE -v $LDMX_BASE:$LDMX_BASE ${tag}"
           mkdir ldmx-sw/build
           interop_patches=".github/interop/${{ matrix.ldmx_sw_branch }}" 
           echo "::endgroup::"
