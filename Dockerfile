@@ -142,11 +142,11 @@ RUN mkdir src && \
     sed -i 's/extern int pyuppr/int pyuppr/g' pythia6_common_address.c && \
     sed -i 's/char py/extern char py/g' pythia6_common_address.c && \
     echo 'void MAIN__() {}' >main.c && \
-    gcc -c -m64 -fPIC -shared main.c -lgfortran && \
-    gcc -c -m64 -fPIC -shared pythia6_common_address.c -lgfortran && \
-    gfortran -c -m64 -fPIC -shared pythia*.f && \
-    gfortran -c -m64 -fPIC -shared -fno-second-underscore tpythia6_called_from_cc.F && \
-    gfortran -m64 -shared -Wl,-soname,libPythia6.so -o libPythia6.so main.o  pythia*.o tpythia*.o &&\
+    gcc -c -fPIC -shared main.c -lgfortran && \
+    gcc -c -fPIC -shared pythia6_common_address.c -lgfortran && \
+    gfortran -c -fPIC -shared pythia*.f && \
+    gfortran -c -fPIC -shared -fno-second-underscore tpythia6_called_from_cc.F && \
+    gfortran -shared -Wl,-soname,libPythia6.so -o libPythia6.so main.o  pythia*.o tpythia*.o &&\
     mkdir -p ${__prefix}/pythia6 && cp -r * ${__prefix}/pythia6/ &&\
     cd ../ && rm -rf src &&\
     echo "${__prefix}/pythia6/" > /etc/ld.so.conf.d/pythia6.conf
