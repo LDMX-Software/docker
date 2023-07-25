@@ -355,7 +355,7 @@ RUN mkdir -p src &&\
 #  so I don't think it will be able to be used in arm architecture images.
 #  For this reason, I am omitting it until future development is done.
 ###############################################################################
-LABEL onnx.version=1.2.0
+LABEL onnx.version=1.15.0
 #RUN mkdir -p src &&\
 #    ${__wget} https://github.com/microsoft/onnxruntime/archive/refs/tags/v1.15.0.tar.gz |\
 #      ${__untar} &&\
@@ -374,12 +374,14 @@ RUN set -x ;\
     ARCH="$(uname -m)" &&\
     if [ "x86_64" = "$ARCH" ]; then \
       onnx_arch="x64"; \
+    elif [ "aarch64" = "$ARCH" ]; then \
+      onnx_arch="aarch64"; \
     else \
       exit 0; \
     fi &&\
     mkdir -p src &&\
     release_stub="https://github.com/microsoft/onnxruntime/releases/download" &&\
-    onnx_version="1.2.0" &&\
+    onnx_version="1.15.0" &&\
     ${__wget} ${release_stub}/v${onnx_version}/onnxruntime-linux-${onnx_arch}-${onnx_version}.tgz |\
       ${__untar} &&\
     install -D -m 0644 -t ${__prefix}/lib src/lib/* &&\
