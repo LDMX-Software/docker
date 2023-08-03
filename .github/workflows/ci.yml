@@ -73,7 +73,6 @@ jobs:
           name: digests
           path: /tmp/digests/*
           if-no-files-found: error
-          retention-days: 1
 
   merge:
     runs-on: ubuntu-latest
