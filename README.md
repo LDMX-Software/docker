@@ -39,7 +39,8 @@ Direct Dependecy of ldmx-sw | Version | Construction Process
 [Catch2](https://github.com/catchorg/Catch2) | 3.3.1 | Built from source
 [ONNX Runtime](https://github.com/microsoft/onnxruntime) | 1.15.0 | Download pre-built binaries
 
-A detailed list of all packages installed from ubuntu repositories is given [here](docs/ubuntu-packages.md).
+A detailed list of all packages installed from ubuntu repositories is given [here](docs/ubuntu-packages.md),
+and documentation on the workflow and runner used to build the image is [here](docs/runner.md).
 
 ### Python Packages for Analyses
 Installed in Python 3.
