@@ -78,6 +78,11 @@ RUN apt-get update &&\
         util-linux \
         wget \
         zsh \
+	clang \
+	clang-tidy \
+	clang-tools \
+	lld \
+	cmake-curses-gui \
     && rm -rf /var/lib/apt/lists/* &&\
     apt-get autoremove --purge &&\
     apt-get clean all
