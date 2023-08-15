@@ -11,8 +11,11 @@ automake | Yes | Configuration of log4cpp build, needed for GENIE
 bc | Yes | Necessary for distrobox support
 binutils | Yes | Adding PPA and linking libraries
 ca-certificates | Yes | Installing certificates to trust in container
+clang | No | Alternative compiler to GCC that can be used for additional static analysis 
+clang-tidy | No | Static analysis tool for C++ code 
 clang-format | Yes | LDMX C++ code formatting
 cmake | Yes | Make configuration, v3.22.1 available in Ubuntu 22.04 repos
+cmake-curses-gui | No | Allows for modifying cmake configurations with a ncurses-gui
 curl | Yes | Necessary for distrobox support
 dialog | Yes | Necessary for distrobox support
 diffutils | Yes | Necessary for distrobox support
