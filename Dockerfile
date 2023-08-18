@@ -20,7 +20,7 @@ RUN chmod +x /usr/local/bin/install-ubuntu-packages
 # Basic OS/System tools
 RUN install-ubuntu-packages \
     autoconf \
-    automake
+    automake \
     binutils \
     cmake \
     curl\
