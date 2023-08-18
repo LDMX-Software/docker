@@ -427,6 +427,9 @@ RUN install-ubuntu-packages \
     libssl-dev
 
 # Optional tools and developer utilities
+#
+# If you want to add additional packages that aren't strictly necessary to build
+# ldmx-sw or its dependencies, this is a good place to put them
 RUN install-ubuntu-packages \
     clang \
     clang-tidy \
