@@ -152,6 +152,33 @@ RUN mkdir src && \
 # We promote the environment variables defined in thisroot.sh to this
 # Dockerfile so that thisroot.sh doesn't need to be sourced.
 ###############################################################################
+
+RUN install-ubuntu-packages \
+    fonts-freefont-ttf \
+    libafterimage-dev \
+    libfftw3-dev \
+    libfreetype6-dev \
+    libftgl-dev \
+    libgif-dev \
+    libgl1-mesa-dev \
+    libgl2ps-dev \
+    libglew-dev \
+    libglu-dev \
+    libjpeg-dev \
+    liblz4-dev \
+    liblzma-dev \
+    libpcre++-dev \
+    libpng-dev \
+    libx11-dev \
+    libxext-dev \
+    libxft-dev \
+    libxml2-dev \
+    libxmu-dev \
+    libxpm-dev \
+    libz-dev \
+    libzstd-dev \
+    srm-ifce-dev
+
 LABEL root.version="6.22.08"
 RUN mkdir src &&\
     ${__wget} https://root.cern/download/root_v6.22.08.source.tar.gz |\
