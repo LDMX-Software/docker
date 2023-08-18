@@ -5,6 +5,16 @@ MAINTAINER Tom Eichlersmith <eichl008@umn.edu>
 
 ARG NPROC=1
 
+
+# Add a script to the container environment that lets us install a list of
+# packages from the ubuntu repositories while keeping the size of the docker
+# layer relatively small
+
+# /usr/local/bin will be in the path so we can refer to the script without the
+# full path
+COPY install-ubuntu-packages.sh /usr/local/bin/install-ubuntu-packages
+# Make it executable
+RUN chmod +x /usr/local/bin/install-ubuntu-packages
 # First install any required dependencies from ubuntu repos
 # Ongoing documentation for this list is in docs/ubuntu-packages.md
 RUN apt-get update &&\
