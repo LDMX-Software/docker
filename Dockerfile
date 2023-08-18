@@ -15,6 +15,8 @@ ARG NPROC=1
 COPY install-ubuntu-packages.sh /usr/local/bin/install-ubuntu-packages
 # Make it executable
 RUN chmod +x /usr/local/bin/install-ubuntu-packages
+
+# Ongoing documentation for packages used is in docs/ubuntu-packages.md
 # First install any required dependencies from ubuntu repos
 # Ongoing documentation for this list is in docs/ubuntu-packages.md
 RUN apt-get update &&\
