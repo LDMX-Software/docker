@@ -177,7 +177,8 @@ RUN install-ubuntu-packages \
     libxpm-dev \
     libz-dev \
     libzstd-dev \
-    srm-ifce-dev
+    srm-ifce-dev \
+    libgsl-dev # Necessary for GENIE
 
 LABEL root.version="6.22.08"
 RUN mkdir src &&\
@@ -319,8 +320,10 @@ RUN mkdir src &&\
 ###############################################################################
 
 # See https://github.com/LDMX-Software/docker/pull/48
+#
+# Note that libgsl-dev needs to be available already when building ROOT to build
+# GENIE
 RUN install-ubuntu-packages \
-    libgsl-dev \
     liblog4cpp5-dev \
     libtool
 
