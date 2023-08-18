@@ -29,6 +29,28 @@ RUN install-ubuntu-packages \
     make \
     wget
 
+# Packages necessary for Distrobox support
+RUN install-ubuntu-packages \
+    apt-utils \
+    bc \
+    dialog \
+    diffutils \
+    findutils \
+    fish \
+    gnupg2 \
+    less \
+    libnss-myhostname \
+    libvte-2.9[0-9]-common \
+    libvte-common \
+    lsof \
+    ncurses-base \
+    passwd \
+    pinentry-curses \
+    procps \
+    sudo \
+    time \
+    util-linux \
+    zsh
 ###############################################################################
 # Source-Code Downloading Method
 #   mkdir src && ${__wget} <url-to-tar.gz-source-archive> | ${__untar}
