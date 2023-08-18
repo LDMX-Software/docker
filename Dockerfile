@@ -51,6 +51,17 @@ RUN install-ubuntu-packages \
     time \
     util-linux \
     zsh
+
+# Basic python support, necessary for the build steps.
+#
+# Note: If you want to add additional python packages, you probably want to do
+# this in the python_packages.txt file rather than here
+RUN install-ubuntu-packages \
+    python3-dev \
+    python3-numpy \
+    python3-pip \
+    python3-tk
+
 ###############################################################################
 # Source-Code Downloading Method
 #   mkdir src && ${__wget} <url-to-tar.gz-source-archive> | ${__untar}
