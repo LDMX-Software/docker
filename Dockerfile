@@ -17,6 +17,17 @@ COPY install-ubuntu-packages.sh /usr/local/bin/install-ubuntu-packages
 RUN chmod +x /usr/local/bin/install-ubuntu-packages
 
 # Ongoing documentation for packages used is in docs/ubuntu-packages.md
+# Basic OS/System tools
+RUN install-ubuntu-packages \
+    autoconf \
+    automake
+    binutils \
+    cmake \
+    curl\
+    gcc g++ gfortran \
+    locales \
+    make \
+    wget
 
 ###############################################################################
 # Source-Code Downloading Method
