@@ -419,6 +419,12 @@ RUN ldconfig -v
 COPY ./python_packages.txt /etc/python_packages.txt
 RUN python3 -m pip install --no-cache-dir --requirement /etc/python_packages.txt
 
+# Dependencies for LDMX-sw and/or the container environment
+RUN install-ubuntu-packages \
+    ca-certificates \
+    clang-format \
+    libboost-all-dev \
+    libssl-dev
 # add any ssl certificates to the container to trust
 COPY ./certs/ /usr/local/share/ca-certificates
 RUN update-ca-certificates
