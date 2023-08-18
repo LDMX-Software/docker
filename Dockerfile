@@ -425,6 +425,17 @@ RUN install-ubuntu-packages \
     clang-format \
     libboost-all-dev \
     libssl-dev
+
+# Optional tools and developer utilities
+RUN install-ubuntu-packages \
+    clang \
+    clang-tidy \
+    clang-tools \
+    cmake-curses-gui \
+    gdb \
+    libasan8 \
+    lld
+
 # add any ssl certificates to the container to trust
 COPY ./certs/ /usr/local/share/ca-certificates
 RUN update-ca-certificates
