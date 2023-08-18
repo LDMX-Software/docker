@@ -317,6 +317,14 @@ RUN mkdir src &&\
 #   deduces the version from the files in the .git directory if git is
 #   not installed.
 ###############################################################################
+
+# See https://github.com/LDMX-Software/docker/pull/48
+RUN install-ubuntu-packages \
+    libgsl-dev \
+    liblog4cpp5-dev \
+    libtool
+
+
 LABEL genie.version=3.02.00
 ENV GENIE_VERSION=3_02_00
 #ENV GENIE_REWEIGHT_VERSION=1_02_00
