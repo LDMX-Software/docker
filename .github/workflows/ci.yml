@@ -62,16 +62,22 @@ jobs:
           outputs: type=image,name=${{ env.REGISTRY_IMAGE }},push-by-digest=true,name-canonical=true,push=true
       -
         name: Export digest
+        id: export-digest
         run: |
           mkdir digest
           digest="${{ steps.build.outputs.digest }}"
-          touch "digest/${digest#sha256:}"
+          platform="${{ matrix.platform }}"
+          digest_name="${platform#linux/}-digest"
+          digest_file="digest/${digest#sha256:}"
+          touch "${digest_file}"
+          echo "name=${digest_name}" >> "$GITHUB_OUTPUT"
+          echo "file=${digest_file}" >> "$GITHUB_OUTPUT"
       -
         name: Upload digest
         uses: actions/upload-artifact@v3
         with:
-          name: ${{matrix.platform}}-digest
-          path: digest/*
+          name: ${{ steps.export-digest.outputs.name }}
+          path: ${{ steps.export-digest.outputs.file }}
           if-no-files-found: error
 
   merge:
