@@ -115,7 +115,7 @@ jobs:
         working-directory: digests
         run: |
           docker buildx imagetools create $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
-            $(printf '${{ env.REGISTRY_IMAGE }}@sha256:%s ' */*)
+            $(find -type f -exec basename {} ';' | xargs printf '${{ env.REGISTRY_IMAGE }}@sha256:%s ')
       -
         name: Inspect image
         run: |
