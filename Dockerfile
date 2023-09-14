@@ -5,82 +5,62 @@ MAINTAINER Tom Eichlersmith <eichl008@umn.edu>
 
 ARG NPROC=1
 
-# First install any required dependencies from ubuntu repos
-# Ongoing documentation for this list is in docs/ubuntu-packages.md
-RUN apt-get update &&\
-    DEBIAN_FRONTEND=noninteractive \
-    apt-get install -y \
-        apt-utils \
-        autoconf \
-        automake \
-        bc \
-        binutils \
-        ca-certificates \
-        clang-format \
-        cmake \
-        curl \
-        dialog \
-        diffutils \
-        findutils \
-        fish \
-        fonts-freefont-ttf \
-        g++ \
-        gcc \
-        gdb \
-        gfortran \
-        gnupg2 \
-        less \
-        libafterimage-dev \
-        libasan8 \
-        libboost-all-dev \
-        libfftw3-dev \
-        libfreetype6-dev \
-        libftgl-dev \
-        libgif-dev \
-        libgl1-mesa-dev \
-        libgl2ps-dev \
-        libglew-dev \
-        libglu-dev \
-        libgsl-dev \
-        libjpeg-dev \
-        liblog4cpp5-dev \
-        liblz4-dev \
-        liblzma-dev \
-        libnss-myhostname \
-        libpcre++-dev \
-        libpng-dev \
-        libssl-dev \
-        libtool \
-        libvte-2.9[0-9]-common \
-        libvte-common \
-        libx11-dev \
-        libxext-dev \  
-        libxft-dev \
-        libxml2-dev \
-        libxmu-dev \
-        libxpm-dev \
-        libz-dev \
-        libzstd-dev \
-        lsof \
-        locales \
-        make \
-        ncurses-base \
-        passwd \
-        pinentry-curses \
-        procps \
-        python3-dev \
-        python3-pip \
-        python3-numpy \
-        python3-tk \
-        sudo \
-        srm-ifce-dev \
-        time \
-        util-linux \
-        wget \
-        zsh \
-    && rm -rf /var/lib/apt/lists/* &&\
-    apt-get autoremove --purge &&\
-    apt-get clean all
+
+# Add a script to the container environment that lets us install a list of
+# packages from the ubuntu repositories while keeping the size of the docker
+# layer relatively small
+
+# /usr/local/bin will be in the path so we can refer to the script without the
+# full path
+COPY install-ubuntu-packages.sh /usr/local/bin/install-ubuntu-packages
+# Make it executable
+RUN chmod +x /usr/local/bin/install-ubuntu-packages
+
+# Ongoing documentation for packages used is in docs/ubuntu-packages.md
+# Basic OS/System tools
+RUN install-ubuntu-packages \
+    autoconf \
+    automake \
+    binutils \
+    cmake \
+    curl\
+    gcc g++ gfortran \
+    locales \
+    make \
+    wget
+
+# Packages necessary for Distrobox support
+RUN install-ubuntu-packages \
+    apt-utils \
+    bc \
+    dialog \
+    diffutils \
+    findutils \
+    fish \
+    gnupg2 \
+    less \
+    libnss-myhostname \
+    libvte-2.9[0-9]-common \
+    libvte-common \
+    lsof \
+    ncurses-base \
+    passwd \
+    pinentry-curses \
+    procps \
+    sudo \
+    time \
+    util-linux \
+    zsh
+
+# Basic python support, necessary for the build steps.
+#
+# Note: If you want to add additional python packages, you probably want to do
+# this in the python_packages.txt file rather than here
+RUN install-ubuntu-packages \
+    python3-dev \
+    python3-numpy \
+    python3-pip \
+    python3-tk
 
 ###############################################################################
 # Source-Code Downloading Method
@@ -142,11 +122,11 @@ RUN mkdir src && \
     sed -i 's/extern int pyuppr/int pyuppr/g' pythia6_common_address.c && \
     sed -i 's/char py/extern char py/g' pythia6_common_address.c && \
     echo 'void MAIN__() {}' >main.c && \
-    gcc -c -m64 -fPIC -shared main.c -lgfortran && \
-    gcc -c -m64 -fPIC -shared pythia6_common_address.c -lgfortran && \
-    gfortran -c -m64 -fPIC -shared pythia*.f && \
-    gfortran -c -m64 -fPIC -shared -fno-second-underscore tpythia6_called_from_cc.F && \
-    gfortran -m64 -shared -Wl,-soname,libPythia6.so -o libPythia6.so main.o  pythia*.o tpythia*.o &&\
+    gcc -c -fPIC -shared main.c -lgfortran && \
+    gcc -c -fPIC -shared pythia6_common_address.c -lgfortran && \
+    gfortran -c -fPIC -shared pythia*.f && \
+    gfortran -c -fPIC -shared -fno-second-underscore tpythia6_called_from_cc.F && \
+    gfortran -shared -Wl,-soname,libPythia6.so -o libPythia6.so main.o  pythia*.o tpythia*.o &&\
     mkdir -p ${__prefix}/pythia6 && cp -r * ${__prefix}/pythia6/ &&\
     cd ../ && rm -rf src &&\
     echo "${__prefix}/pythia6/" > /etc/ld.so.conf.d/pythia6.conf
@@ -172,6 +152,34 @@ RUN mkdir src && \
 # We promote the environment variables defined in thisroot.sh to this
 # Dockerfile so that thisroot.sh doesn't need to be sourced.
 ###############################################################################
+
+RUN install-ubuntu-packages \
+    fonts-freefont-ttf \
+    libafterimage-dev \
+    libfftw3-dev \
+    libfreetype6-dev \
+    libftgl-dev \
+    libgif-dev \
+    libgl1-mesa-dev \
+    libgl2ps-dev \
+    libglew-dev \
+    libglu-dev \
+    libjpeg-dev \
+    liblz4-dev \
+    liblzma-dev \
+    libpcre++-dev \
+    libpng-dev \
+    libx11-dev \
+    libxext-dev \
+    libxft-dev \
+    libxml2-dev \
+    libxmu-dev \
+    libxpm-dev \
+    libz-dev \
+    libzstd-dev \
+    srm-ifce-dev \
+    libgsl-dev # Necessary for GENIE
+
 LABEL root.version="6.22.08"
 RUN mkdir src &&\
     ${__wget} https://root.cern/download/root_v6.22.08.source.tar.gz |\
@@ -310,8 +318,21 @@ RUN mkdir src &&\
 #   deduces the version from the files in the .git directory if git is
 #   not installed.
 ###############################################################################
+
+# See https://github.com/LDMX-Software/docker/pull/48
+#
+# Note that libgsl-dev needs to be available already when building ROOT to build
+# GENIE
+RUN install-ubuntu-packages \
+    liblog4cpp5-dev \
+    libtool
+
+
 LABEL genie.version=3.04.00
 ENV GENIE_VERSION=3_04_00
+#ENV GENIE_REWEIGHT_VERSION=1_02_00
+
+>>>>>>> e520b871a3abb14bc310accf3ef8fea9e05473ee
 ENV GENIE=/usr/local/src/GENIE/Generator
 
 RUN mkdir -p ${GENIE} &&\
@@ -364,7 +385,7 @@ RUN mkdir -p src &&\
 #  so I don't think it will be able to be used in arm architecture images.
 #  For this reason, I am omitting it until future development is done.
 ###############################################################################
-LABEL onnx.version=1.2.0
+LABEL onnx.version=1.15.0
 #RUN mkdir -p src &&\
 #    ${__wget} https://github.com/microsoft/onnxruntime/archive/refs/tags/v1.15.0.tar.gz |\
 #      ${__untar} &&\
@@ -383,12 +404,14 @@ RUN set -x ;\
     ARCH="$(uname -m)" &&\
     if [ "x86_64" = "$ARCH" ]; then \
       onnx_arch="x64"; \
+    elif [ "aarch64" = "$ARCH" ]; then \
+      onnx_arch="aarch64"; \
     else \
       exit 0; \
     fi &&\
     mkdir -p src &&\
     release_stub="https://github.com/microsoft/onnxruntime/releases/download" &&\
-    onnx_version="1.2.0" &&\
+    onnx_version="1.15.0" &&\
     ${__wget} ${release_stub}/v${onnx_version}/onnxruntime-linux-${onnx_arch}-${onnx_version}.tgz |\
       ${__untar} &&\
     install -D -m 0644 -t ${__prefix}/lib src/lib/* &&\
@@ -410,6 +433,26 @@ RUN ldconfig -v
 ###############################################################################
 COPY ./python_packages.txt /etc/python_packages.txt
 RUN python3 -m pip install --no-cache-dir --requirement /etc/python_packages.txt
+
+# Dependencies for LDMX-sw and/or the container environment
+RUN install-ubuntu-packages \
+    ca-certificates \
+    clang-format \
+    libboost-all-dev \
+    libssl-dev
+
+# Optional tools and developer utilities
+#
+# If you want to add additional packages that aren't strictly necessary to build
+# ldmx-sw or its dependencies, this is a good place to put them
+RUN install-ubuntu-packages \
+    clang \
+    clang-tidy \
+    clang-tools \
+    cmake-curses-gui \
+    gdb \
+    libasan8 \
+    lld
 
 # add any ssl certificates to the container to trust
 COPY ./certs/ /usr/local/share/ca-certificates

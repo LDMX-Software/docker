@@ -13,7 +13,7 @@ A clear and concise description of what the problem is. Ex. I'm used to using th
 ## Describe the solution you'd like. What packages do you want installed?
 A clear and concise description of what you want to happen.
 
-**The Development Container is based on Ubuntu 18.04. How do you install your necessary packages on Ubuntu?**
+**The Development Container is based on Ubuntu 22.04. How do you install your necessary packages on Ubuntu?**
 A description and list of commands to run, for example
 ```
 apt-get install my-package

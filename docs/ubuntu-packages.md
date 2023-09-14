@@ -3,6 +3,21 @@ Here I try to list all of the installed ubuntu packages and give an explanation 
 Lot's of these packages are installed into the [ROOT official docker container](https://github.com/root-project/root-docker/blob/master/ubuntu/Dockerfile) and so I have copied them here. 
 I have looked into their purpose by a combination of googling the package name and looking at [ROOT's reason for them](https://root.cern/install/dependencies/). 
 
+In the Dockerfile, most packages are added when they are needed for the rest of
+the build. Adding packages before they are needed means the container needs to
+be rebuilt starting from the point you add them, so it is a good habit to avoid
+doing so. There is a helper script installed in the container
+`install-ubuntu-packages` that can be called directly in the Dockerfile with a
+list of packages to install.
+
+If you want to add additional packages that aren't necessary for building
+ldmx-sw, its dependencies, or the container environment use the install command
+at the end of the Dockerfile.
+
+Note: If you are looking to add python packages, prefer adding them to the
+[python packages file](../python_packages.txt) rather than installing them from
+the ubuntu repositories.
+
 Package | Necessary | Reason
 ---|---|---
 apt-utils | Yes | Necessary for distrobox support
