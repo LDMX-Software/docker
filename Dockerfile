@@ -332,7 +332,6 @@ LABEL genie.version=3.04.00
 ENV GENIE_VERSION=3_04_00
 #ENV GENIE_REWEIGHT_VERSION=1_02_00
 
->>>>>>> e520b871a3abb14bc310accf3ef8fea9e05473ee
 ENV GENIE=/usr/local/src/GENIE/Generator
 
 RUN mkdir -p ${GENIE} &&\
