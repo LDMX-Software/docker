@@ -310,10 +310,8 @@ RUN mkdir src &&\
 #   deduces the version from the files in the .git directory if git is
 #   not installed.
 ###############################################################################
-LABEL genie.version=3.02.00
-ENV GENIE_VERSION=3_02_00
-#ENV GENIE_REWEIGHT_VERSION=1_02_00
-
+LABEL genie.version=3.04.00
+ENV GENIE_VERSION=3_04_00
 ENV GENIE=/usr/local/src/GENIE/Generator
 
 RUN mkdir -p ${GENIE} &&\
@@ -329,6 +327,17 @@ RUN mkdir -p ${GENIE} &&\
       --with-pythia6-lib=${__prefix}/pythia6 \
       --enable-test \
     && \
+    make -j$NPROC && \
+    make -j$NPROC install
+
+#Unfortunately ... need to use the master branch of GENIE reweight...
+ENV GENIE_REWEIGHT_VERSION=1_02_02
+ENV GENIE_REWEIGHT=/usr/local/src/GENIE/Reweight
+RUN mkdir -p ${GENIE_REWEIGHT} &&\
+    #${__wget} https://github.com/GENIE-MC/Reweight/archive/refs/tags/R-${GENIE_REWEIGHT_VERSION}.tar.gz |\
+    ${__wget} https://github.com/GENIE-MC/Reweight/tarball/master |\
+    ${__untar_to} ${GENIE_REWEIGHT} &&\
+    cd ${GENIE_REWEIGHT} &&\
     make -j$NPROC && \
     make -j$NPROC install
 
