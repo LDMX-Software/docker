@@ -4,3 +4,12 @@ language = "en"
 multilingual = false
 src = "src"
 title = "LDMX Development Image"
+
+[build]
+create-missing = false
+
+[output.html]
+mathjax-support = true
+git-repository-url = "https://github.com/LDMX-Software/docker/tree/main/"
+edit-url-template = "https://github.com/LDMX-Software/docker/edit/main/docs/{path}"
+
