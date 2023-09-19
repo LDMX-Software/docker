@@ -12,4 +12,5 @@
 - [Running the Image](usage.md)
   - [With Docker](use_with_docker.md)
   - [With Singularity](use_with_singularity.md)
-- [Self-Hosted Runner](runner.md)
+- [GitHub Workflows](workflows.md)
+  - [Self-Hosted Runner](runner.md)
