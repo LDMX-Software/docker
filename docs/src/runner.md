@@ -91,8 +91,11 @@ actor could fork this repository and
 - Follow [post-install instructions](https://docs.docker.com/engine/install/linux-postinstall/) to allow `docker` to be run by users
 - Follow [Add a Self-Hosted Runner](https://docs.github.com/en/actions/hosting-your-own-runners/managing-self-hosted-runners/adding-self-hosted-runners)
   treating _the VM_ as the runner and _not_ the host
-  - spawn a new runner for _each_ core, giving each runner its own working directory and its own copy of the actions-runner software
   - add the `UMN` label to the runners during config so LDMX knows where they are
+- Repeat these steps for _each_ of the runners (isolating the runners from the host and each other)
+  - We did attempt to have the runners share a VM and a layer cache, but this was
+    causing issues when two jobs were trying to read from the same layer cache and one
+    was completing before the other [LDMX-Software/docker Issue #69](https://github.com/LDMX-Software/docker/issues/69)
 
 I'd like to emphasize how simple this procedure was.
 GitHub has put a good amount of effort into making Self-Hosted runners easy to connect,
