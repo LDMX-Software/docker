@@ -7,7 +7,7 @@
 - [Parallel Containers](parallel_containers.md)
 
 # Developer's Guide
-- [Contributing]()
+- [Contributing](contributing.md)
 - [Ubuntu Packages](ubuntu-packages.md)
 - [Running the Image]()
   - [With Docker](use_with_docker.md)
