@@ -14,6 +14,18 @@ The workflow is split into three parts.
 We only test after a successful build so, if the tests fail, users can pull the image and
 debug why the tests are failing locally.
 
+## ldmx-sw Test Versions
+The CI can only test a finite number of versions of ldmx-sw - in general, we'd like
+to make sure the past few minor versions are supported (with the possibility of interop
+patches) by the new container image build while also enabling support for the newest ldmx-sw.
+This means we _manually_ write the `ldmx_sw_branch` for the CI to test following the rules
+- Test minimum version supported (currently set at `v3.0.0`)
+- Test newest developments of ldmx-sw (`trunk`)
+- Test highest patch-number for each minor version in between (`v3.0.2`, `v3.1.13`, `v3.2.12`)
+- Test additional releases specifically related to the container image
+  - For example `v3.2.4` was the last release before necessary updates were made to support
+    the newer GCC version in v4 images.
+
 ## Legacy Interop
 For some past versions of ldmx-sw, we need to modify the code slightly 
 in order for it to be able to be built by the newer containers. For
