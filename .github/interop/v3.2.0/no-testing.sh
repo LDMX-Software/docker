@@ -1,1 +1,0 @@
-../no-testing.sh

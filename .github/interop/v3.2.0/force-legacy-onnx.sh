@@ -1,1 +1,0 @@
-../force-legacy-onnx.sh
