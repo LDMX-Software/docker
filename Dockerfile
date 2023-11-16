@@ -86,7 +86,7 @@ ENV CMAKE_PREFIX_PATH="${EXTERNAL_INSTALL_DIR}:${__prefix}"
 # Xerces-C 
 #   Used by Geant4 to parse GDML
 ################################################################################
-XERCESC_VERSION="3.2.4"
+ENV XERCESC_VERSION="3.2.4"
 LABEL xercesc.version=${XERCESC_VERSION}
 #LABEL xercesc.version="3.2.4"
 RUN mkdir src &&\
@@ -114,14 +114,14 @@ RUN mkdir src &&\
 # (Ideally GENIE works with Pythia8? But not sure that works yet despite the adverts that it does.)
 # 
 ###############################################################################
-PYTHIA_VERSION="6.428"
-PREVIOUS_PYTHIA_VERSION="6.416"
+ENV PYTHIA_VERSION="6.428"
+ENV PREVIOUS_PYTHIA_VERSION="6.416"
 LABEL pythia.version=${PYTHIA_VERSION}
 #"6.428"
 # Pythia uses an un-dotted version file naming convention
-PYTHIA_VERSION_INTEGER=$(awk '{print $1*1000}' <<< "${PYTHIA_VERSION}" )
-PREVIOUS_PYTHIA_VERSION_INTEGER=$(awk '{print $1*1000}' <<< "${PREVIOUS_PYTHIA_VERSION}" )
-PYTHIA_MAJOR_VERSION=$(awk '{print int($1) }' <<< "${PYTHIA_VERSION}" )
+ENV PYTHIA_VERSION_INTEGER=$(awk '{print $1*1000}' <<< "${PYTHIA_VERSION}" )
+ENV PREVIOUS_PYTHIA_VERSION_INTEGER=$(awk '{print $1*1000}' <<< "${PREVIOUS_PYTHIA_VERSION}" )
+ENV PYTHIA_MAJOR_VERSION=$(awk '{print int($1) }' <<< "${PYTHIA_VERSION}" )
 
 RUN mkdir src && \
     ${__wget} https://root.cern.ch/download/pythia${PYTHIA_MAJOR_VERSION}.tar.gz | ${__untar} &&\
@@ -190,7 +190,7 @@ RUN install-ubuntu-packages \
     srm-ifce-dev \
     libgsl-dev # Necessary for GENIE
 
-ROOT_VERSION="6.22.08"
+ENV ROOT_VERSION="6.22.08"
 LABEL root.version=${ROOT_VERSION}
 RUN mkdir src &&\
     ${__wget} https://root.cern/download/root_v${ROOT_VERSION}.source.tar.gz |\
@@ -297,7 +297,7 @@ RUN mkdir src &&\
 # - We disable the python subpackage because it is based on Python2 whose
 #   executable has been removed from Ubuntu 22.04.
 ###############################################################################
-LHAPDF_VERSION="6.5.3"
+ENV LHAPDF_VERSION="6.5.3"
 LABEL lhapdf.version=${LHAPDF_VERSION}
 RUN mkdir src &&\
     ${__wget} https://lhapdf.hepforge.org/downloads/?f=LHAPDF-${LHAPDF_VERSION}.tar.gz |\
@@ -343,7 +343,8 @@ RUN install-ubuntu-packages \
 ENV GENIE_VERSION=3_02_00
 #ENV GENIE_REWEIGHT_VERSION=1_02_00
 ENV GENIE=/usr/local/src/GENIE/Generator
-LABEL genie.version=$(sed -e 's/_/\./g' <<< $GENIE_VERSION )
+ENV GENIE_DOT_VERSION=$(sed 's,_,\.,g' <<< $GENIE_VERSION )
+LABEL genie.version=${GENIE_DOT_VERSION}
 
 
 RUN mkdir -p ${GENIE} &&\
@@ -365,7 +366,7 @@ RUN mkdir -p ${GENIE} &&\
 ###############################################################################
 # Catch2
 ###############################################################################
-CATCH2_VERSION="3.3.1"
+ENV CATCH2_VERSION="3.3.1"
 LABEL catch2.version=${CATCH2_VERSION}
 RUN mkdir -p src &&\
     ${__wget} https://github.com/catchorg/Catch2/archive/refs/tags/v${CATCH2_VERSION}.tar.gz |\
@@ -386,7 +387,7 @@ RUN mkdir -p src &&\
 #  so I don't think it will be able to be used in arm architecture images.
 #  For this reason, I am omitting it until future development is done.
 ###############################################################################
-ONNX_VERSION="1.15.0"
+ENV ONNX_VERSION="1.15.0"
 LABEL onnx.version=${ONNX_VERSION}
 #RUN mkdir -p src &&\
 #    ${__wget} https://github.com/microsoft/onnxruntime/archive/refs/tags/v${ONNX_VERSION}.tar.gz |\
