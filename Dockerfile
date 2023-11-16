@@ -116,14 +116,18 @@ RUN mkdir src &&\
 ###############################################################################
 ENV PYTHIA_VERSION="6.428"
 ENV PREVIOUS_PYTHIA_VERSION="6.416"
+ENV PYTHIA_MAJOR_VERSION=6
 LABEL pythia.version=${PYTHIA_VERSION}
 #"6.428"
-# Pythia uses an un-dotted version file naming convention
-ENV PYTHIA_VERSION_INTEGER=$(awk '{print $1*1000}' <<< "${PYTHIA_VERSION}" )
-ENV PREVIOUS_PYTHIA_VERSION_INTEGER=$(awk '{print $1*1000}' <<< "${PREVIOUS_PYTHIA_VERSION}" )
-ENV PYTHIA_MAJOR_VERSION=$(awk '{print int($1) }' <<< "${PYTHIA_VERSION}" )
+# Pythia uses an un-dotted version file naming convention. To deal with that
+# we need some string manipulation and exports that work best with bash 
+SHELL ["/bin/bash", "-c"] 
+#ENV PYTHIA_MAJOR_VERSION=$(awk '{print int($1) }' <<< ${PYTHIA_VERSION} ) 
+#    export PYTHIA_MAJOR_VERSION=$(awk '{print int($1) }' <<< ${PYTHIA_VERSION} )  &&\
 
 RUN mkdir src && \
+    export PYTHIA_VERSION_INTEGER=$(awk '{print $1*1000}' <<< ${PYTHIA_VERSION} )  &&\
+    export PREVIOUS_PYTHIA_VERSION_INTEGER=$(awk '{print $1*1000}' <<< ${PREVIOUS_PYTHIA_VERSION} )  &&\
     ${__wget} https://root.cern.ch/download/pythia${PYTHIA_MAJOR_VERSION}.tar.gz | ${__untar} &&\
     wget --no-check-certificate https://pythia.org/download/pythia${PYTHIA_MAJOR_VERSION}/pythia${PYTHIA_VERSION_INTEGER}.f &&\
     mv pythia${PYTHIA_VERSION_INTEGER}.f src/pythia${PYTHIA_VERSION_INTEGER}.f && rm -rf src/pythia${PREVIOUS_PYTHIA_VERSION_INTEGER}.f &&\
@@ -136,11 +140,12 @@ RUN mkdir src && \
     gcc -c -fPIC -shared pythia${PYTHIA_MAJOR_VERSION}_common_address.c -lgfortran && \
     gfortran -c -fPIC -shared pythia*.f && \
     gfortran -c -fPIC -shared -fno-second-underscore tpythia${PYTHIA_MAJOR_VERSION}_called_from_cc.F && \
-    gfortran -shared -Wl,-soname,libPythia${PMajorVersion}.so -o libPythia${PMajorVersion}.so main.o  pythia*.o tpythia*.o &&\
+    gfortran -shared -Wl,-soname,libPythia${PYTHIA_MAJOR_VERSION}.so -o libPythia${PYTHIA_MAJOR_VERSION}.so main.o  pythia*.o tpythia*.o &&\
     mkdir -p ${__prefix}/pythia${PYTHIA_MAJOR_VERSION} && cp -r * ${__prefix}/pythia${PYTHIA_MAJOR_VERSION}/ &&\
     cd ../ && rm -rf src &&\
-    echo "${__prefix}/pythia${PYTHIA_MAJOR_VERSION}/" > /etc/ld.so.conf.d/pythia${PYTHIA_MAJOR_VERSION}.conf
+    echo "${__prefix}/pythia${PYTHIA_MAJOR_VERSION}/" > /etc/ld.so.conf.d/pythia${PYTHIA_MAJOR_VERSION}.conf 
 
+SHELL ["/bin/sh", "-c"] 
 ###############################################################################
 # CERN's ROOT
 #  Needed for GENIE and serialization within the Framework
@@ -343,7 +348,7 @@ RUN install-ubuntu-packages \
 ENV GENIE_VERSION=3_02_00
 #ENV GENIE_REWEIGHT_VERSION=1_02_00
 ENV GENIE=/usr/local/src/GENIE/Generator
-ENV GENIE_DOT_VERSION=$(sed 's,_,\.,g' <<< $GENIE_VERSION )
+ENV GENIE_DOT_VERSION="$(sed 's,_,\.,g' <<< $GENIE_VERSION )"
 LABEL genie.version=${GENIE_DOT_VERSION}
 
 
