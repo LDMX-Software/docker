@@ -86,9 +86,11 @@ ENV CMAKE_PREFIX_PATH="${EXTERNAL_INSTALL_DIR}:${__prefix}"
 # Xerces-C 
 #   Used by Geant4 to parse GDML
 ################################################################################
-LABEL xercesc.version="3.2.4"
+XERCESC_VERSION="3.2.4"
+LABEL xercesc.version=${XERCESC_VERSION}
+#LABEL xercesc.version="3.2.4"
 RUN mkdir src &&\
-    ${__wget} http://archive.apache.org/dist/xerces/c/3/sources/xerces-c-3.2.4.tar.gz |\
+    ${__wget} http://archive.apache.org/dist/xerces/c/3/sources/xerces-c-${XERCESC_VERSION}.tar.gz |\
       ${__untar} &&\
     cmake -B src/build -S src -DCMAKE_INSTALL_PREFIX=${__prefix} &&\
     cmake --build src/build --target install -j$NPROC &&\
@@ -112,24 +114,32 @@ RUN mkdir src &&\
 # (Ideally GENIE works with Pythia8? But not sure that works yet despite the adverts that it does.)
 # 
 ###############################################################################
-LABEL pythia.version="6.428"
+PYTHIA_VERSION="6.428"
+PREVIOUS_PYTHIA_VERSION="6.416"
+LABEL pythia.version=${PYTHIA_VERSION}
+#"6.428"
+# Pythia uses an un-dotted version file naming convention
+PYTHIA_VERSION_INTEGER=$(awk '{print $1*1000}' <<< "${PYTHIA_VERSION}" )
+PREVIOUS_PYTHIA_VERSION_INTEGER=$(awk '{print $1*1000}' <<< "${PREVIOUS_PYTHIA_VERSION}" )
+PYTHIA_MAJOR_VERSION=$(awk '{print int($1) }' <<< "${PYTHIA_VERSION}" )
+
 RUN mkdir src && \
-    ${__wget} https://root.cern.ch/download/pythia6.tar.gz | ${__untar} &&\
-    wget --no-check-certificate https://pythia.org/download/pythia6/pythia6428.f &&\
-    mv pythia6428.f src/pythia6428.f && rm -rf src/pythia6416.f &&\
+    ${__wget} https://root.cern.ch/download/pythia${PYTHIA_MAJOR_VERSION}.tar.gz | ${__untar} &&\
+    wget --no-check-certificate https://pythia.org/download/pythia${PYTHIA_MAJOR_VERSION}/pythia${PYTHIA_VERSION_INTEGER}.f &&\
+    mv pythia${PYTHIA_VERSION_INTEGER}.f src/pythia${PYTHIA_VERSION_INTEGER}.f && rm -rf src/pythia${PREVIOUS_PYTHIA_VERSION_INTEGER}.f &&\
     cd src/ &&\
-    sed -i 's/int py/extern int py/g' pythia6_common_address.c && \
-    sed -i 's/extern int pyuppr/int pyuppr/g' pythia6_common_address.c && \
-    sed -i 's/char py/extern char py/g' pythia6_common_address.c && \
+    sed -i 's/int py/extern int py/g' pythia${PYTHIA_MAJOR_VERSION}_common_address.c && \
+    sed -i 's/extern int pyuppr/int pyuppr/g' pythia${PYTHIA_MAJOR_VERSION}_common_address.c && \
+    sed -i 's/char py/extern char py/g' pythia${PYTHIA_MAJOR_VERSION}_common_address.c && \
     echo 'void MAIN__() {}' >main.c && \
     gcc -c -fPIC -shared main.c -lgfortran && \
-    gcc -c -fPIC -shared pythia6_common_address.c -lgfortran && \
+    gcc -c -fPIC -shared pythia${PYTHIA_MAJOR_VERSION}_common_address.c -lgfortran && \
     gfortran -c -fPIC -shared pythia*.f && \
-    gfortran -c -fPIC -shared -fno-second-underscore tpythia6_called_from_cc.F && \
-    gfortran -shared -Wl,-soname,libPythia6.so -o libPythia6.so main.o  pythia*.o tpythia*.o &&\
-    mkdir -p ${__prefix}/pythia6 && cp -r * ${__prefix}/pythia6/ &&\
+    gfortran -c -fPIC -shared -fno-second-underscore tpythia${PYTHIA_MAJOR_VERSION}_called_from_cc.F && \
+    gfortran -shared -Wl,-soname,libPythia${PMajorVersion}.so -o libPythia${PMajorVersion}.so main.o  pythia*.o tpythia*.o &&\
+    mkdir -p ${__prefix}/pythia${PYTHIA_MAJOR_VERSION} && cp -r * ${__prefix}/pythia${PYTHIA_MAJOR_VERSION}/ &&\
     cd ../ && rm -rf src &&\
-    echo "${__prefix}/pythia6/" > /etc/ld.so.conf.d/pythia6.conf
+    echo "${__prefix}/pythia${PYTHIA_MAJOR_VERSION}/" > /etc/ld.so.conf.d/pythia${PYTHIA_MAJOR_VERSION}.conf
 
 ###############################################################################
 # CERN's ROOT
