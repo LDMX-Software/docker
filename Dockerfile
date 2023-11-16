@@ -340,11 +340,11 @@ RUN install-ubuntu-packages \
     libtool
 
 
-LABEL genie.version=3.02.00
 ENV GENIE_VERSION=3_02_00
 #ENV GENIE_REWEIGHT_VERSION=1_02_00
-
 ENV GENIE=/usr/local/src/GENIE/Generator
+LABEL genie.version=$(sed -e 's/_/\./g' <<< $GENIE_VERSION )
+
 
 RUN mkdir -p ${GENIE} &&\
     ${__wget} https://github.com/GENIE-MC/Generator/archive/refs/tags/R-${GENIE_VERSION}.tar.gz |\
@@ -365,9 +365,10 @@ RUN mkdir -p ${GENIE} &&\
 ###############################################################################
 # Catch2
 ###############################################################################
-LABEL catch2.version=3.3.1
+CATCH2_VERSION=3.3.1
+LABEL catch2.version=${CATCH2_VERSION}
 RUN mkdir -p src &&\
-    ${__wget} https://github.com/catchorg/Catch2/archive/refs/tags/v3.3.1.tar.gz |\
+    ${__wget} https://github.com/catchorg/Catch2/archive/refs/tags/v${CATCH2_VERSION}.tar.gz |\
       ${__untar} &&\
     cmake -B src/build -S src &&\
     cmake --build src/build --target install -- -j$NPROC &&\
