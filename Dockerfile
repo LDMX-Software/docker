@@ -365,7 +365,7 @@ RUN mkdir -p ${GENIE} &&\
 ###############################################################################
 # Catch2
 ###############################################################################
-CATCH2_VERSION=3.3.1
+CATCH2_VERSION="3.3.1"
 LABEL catch2.version=${CATCH2_VERSION}
 RUN mkdir -p src &&\
     ${__wget} https://github.com/catchorg/Catch2/archive/refs/tags/v${CATCH2_VERSION}.tar.gz |\
@@ -386,9 +386,10 @@ RUN mkdir -p src &&\
 #  so I don't think it will be able to be used in arm architecture images.
 #  For this reason, I am omitting it until future development is done.
 ###############################################################################
-LABEL onnx.version=1.15.0
+ONNX_VERSION="1.15.0"
+LABEL onnx.version=${ONNX_VERSION}
 #RUN mkdir -p src &&\
-#    ${__wget} https://github.com/microsoft/onnxruntime/archive/refs/tags/v1.15.0.tar.gz |\
+#    ${__wget} https://github.com/microsoft/onnxruntime/archive/refs/tags/v${ONNX_VERSION}.tar.gz |\
 #      ${__untar} &&\
 #    cd src &&\
 #    ./build.sh \
@@ -412,7 +413,7 @@ RUN set -x ;\
     fi &&\
     mkdir -p src &&\
     release_stub="https://github.com/microsoft/onnxruntime/releases/download" &&\
-    onnx_version="1.15.0" &&\
+    onnx_version="${ONNX_VERSION}" &&\
     ${__wget} ${release_stub}/v${onnx_version}/onnxruntime-linux-${onnx_arch}-${onnx_version}.tgz |\
       ${__untar} &&\
     install -D -m 0644 -t ${__prefix}/lib src/lib/* &&\
