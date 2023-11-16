@@ -190,9 +190,10 @@ RUN install-ubuntu-packages \
     srm-ifce-dev \
     libgsl-dev # Necessary for GENIE
 
-LABEL root.version="6.22.08"
+ROOT_VERSION="6.22.08"
+LABEL root.version=${ROOT_VERSION}
 RUN mkdir src &&\
-    ${__wget} https://root.cern/download/root_v6.22.08.source.tar.gz |\
+    ${__wget} https://root.cern/download/root_v${ROOT_VERSION}.source.tar.gz |\
      ${__untar} &&\
     cmake \
       -DCMAKE_BUILD_TYPE=Release \
@@ -296,9 +297,10 @@ RUN mkdir src &&\
 # - We disable the python subpackage because it is based on Python2 whose
 #   executable has been removed from Ubuntu 22.04.
 ###############################################################################
-LABEL lhapdf.version="6.5.3"
+LHAPDF_VERSION="6.5.3"
+LABEL lhapdf.version=${LHAPDF_VERSION}
 RUN mkdir src &&\
-    ${__wget} https://lhapdf.hepforge.org/downloads/?f=LHAPDF-6.5.3.tar.gz |\
+    ${__wget} https://lhapdf.hepforge.org/downloads/?f=LHAPDF-${LHAPDF_VERSION}.tar.gz |\
       ${__untar} &&\
     cd src &&\
     ./configure --disable-python --prefix=${__prefix} &&\
