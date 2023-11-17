@@ -345,15 +345,17 @@ RUN install-ubuntu-packages \
     libtool
 
 
-ENV GENIE_VERSION=3_02_00
+ENV GENIE_VERSION=3.02.00
 #ENV GENIE_REWEIGHT_VERSION=1_02_00
 ENV GENIE=/usr/local/src/GENIE/Generator
-ENV GENIE_DOT_VERSION="$(sed 's,_,\.,g' <<< $GENIE_VERSION )"
-LABEL genie.version=${GENIE_DOT_VERSION}
+#ENV GENIE_DOT_VERSION="$(sed 's,_,\.,g' <<< $GENIE_VERSION )"
+LABEL genie.version=${GENIE_VERSION}
 
+SHELL ["/bin/bash", "-c"]
 
 RUN mkdir -p ${GENIE} &&\
-    ${__wget} https://github.com/GENIE-MC/Generator/archive/refs/tags/R-${GENIE_VERSION}.tar.gz |\
+    export ENV GENIE_GET_VERSION="$(sed 's,\.,_,g' <<< $GENIE_VERSION )" &&\ 
+    ${__wget} https://github.com/GENIE-MC/Generator/archive/refs/tags/R-${GENIE_GET_VERSION}.tar.gz |\
       ${__untar_to} ${GENIE} &&\
     cd ${GENIE} &&\
     ./configure \
@@ -367,6 +369,8 @@ RUN mkdir -p ${GENIE} &&\
     && \
     make -j$NPROC && \
     make -j$NPROC install
+
+SHELL ["/bin/sh", "-c"]
 
 ###############################################################################
 # Catch2
