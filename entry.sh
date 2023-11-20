@@ -51,5 +51,14 @@ export MPLCONFIGDIR=$LDMX_BASE/.config/matplotlib
 # go to first argument
 cd "$1"
 
+# Developer option: If a custom geant4 install is to be used, source the
+# environment script from that install
+#
+# Note: Use with care!
+# The custom Geant4 install still needs to have been built with the same
+# container environment
+if [ -n "$LDMX_CUSTOM_GEANT4" ]; then
+   source $LDMX_CUSTOM_GEANT4/bin/geant4.sh
+fi
 # execute the rest as a one-liner command
 eval "${@:2}"
