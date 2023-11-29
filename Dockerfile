@@ -86,9 +86,11 @@ ENV CMAKE_PREFIX_PATH="${EXTERNAL_INSTALL_DIR}:${__prefix}"
 # Xerces-C 
 #   Used by Geant4 to parse GDML
 ################################################################################
-LABEL xercesc.version="3.2.4"
+ENV XERCESC_VERSION="3.2.4"
+LABEL xercesc.version=${XERCESC_VERSION}
+#LABEL xercesc.version="3.2.4"
 RUN mkdir src &&\
-    ${__wget} http://archive.apache.org/dist/xerces/c/3/sources/xerces-c-3.2.4.tar.gz |\
+    ${__wget} http://archive.apache.org/dist/xerces/c/3/sources/xerces-c-${XERCESC_VERSION}.tar.gz |\
       ${__untar} &&\
     cmake -B src/build -S src -DCMAKE_INSTALL_PREFIX=${__prefix} &&\
     cmake --build src/build --target install -j$NPROC &&\
@@ -112,25 +114,38 @@ RUN mkdir src &&\
 # (Ideally GENIE works with Pythia8? But not sure that works yet despite the adverts that it does.)
 # 
 ###############################################################################
-LABEL pythia.version="6.428"
+ENV PYTHIA_VERSION="6.428"
+ENV PREVIOUS_PYTHIA_VERSION="6.416"
+ENV PYTHIA_MAJOR_VERSION=6
+LABEL pythia.version=${PYTHIA_VERSION}
+#"6.428"
+# Pythia uses an un-dotted version file naming convention. To deal with that
+# we need some string manipulation and exports that work best with bash 
+SHELL ["/bin/bash", "-c"] 
+#ENV PYTHIA_MAJOR_VERSION=$(awk '{print int($1) }' <<< ${PYTHIA_VERSION} ) 
+#    export PYTHIA_MAJOR_VERSION=$(awk '{print int($1) }' <<< ${PYTHIA_VERSION} )  &&\
+
 RUN mkdir src && \
-    ${__wget} https://root.cern.ch/download/pythia6.tar.gz | ${__untar} &&\
-    wget --no-check-certificate https://pythia.org/download/pythia6/pythia6428.f &&\
-    mv pythia6428.f src/pythia6428.f && rm -rf src/pythia6416.f &&\
+    export PYTHIA_VERSION_INTEGER=$(awk '{print $1*1000}' <<< ${PYTHIA_VERSION} )  &&\
+    export PREVIOUS_PYTHIA_VERSION_INTEGER=$(awk '{print $1*1000}' <<< ${PREVIOUS_PYTHIA_VERSION} )  &&\
+    ${__wget} https://root.cern.ch/download/pythia${PYTHIA_MAJOR_VERSION}.tar.gz | ${__untar} &&\
+    wget --no-check-certificate https://pythia.org/download/pythia${PYTHIA_MAJOR_VERSION}/pythia${PYTHIA_VERSION_INTEGER}.f &&\
+    mv pythia${PYTHIA_VERSION_INTEGER}.f src/pythia${PYTHIA_VERSION_INTEGER}.f && rm -rf src/pythia${PREVIOUS_PYTHIA_VERSION_INTEGER}.f &&\
     cd src/ &&\
-    sed -i 's/int py/extern int py/g' pythia6_common_address.c && \
-    sed -i 's/extern int pyuppr/int pyuppr/g' pythia6_common_address.c && \
-    sed -i 's/char py/extern char py/g' pythia6_common_address.c && \
+    sed -i 's/int py/extern int py/g' pythia${PYTHIA_MAJOR_VERSION}_common_address.c && \
+    sed -i 's/extern int pyuppr/int pyuppr/g' pythia${PYTHIA_MAJOR_VERSION}_common_address.c && \
+    sed -i 's/char py/extern char py/g' pythia${PYTHIA_MAJOR_VERSION}_common_address.c && \
     echo 'void MAIN__() {}' >main.c && \
     gcc -c -fPIC -shared main.c -lgfortran && \
-    gcc -c -fPIC -shared pythia6_common_address.c -lgfortran && \
+    gcc -c -fPIC -shared pythia${PYTHIA_MAJOR_VERSION}_common_address.c -lgfortran && \
     gfortran -c -fPIC -shared pythia*.f && \
-    gfortran -c -fPIC -shared -fno-second-underscore tpythia6_called_from_cc.F && \
-    gfortran -shared -Wl,-soname,libPythia6.so -o libPythia6.so main.o  pythia*.o tpythia*.o &&\
-    mkdir -p ${__prefix}/pythia6 && cp -r * ${__prefix}/pythia6/ &&\
+    gfortran -c -fPIC -shared -fno-second-underscore tpythia${PYTHIA_MAJOR_VERSION}_called_from_cc.F && \
+    gfortran -shared -Wl,-soname,libPythia${PYTHIA_MAJOR_VERSION}.so -o libPythia${PYTHIA_MAJOR_VERSION}.so main.o  pythia*.o tpythia*.o &&\
+    mkdir -p ${__prefix}/pythia${PYTHIA_MAJOR_VERSION} && cp -r * ${__prefix}/pythia${PYTHIA_MAJOR_VERSION}/ &&\
     cd ../ && rm -rf src &&\
-    echo "${__prefix}/pythia6/" > /etc/ld.so.conf.d/pythia6.conf
+    echo "${__prefix}/pythia${PYTHIA_MAJOR_VERSION}/" > /etc/ld.so.conf.d/pythia${PYTHIA_MAJOR_VERSION}.conf 
 
+SHELL ["/bin/sh", "-c"] 
 ###############################################################################
 # CERN's ROOT
 #  Needed for GENIE and serialization within the Framework
@@ -180,9 +195,10 @@ RUN install-ubuntu-packages \
     srm-ifce-dev \
     libgsl-dev # Necessary for GENIE
 
-LABEL root.version="6.22.08"
+ENV ROOT_VERSION="6.22.08"
+LABEL root.version=${ROOT_VERSION}
 RUN mkdir src &&\
-    ${__wget} https://root.cern/download/root_v6.22.08.source.tar.gz |\
+    ${__wget} https://root.cern/download/root_v${ROOT_VERSION}.source.tar.gz |\
      ${__untar} &&\
     cmake \
       -DCMAKE_BUILD_TYPE=Release \
@@ -286,9 +302,10 @@ RUN mkdir src &&\
 # - We disable the python subpackage because it is based on Python2 whose
 #   executable has been removed from Ubuntu 22.04.
 ###############################################################################
-LABEL lhapdf.version="6.5.3"
+ENV LHAPDF_VERSION="6.5.3"
+LABEL lhapdf.version=${LHAPDF_VERSION}
 RUN mkdir src &&\
-    ${__wget} https://lhapdf.hepforge.org/downloads/?f=LHAPDF-6.5.3.tar.gz |\
+    ${__wget} https://lhapdf.hepforge.org/downloads/?f=LHAPDF-${LHAPDF_VERSION}.tar.gz |\
       ${__untar} &&\
     cd src &&\
     ./configure --disable-python --prefix=${__prefix} &&\
@@ -328,14 +345,17 @@ RUN install-ubuntu-packages \
     libtool
 
 
-LABEL genie.version=3.02.00
-ENV GENIE_VERSION=3_02_00
+ENV GENIE_VERSION=3.02.00
 #ENV GENIE_REWEIGHT_VERSION=1_02_00
-
 ENV GENIE=/usr/local/src/GENIE/Generator
+#ENV GENIE_DOT_VERSION="$(sed 's,_,\.,g' <<< $GENIE_VERSION )"
+LABEL genie.version=${GENIE_VERSION}
+
+SHELL ["/bin/bash", "-c"]
 
 RUN mkdir -p ${GENIE} &&\
-    ${__wget} https://github.com/GENIE-MC/Generator/archive/refs/tags/R-${GENIE_VERSION}.tar.gz |\
+    export ENV GENIE_GET_VERSION="$(sed 's,\.,_,g' <<< $GENIE_VERSION )" &&\ 
+    ${__wget} https://github.com/GENIE-MC/Generator/archive/refs/tags/R-${GENIE_GET_VERSION}.tar.gz |\
       ${__untar_to} ${GENIE} &&\
     cd ${GENIE} &&\
     ./configure \
@@ -350,12 +370,15 @@ RUN mkdir -p ${GENIE} &&\
     make -j$NPROC && \
     make -j$NPROC install
 
+SHELL ["/bin/sh", "-c"]
+
 ###############################################################################
 # Catch2
 ###############################################################################
-LABEL catch2.version=3.3.1
+ENV CATCH2_VERSION="3.3.1"
+LABEL catch2.version=${CATCH2_VERSION}
 RUN mkdir -p src &&\
-    ${__wget} https://github.com/catchorg/Catch2/archive/refs/tags/v3.3.1.tar.gz |\
+    ${__wget} https://github.com/catchorg/Catch2/archive/refs/tags/v${CATCH2_VERSION}.tar.gz |\
       ${__untar} &&\
     cmake -B src/build -S src &&\
     cmake --build src/build --target install -- -j$NPROC &&\
@@ -373,9 +396,10 @@ RUN mkdir -p src &&\
 #  so I don't think it will be able to be used in arm architecture images.
 #  For this reason, I am omitting it until future development is done.
 ###############################################################################
-LABEL onnx.version=1.15.0
+ENV ONNX_VERSION="1.15.0"
+LABEL onnx.version=${ONNX_VERSION}
 #RUN mkdir -p src &&\
-#    ${__wget} https://github.com/microsoft/onnxruntime/archive/refs/tags/v1.15.0.tar.gz |\
+#    ${__wget} https://github.com/microsoft/onnxruntime/archive/refs/tags/v${ONNX_VERSION}.tar.gz |\
 #      ${__untar} &&\
 #    cd src &&\
 #    ./build.sh \
@@ -399,7 +423,7 @@ RUN set -x ;\
     fi &&\
     mkdir -p src &&\
     release_stub="https://github.com/microsoft/onnxruntime/releases/download" &&\
-    onnx_version="1.15.0" &&\
+    onnx_version="${ONNX_VERSION}" &&\
     ${__wget} ${release_stub}/v${onnx_version}/onnxruntime-linux-${onnx_arch}-${onnx_version}.tgz |\
       ${__untar} &&\
     install -D -m 0644 -t ${__prefix}/lib src/lib/* &&\
