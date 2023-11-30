@@ -86,8 +86,11 @@ actor could fork this repository and
 - Ubuntu 22.04 Minimal Server
 - Install OpenSSH so we can connect to the VM from the host machine
 - Have `github` be the username (so the home directory corresponds to the directory in the workflow)
-- [Install docker engine](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository)
 - Make sure `tmux` is installed so we can startup the runner and detach
+- Get the IP of the VM with `hostname -I` so we can SSH into it from the host
+  - I update the host's SSH config to give a name to these IP addresses so its easier to remember how to connect.
+  - From here on, I am just SSHing to the VM from the host. This makes it easier to copy in commands copied from the guides linked below.  
+- [Install docker engine](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository)
 - Follow [post-install instructions](https://docs.docker.com/engine/install/linux-postinstall/) to allow `docker` to be run by users
 - Follow [Add a Self-Hosted Runner](https://docs.github.com/en/actions/hosting-your-own-runners/managing-self-hosted-runners/adding-self-hosted-runners)
   treating _the VM_ as the runner and _not_ the host
