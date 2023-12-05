@@ -28,6 +28,12 @@ Below are a few that are highlighted for how we use containers and their interac
 - `CMAKE_INSTALL_PREFIX`: This should be set to a path accessible from the container so that the programs within the container can read from and write to this directory. If the geant4 build directory is within `LDMX_BASE` (like it is above), then you could do something like `-DCMAKE_INSTALL_PREFIX=../install` when you run `ldmx cmake` within the build directory.
 - `GEANT4_INSTALL_DATADIR`: If you are building a version of Geant4 that has the same data files as the Geant4 version built into the container iamge, then you can tell the Geant4 build to use those data files with this option, saving build time and disk space. This is helpful if (for example) you are just re-building the same version of Geant4 but in Debug mode. You can see where the Geant4 data is within the container with `ldmx 'echo ${G4DATADIR}'` and then use this value `-DGEANT4_INSTALL_DATADIR=/usr/local/share/geant4/data`.
 
+The following are the build options used in when setting up the container and are likely what you want to get started 
+- `-DGEANT4_USE_GDML=ON` Enable reading geometries with the GDML markup language which is used in LDMX-sw for all our geometries 
+- `-DGEANT4_INSTALL_EXAMPLES=OFF` Don't install the Geant4 example applications 
+- `-DGEANT4_USE_OPENGL_X11=ON`  
+- `-DGEANT4_MULTITHREADED=OFF` If you are building a version of Geant4 that is multithreaded by default, you will want to disable it with. The dynamic loading used in LDMX-sw will often not work with a multithreaded version of Geant4 
+
 ### Running with your Geant4
 Just like with ldmx-sw, you can only run a specific build of Geant4 in the same container that you used to build it.
 ```
