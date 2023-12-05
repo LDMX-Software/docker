@@ -34,6 +34,36 @@ The following are the build options used in when setting up the container and ar
 - `-DGEANT4_USE_OPENGL_X11=ON`  
 - `-DGEANT4_MULTITHREADED=OFF` If you are building a version of Geant4 that is multithreaded by default, you will want to disable it with. The dynamic loading used in LDMX-sw will often not work with a multithreaded version of Geant4 
 
+#### Concerns when building different versions of Geant4 than 10.2.3
+
+For most use cases you will be building a modified version of the same release of Geant4 that is used in the container (10.2.3). It is also possible to build and use later versions of Geant4 although this should be done with care. In particular 
+- Different Geant4 release versions will require that you rebuild LDMX-sw for use with that version, it will not be sufficient to set the `LDMX_CUSTOM_GEANT4` environment variable and pick up the shared libraries therein
+- Recent versions of Geant4 group the electromagnetic processes for each particle into a so-called general process for performance reasons. This means that many features in LDMX-sw that rely on the exact names of processes in Geant4 will not work. You can disable this by inserting something like the following in [RunManager::setupPhysics()](https://github.com/LDMX-Software/SimCore/blob/20d9bcb6d2bad2b99255cf32c1b3f099b26752b0/src/SimCore/RunManager.cxx#L60)
+```C++ 
+// Make sure to include G4EmParameters if needed
+auto electromagneticParameters {G4EmParameters::Instance()};
+// Disable the use of G4XXXGeneralProcess,
+// i.e. G4GammaGeneralProcess and G4ElectronGeneralProcess
+electromagneticParameters->SetGeneralProcessActive(false);
+```
+- Geant4 relies on being able to locate a set of datasets when running. For builds of 10.2.3, the ones that are present in the container will suffice but other versions may kuneed different versions of these datasets. If you run into issues with this, use `ldmx env` and check that the following environment variables are pointing to the right location 
+- `GEANT4_DATA_DIR` should point to `$LDMX_CUSTOM_GEANT4/share/Geant4/data`
+- The following environment variables should either be unset or point to the correct location in `GEANT4_DATA_DIR`
+  - `G4NEUTRONHPDATA` 
+  - `G4LEDATA`
+  - `G4LEVELGAMMADATA`
+  - `G4RADIOACTIVEDATA`
+  - `G4PARTICLEXSDATA`
+  - `G4PIIDATA`
+  - `G4REALSURFACEDATA`
+  - `G4SAIDXSDATA`
+  - `G4ABLADATA`
+  - `G4INCLDATA`
+  - `G4ENSDFSTATEDATA`
+- When using CMake, ensure that the right version of Geant4 is picked up at configuration time (i.e. when you run `ldmx cmake`)
+  - You can always check the version that is used in a build directory by running `ldmx ccmake .` in the build directory and searching for the Geant4 version variable 
+  - If the version is incorrect, you will need to re-configure your build directory. If `cmake` isn't picking up the right Geant4 version by default, ensure that the `CMAKE_PREFIX_PATH` is pointing to your version of Geant4 
+- Make sure that your version of Geant4 was built with multithreading disabled 
 ### Running with your Geant4
 Just like with ldmx-sw, you can only run a specific build of Geant4 in the same container that you used to build it.
 ```
