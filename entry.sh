@@ -42,8 +42,6 @@ do
 done
 unset _external_path
 
-# helps simplify any cmake nonsense
-export CMAKE_PREFIX_PATH=/usr/local/:$LDMX_SW_INSTALL
 
 # puts a config/cache directory for matplotlib to use
 export MPLCONFIGDIR=$LDMX_BASE/.config/matplotlib
@@ -58,7 +56,18 @@ cd "$1"
 # The custom Geant4 install still needs to have been built with the same
 # container environment
 if [ -n "$LDMX_CUSTOM_GEANT4" ]; then
-   source $LDMX_CUSTOM_GEANT4/bin/geant4.sh
+    source $LDMX_CUSTOM_GEANT4/bin/geant4.sh
+    # Prioritize the cmake config in the Geant4 installation
+    export CMAKE_PREFIX_PATH=$LDMX_CUSTOM_GEANT4/lib/cmake:$CMAKE_PREFIX_PATH
+    if [ -z "$GEANT4_DATA_DIR" ]; then
+        # Assume we are using 10.2.3
+        export GEANT4_DATA_DIR=${G4DATADIR}
+    fi
+else
+    # Default container location
+    source /usr/local/bin/geant4.sh
+    # helps simplify any cmake nonsense
+    export CMAKE_PREFIX_PATH=/usr/local/:$LDMX_SW_INSTALL
 fi
 # execute the rest as a one-liner command
 eval "${@:2}"
