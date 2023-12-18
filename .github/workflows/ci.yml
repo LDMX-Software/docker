@@ -84,7 +84,7 @@ jobs:
           echo "file=${digest_file}" >> "$GITHUB_OUTPUT"
       -
         name: Upload digest
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.export-digest.outputs.name }}
           path: ${{ steps.export-digest.outputs.file }}
