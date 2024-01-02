@@ -65,17 +65,33 @@ if [ -n "$LDMX_CUSTOM_GEANT4" ]; then
         echo "If using the standard ldmx-env.sh shell script, use 'ldmx setenv' to set environment variables within the container environment"
         echo "You may also want to define LDMX_CUSTOM_GEANT4_DATA_DIR if you are using a version of Geant4 different from 10.2.3 and the Geant4 build you intend to use has the data directory in an non-standard location (i.e. one that isn't picked up by the geant4.sh script) "
     fi
+    # First: Unset the container-specific versions of the Geant4 data directories
+    unset G4NEUTRONHPDATA
+    unset G4LEDATA
+    unset G4LEVELGAMMADATA
+    unset G4RADIOACTIVEDATA
+    unset G4PARTICLEXSDATA
+    unset G4PIIDATA
+    unset G4REALSURFACEDATA
+    unset G4SAIDXSDATA
+    unset G4ABLADATA
+    unset G4INCLDATA
+    unset G4ENSDFSTATEDATA
+    unset G4NEUTRONXSDATA
+    # Source the custom geant's environment script
     source $LDMX_CUSTOM_GEANT4/bin/geant4.sh
-    # Prioritize the cmake config in the Geant4 installation
-    export CMAKE_PREFIX_PATH=$LDMX_CUSTOM_GEANT4/lib/cmake:$CMAKE_PREFIX_PATH
+    # Prioritize the cmake config in the Geant4 installation over the container location (/usr/local)
+    export CMAKE_PREFIX_PATH=$LDMX_CUSTOM_GEANT4/lib/cmake:/usr/local/:$CMAKE_PREFIX_PATH
+
+    # If no directory was found by the geant4.sh script and the user didn't
+    # explicitly ask for a location (e.g. for a debug build):
+    #
+    # Assume we are using 10.2.3 (container provided) data
     if [ -z "$GEANT4_DATA_DIR" ]; then
-        # Assume we are using 10.2.3
         export GEANT4_DATA_DIR=${G4DATADIR}
     fi
 else
-    # Default container location
-    source /usr/local/bin/geant4.sh
-    # helps simplify any cmake nonsense
+    # Tell CMake to look for configuration files in the container location by default
     export CMAKE_PREFIX_PATH=/usr/local/:$LDMX_SW_INSTALL
 fi
 # execute the rest as a one-liner command
