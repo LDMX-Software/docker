@@ -13,7 +13,7 @@ with whatever code modifications applied, with whatever build instructions you c
 ### Building Your Geant4
 You can build your Geant4 in a similar manner as ldmx-sw. It does take much longer to compile than ldmx-sw since it is larger, so be sure to leave enough time for it.
 **Remember** You can only run this custom build of Geant4 with whatever container you are building it with, so make sure you are happy with the container version you are using.
-```
+``` shell
 cd ${LDMX_BASE}
 git clone git@github.com:LDMX-Software/geant4.git # or could be mainline Geant4 or an unpacked tar-ball
 cd geant4
@@ -62,18 +62,28 @@ electromagneticParameters->SetGeneralProcessActive(false);
   - `G4INCLDATA`
   - `G4ENSDFSTATEDATA`
 - When using CMake, ensure that the right version of Geant4 is picked up at configuration time (i.e. when you run `ldmx cmake`)
-  - You can always check the version that is used in a build directory by running `ldmx ccmake .` in the build directory and searching for the Geant4 version variable 
-  - If the version is incorrect, you will need to re-configure your build directory. If `cmake` isn't picking up the right Geant4 version by default, ensure that the `CMAKE_PREFIX_PATH` is pointing to your version of Geant4 
-- Make sure that your version of Geant4 was built with multithreading disabled 
+  - You can always check the version that is used in a build directory by running `ldmx ccmake .` in the build directory and searching for the Geant4 version variable
+  - If the version is incorrect, you will need to re-configure your build directory. If `cmake` isn't picking up the right Geant4 version by default, ensure that the `CMAKE_PREFIX_PATH` is pointing to your version of Geant4
+- Make sure that your version of Geant4 was built with multithreading disabled
 ### Running with your Geant4
 Just like with ldmx-sw, you can only run a specific build of Geant4 in the same container that you used to build it.
-```
+``` shell
 ldmx setenv LDMX_CUSTOM_GEANT4=/path/to/geant4/install
 ```
 If you followed the procedure above, the Geant4 install will be located at `${LDMX_BASE}/geant4/install` and you can use
 this in the `setenv` command.
-```
+``` shell
 ldmx setenv LDMX_CUSTOM_GEANT4=${LDMX_BASE}/geant4/install
+```
+
+By default the container will produce a rather verbose warning when using a custom Geant4 build. This is to avoid reproducibility issues caused by accidental use of the feature. You can disable it by defining the `LDMX_CUSTOM_GEANT4_CONFIRM_DEV` environment variable in the container environment 
+
+```shell
+ldmx setenv LDMX_CUSTOM_GEANT4=${LDMX_BASE}/geant4/install 
+ldmx ... # Some command 
+> Warning: You are relying on a non-container version of Geant4. This mode of operation can come with some reproducibility concerns if you aren't careful. # The actual warning is longer than this...
+ldmx setenv LDMX_CUSTOM_GEANT4_CONFIRM_DEV=yes # Can be anything other than an empty string 
+ldmx ... # No warning!
 ```
 
 ## Remote Build
@@ -82,7 +92,7 @@ The container is allowed to build (almost) any release of Geant4, pulling either
 
 Most of the newer versions of Geant4 can be built the same as the current standard [LDMX.10.2.3_v0.4](https://github.com/LDMX-Software/geant4/releases/tag/LDMX.10.2.3_v0.4), so to change the tag that you want to use in the container you simply need to change the `GEANT4` parameter in the Dockerfile.
 
-```
+``` Dockerfile
 ...a bunch of crap...
 ENV GEANT4=LDMX.10.2.3_v0.4 #CHANGE ME TO YOUR TAG NAME
 ... other crap ...
