@@ -48,6 +48,7 @@ electromagneticParameters->SetGeneralProcessActive(false);
 ```
 - Geant4 relies on being able to locate a set of datasets when running. For builds of 10.2.3, the ones that are present in the container will suffice but other versions may kuneed different versions of these datasets. If you run into issues with this, use `ldmx env` and check that the following environment variables are pointing to the right location 
 - `GEANT4_DATA_DIR` should point to `$LDMX_CUSTOM_GEANT4/share/Geant4/data`
+  - You can define the `LDMX_CUSTOM_GEANT4_DATA_DIR` environment variable in the container environment to manually point it to a custom location
 - The following environment variables should either be unset or point to the correct location in `GEANT4_DATA_DIR`
   - `G4NEUTRONHPDATA` 
   - `G4LEDATA`
