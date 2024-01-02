@@ -53,9 +53,18 @@ cd "$1"
 # environment script from that install
 #
 # Note: Use with care!
+# 
 # The custom Geant4 install still needs to have been built with the same
 # container environment
 if [ -n "$LDMX_CUSTOM_GEANT4" ]; then
+    # Overly obnoxious warning to make sure this feature isn't used accidentally
+    # Also detail how to set custom Geant4 data directories
+    if [ -z "$LDMX_CUSTOM_GEANT4_CONFIRM_DEV" ]; then
+        echo "Warning: You are relying on a non-container version of Geant4. This mode of operation can come with some reproducibility concerns if you aren't careful. "
+        echo "Define the environment variable LDMX_CUSTOM_GEANT4_CONFIRM_DEV in the container environment to suppress this message"
+        echo "If using the standard ldmx-env.sh shell script, use 'ldmx setenv' to set environment variables within the container environment"
+        echo "You may also want to define LDMX_CUSTOM_GEANT4_DATA_DIR if you are using a version of Geant4 different from 10.2.3 and the Geant4 build you intend to use has the data directory in an non-standard location (i.e. one that isn't picked up by the geant4.sh script) "
+    fi
     source $LDMX_CUSTOM_GEANT4/bin/geant4.sh
     # Prioritize the cmake config in the Geant4 installation
     export CMAKE_PREFIX_PATH=$LDMX_CUSTOM_GEANT4/lib/cmake:$CMAKE_PREFIX_PATH
