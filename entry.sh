@@ -78,6 +78,10 @@ if [ -n "$LDMX_CUSTOM_GEANT4" ]; then
     unset G4INCLDATA
     unset G4ENSDFSTATEDATA
     unset G4NEUTRONXSDATA
+    # If explicitly requested, use a custom location for Geant4's data directories
+    if [ -n "$LDMX_CUSTOM_GEANT4_DATA_DIR"]; then
+        export GEANT4_DATA_DIR=$LDMX_CUSTOM_GEANT4_DATA_DIR
+    fi 
     # Source the custom geant's environment script
     source $LDMX_CUSTOM_GEANT4/bin/geant4.sh
     # Prioritize the cmake config in the Geant4 installation over the container location (/usr/local)
