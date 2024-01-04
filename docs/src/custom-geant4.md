@@ -26,12 +26,12 @@ Now building Geant4 from source has a lot of configuration options that can be u
 Below are a few that are highlighted for how we use containers and their interaction with the Geant4 build.
 
 - `CMAKE_INSTALL_PREFIX`: This should be set to a path accessible from the container so that the programs within the container can read from and write to this directory. If the geant4 build directory is within `LDMX_BASE` (like it is above), then you could do something like `-DCMAKE_INSTALL_PREFIX=../install` when you run `ldmx cmake` within the build directory.
-- `GEANT4_INSTALL_DATADIR`: If you are building a version of Geant4 that has the same data files as the Geant4 version built into the container iamge, then you can tell the Geant4 build to use those data files with this option, saving build time and disk space. This is helpful if (for example) you are just re-building the same version of Geant4 but in Debug mode. You can see where the Geant4 data is within the container with `ldmx 'echo ${G4DATADIR}'` and then use this value `-DGEANT4_INSTALL_DATADIR=/usr/local/share/geant4/data`.
+- `GEANT4_INSTALL_DATADIR`: If you are building a version of Geant4 that has the same data files as the Geant4 version built into the container image, then you can tell the Geant4 build to use those data files with this option, saving build time and disk space. This is helpful if (for example) you are just re-building the same version of Geant4 but in Debug mode. You can see where the Geant4 data is within the container with `ldmx 'echo ${G4DATADIR}'` and then use this value `-DGEANT4_INSTALL_DATADIR=/usr/local/share/geant4/data`.
 
-The following are the build options used in when setting up the container and are likely what you want to get started 
+The following are the build options used when setting up the container and are likely what you want to get started 
 - `-DGEANT4_USE_GDML=ON` Enable reading geometries with the GDML markup language which is used in LDMX-sw for all our geometries 
-- `-DGEANT4_INSTALL_EXAMPLES=OFF` Don't install the Geant4 example applications 
-- `-DGEANT4_USE_OPENGL_X11=ON`  
+- `-DGEANT4_INSTALL_EXAMPLES=OFF` Don't install the Geant4 example applications (just to save space and compilation time)
+- `-DGEANT4_USE_OPENGL_X11=ON`  enable an X11-based GUI for inspecting geometries
 - `-DGEANT4_MULTITHREADED=OFF` If you are building a version of Geant4 that is multithreaded by default, you will want to disable it with. The dynamic loading used in LDMX-sw will often not work with a multithreaded version of Geant4 
 
 #### Concerns when building different versions of Geant4 than 10.2.3
@@ -46,7 +46,7 @@ auto electromagneticParameters {G4EmParameters::Instance()};
 // i.e. G4GammaGeneralProcess and G4ElectronGeneralProcess
 electromagneticParameters->SetGeneralProcessActive(false);
 ```
-- Geant4 relies on being able to locate a set of datasets when running. For builds of 10.2.3, the ones that are present in the container will suffice but other versions may kuneed different versions of these datasets. If you run into issues with this, use `ldmx env` and check that the following environment variables are pointing to the right location 
+- Geant4 relies on being able to locate a set of datasets when running. For builds of 10.2.3, the ones that are present in the container will suffice but other versions may need different versions of these datasets. If you run into issues with this, use `ldmx env` and check that the following environment variables are pointing to the right location 
 - `GEANT4_DATA_DIR` should point to `$LDMX_CUSTOM_GEANT4/share/Geant4/data`
   - You can define the `LDMX_CUSTOM_GEANT4_DATA_DIR` environment variable in the container environment to manually point it to a custom location
 - The following environment variables should either be unset or point to the correct location in `GEANT4_DATA_DIR`
