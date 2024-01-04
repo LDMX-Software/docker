@@ -12,4 +12,11 @@ create-missing = false
 mathjax-support = true
 git-repository-url = "https://github.com/LDMX-Software/docker/tree/main/"
 edit-url-template = "https://github.com/LDMX-Software/docker/edit/main/docs/{path}"
+additional-css = ["mdbook-admonish.css"]
+
+[preprocessor]
+
+[preprocessor.admonish]
+command = "mdbook-admonish"
+assets_version = "3.0.1" # do not edit: managed by `mdbook-admonish install`
 
