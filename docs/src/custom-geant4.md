@@ -12,7 +12,11 @@ with whatever code modifications applied, with whatever build instructions you c
 
 ### Building Your Geant4
 You can build your Geant4 in a similar manner as ldmx-sw. It does take much longer to compile than ldmx-sw since it is larger, so be sure to leave enough time for it.
-**Remember** You can only run this custom build of Geant4 with whatever container you are building it with, so make sure you are happy with the container version you are using.
+
+```admonish warning title="Remember"
+You can only run this custom build of Geant4 with whatever container you are building it with, so make sure you are happy with the container version you are using.
+```
+
 ``` shell
 cd ${LDMX_BASE}
 git clone git@github.com:LDMX-Software/geant4.git # or could be mainline Geant4 or an unpacked tar-ball
@@ -65,6 +69,155 @@ electromagneticParameters->SetGeneralProcessActive(false);
   - You can always check the version that is used in a build directory by running `ldmx ccmake .` in the build directory and searching for the Geant4 version variable
   - If the version is incorrect, you will need to re-configure your build directory. If `cmake` isn't picking up the right Geant4 version by default, ensure that the `CMAKE_PREFIX_PATH` is pointing to your version of Geant4
 - Make sure that your version of Geant4 was built with multithreading disabled
+
+~~~admonish tip collapsible=true title="Geant4 Data Duplication"
+The Geant4 datasets do not evolve as quickly as the source code that uses them.
+We have a copy of the data needed for the LDMX standard version within the container (v10.2.3 currently)
+and you can inspect the versions of the datasets that have changed between the version in the container
+image and the one you want to build to see which datasets you may need to install.
+
+The file `cmake/Modules/Geant4DatasetDefinitions.cmake` in the Geant4 source code has these
+versions for us (The name changed from `Geant4Data...` to `G4Data...` in v10.7.0) and we can
+use this file to check manually which datasets need to be updated when running a newer version.
+Below, I'm comparing Geant4 v10.3.0 and our current standard.
+```
+diff \
+  --new-line-format='+%L' \
+  --old-line-format='-%L' \
+  --unchanged-line-format=' %L' \
+  <(wget -q -O - https://raw.githubusercontent.com/LDMX-Software/geant4/LDMX.10.2.3_v0.5/cmake/Modules/Geant4DatasetDefinitions.cmake) \
+  <(wget -q -O - https://raw.githubusercontent.com/Geant4/geant4/v10.3.0/cmake/Modules/Geant4DatasetDefinitions.cmake)
+```
+
+<details>
+  <summary>Output</summary>
+
+```diff
+ # - Define datasets known and used by Geant4
+ # We keep this separate from the Geant4InstallData module for conveniance
+ # when updating and patching because datasets may change more rapidly.
+ # It allows us to decouple the dataset definitions from how they are
+ # checked/installed/configured
+ #
+ 
+ # - NDL
+ geant4_add_dataset(
+   NAME      G4NDL
+   VERSION   4.5
+   FILENAME  G4NDL
+   EXTENSION tar.gz
+   ENVVAR    G4NEUTRONHPDATA
+   MD5SUM    fd29c45fe2de432f1f67232707b654c0
+   )
+ 
+ # - Low energy electromagnetics
+ geant4_add_dataset(
+   NAME      G4EMLOW
+-  VERSION   6.48
++  VERSION   6.50
+   FILENAME  G4EMLOW
+   EXTENSION tar.gz
+   ENVVAR    G4LEDATA
+-  MD5SUM    844064faa16a063a6a08406dc7895b68
++  MD5SUM    2a0dbeb2dd57158919c149f33675cce5
+   )
+ 
+ # - Photon evaporation
+ geant4_add_dataset(
+   NAME      PhotonEvaporation
+-  VERSION   3.2
++  VERSION   4.3
+   FILENAME  G4PhotonEvaporation
+   EXTENSION tar.gz
+   ENVVAR    G4LEVELGAMMADATA
+-  MD5SUM    01d5ba17f615d3def01f7c0c6b19bd69
++  MD5SUM    012fcdeaa517efebba5770e6c1cbd882
+   )
+ 
+ # - Radioisotopes
+ geant4_add_dataset(
+   NAME      RadioactiveDecay
+-  VERSION   4.3.2
++  VERSION   5.1
+   FILENAME  G4RadioactiveDecay
+   EXTENSION tar.gz
+   ENVVAR    G4RADIOACTIVEDATA
+-  MD5SUM    ed171641682cf8c10fc3f0266c8d482e
++  MD5SUM    994853b153c6f805e60e2b83b9ac10e0
+   )
+ 
+ # - Neutron XS
+ geant4_add_dataset(
+   NAME      G4NEUTRONXS
+   VERSION   1.4
+   FILENAME  G4NEUTRONXS
+   EXTENSION tar.gz
+   ENVVAR    G4NEUTRONXSDATA
+   MD5SUM    665a12771267e3b31a08c622ba1238a7
+   )
+ 
+ # - PII
+ geant4_add_dataset(
+   NAME      G4PII
+   VERSION   1.3
+   FILENAME  G4PII
+   EXTENSION tar.gz
+   ENVVAR    G4PIIDATA
+   MD5SUM    05f2471dbcdf1a2b17cbff84e8e83b37
+   )
+ 
+ # - Optical Surfaces
+ geant4_add_dataset(
+   NAME      RealSurface
+   VERSION   1.0
+   FILENAME  RealSurface
+   EXTENSION tar.gz
+   ENVVAR    G4REALSURFACEDATA
+   MD5SUM    0dde95e00fcd3bcd745804f870bb6884
+   )
+ 
+ # - SAID
+ geant4_add_dataset(
+   NAME      G4SAIDDATA
+   VERSION   1.1
+   FILENAME  G4SAIDDATA
+   EXTENSION tar.gz
+   ENVVAR    G4SAIDXSDATA
+   MD5SUM    d88a31218fdf28455e5c5a3609f7216f
+   )
+ 
+ # - ABLA
+ geant4_add_dataset(
+   NAME      G4ABLA
+   VERSION   3.0
+   FILENAME  G4ABLA
+   EXTENSION tar.gz
+   ENVVAR    G4ABLADATA
+   MD5SUM    d7049166ef74a592cb97df0ed4b757bd
+   )
+ 
+ # - ENSDFSTATE
+ geant4_add_dataset(
+   NAME      G4ENSDFSTATE
+-  VERSION   1.2.3
++  VERSION   2.1
+   FILENAME  G4ENSDFSTATE
+   EXTENSION tar.gz
+   ENVVAR    G4ENSDFSTATEDATA
+-  MD5SUM    98fef898ea35df4010920ad7ad88f20b
++  MD5SUM    95d970b97885aeafaa8909f29997b0df
+   )
+```
+
+</details>
+
+As you can see, while only a subset of the datasets change, some of them _do_ change.
+Unless you are planning to compare several different Geant4 versions that all share
+mostly the same datasets, it is easier just to have each Geant4 version have its
+own downloaded copies of the datasets.
+~~~
+
+
 ### Running with your Geant4
 Just like with ldmx-sw, you can only run a specific build of Geant4 in the same container that you used to build it.
 ``` shell
