@@ -86,9 +86,11 @@ ENV CMAKE_PREFIX_PATH="${EXTERNAL_INSTALL_DIR}:${__prefix}"
 # Xerces-C 
 #   Used by Geant4 to parse GDML
 ################################################################################
-LABEL xercesc.version="3.2.4"
+ENV XERCESC_VERSION="3.2.4"
+LABEL xercesc.version=${XERCESC_VERSION}
+#LABEL xercesc.version="3.2.4"
 RUN mkdir src &&\
-    ${__wget} http://archive.apache.org/dist/xerces/c/3/sources/xerces-c-3.2.4.tar.gz |\
+    ${__wget} http://archive.apache.org/dist/xerces/c/3/sources/xerces-c-${XERCESC_VERSION}.tar.gz |\
       ${__untar} &&\
     cmake -B src/build -S src -DCMAKE_INSTALL_PREFIX=${__prefix} &&\
     cmake --build src/build --target install -j$NPROC &&\
@@ -112,25 +114,38 @@ RUN mkdir src &&\
 # (Ideally GENIE works with Pythia8? But not sure that works yet despite the adverts that it does.)
 # 
 ###############################################################################
-LABEL pythia.version="6.428"
+ENV PYTHIA_VERSION="6.428"
+ENV PREVIOUS_PYTHIA_VERSION="6.416"
+ENV PYTHIA_MAJOR_VERSION=6
+LABEL pythia.version=${PYTHIA_VERSION}
+#"6.428"
+# Pythia uses an un-dotted version file naming convention. To deal with that
+# we need some string manipulation and exports that work best with bash 
+SHELL ["/bin/bash", "-c"] 
+#ENV PYTHIA_MAJOR_VERSION=$(awk '{print int($1) }' <<< ${PYTHIA_VERSION} ) 
+#    export PYTHIA_MAJOR_VERSION=$(awk '{print int($1) }' <<< ${PYTHIA_VERSION} )  &&\
+
 RUN mkdir src && \
-    ${__wget} https://root.cern.ch/download/pythia6.tar.gz | ${__untar} &&\
-    wget --no-check-certificate https://pythia.org/download/pythia6/pythia6428.f &&\
-    mv pythia6428.f src/pythia6428.f && rm -rf src/pythia6416.f &&\
+    export PYTHIA_VERSION_INTEGER=$(awk '{print $1*1000}' <<< ${PYTHIA_VERSION} )  &&\
+    export PREVIOUS_PYTHIA_VERSION_INTEGER=$(awk '{print $1*1000}' <<< ${PREVIOUS_PYTHIA_VERSION} )  &&\
+    ${__wget} https://root.cern.ch/download/pythia${PYTHIA_MAJOR_VERSION}.tar.gz | ${__untar} &&\
+    wget --no-check-certificate https://pythia.org/download/pythia${PYTHIA_MAJOR_VERSION}/pythia${PYTHIA_VERSION_INTEGER}.f &&\
+    mv pythia${PYTHIA_VERSION_INTEGER}.f src/pythia${PYTHIA_VERSION_INTEGER}.f && rm -rf src/pythia${PREVIOUS_PYTHIA_VERSION_INTEGER}.f &&\
     cd src/ &&\
-    sed -i 's/int py/extern int py/g' pythia6_common_address.c && \
-    sed -i 's/extern int pyuppr/int pyuppr/g' pythia6_common_address.c && \
-    sed -i 's/char py/extern char py/g' pythia6_common_address.c && \
+    sed -i 's/int py/extern int py/g' pythia${PYTHIA_MAJOR_VERSION}_common_address.c && \
+    sed -i 's/extern int pyuppr/int pyuppr/g' pythia${PYTHIA_MAJOR_VERSION}_common_address.c && \
+    sed -i 's/char py/extern char py/g' pythia${PYTHIA_MAJOR_VERSION}_common_address.c && \
     echo 'void MAIN__() {}' >main.c && \
     gcc -c -fPIC -shared main.c -lgfortran && \
-    gcc -c -fPIC -shared pythia6_common_address.c -lgfortran && \
+    gcc -c -fPIC -shared pythia${PYTHIA_MAJOR_VERSION}_common_address.c -lgfortran && \
     gfortran -c -fPIC -shared pythia*.f && \
-    gfortran -c -fPIC -shared -fno-second-underscore tpythia6_called_from_cc.F && \
-    gfortran -shared -Wl,-soname,libPythia6.so -o libPythia6.so main.o  pythia*.o tpythia*.o &&\
-    mkdir -p ${__prefix}/pythia6 && cp -r * ${__prefix}/pythia6/ &&\
+    gfortran -c -fPIC -shared -fno-second-underscore tpythia${PYTHIA_MAJOR_VERSION}_called_from_cc.F && \
+    gfortran -shared -Wl,-soname,libPythia${PYTHIA_MAJOR_VERSION}.so -o libPythia${PYTHIA_MAJOR_VERSION}.so main.o  pythia*.o tpythia*.o &&\
+    mkdir -p ${__prefix}/pythia${PYTHIA_MAJOR_VERSION} && cp -r * ${__prefix}/pythia${PYTHIA_MAJOR_VERSION}/ &&\
     cd ../ && rm -rf src &&\
-    echo "${__prefix}/pythia6/" > /etc/ld.so.conf.d/pythia6.conf
+    echo "${__prefix}/pythia${PYTHIA_MAJOR_VERSION}/" > /etc/ld.so.conf.d/pythia${PYTHIA_MAJOR_VERSION}.conf 
 
+SHELL ["/bin/sh", "-c"] 
 ###############################################################################
 # LHAPDF
 #
@@ -213,9 +228,10 @@ RUN install-ubuntu-packages \
     srm-ifce-dev \
     libgsl-dev # Necessary for GENIE
 
-LABEL root.version="6.22.08"
+ENV ROOT_VERSION="6.22.08"
+LABEL root.version=${ROOT_VERSION}
 RUN mkdir src &&\
-    ${__wget} https://root.cern/download/root_v6.22.08.source.tar.gz |\
+    ${__wget} https://root.cern/download/root_v${ROOT_VERSION}.source.tar.gz |\
      ${__untar} &&\
     cmake \
       -DCMAKE_BUILD_TYPE=Release \
@@ -276,6 +292,7 @@ RUN __owner="geant4" &&\
         &&\
     cmake --build src/build --target install -j$NPROC &&\
     rm -rf src 
+
 ENV G4NEUTRONHPDATA="${G4DATADIR}/G4NDL4.5"
 ENV G4LEDATA="${G4DATADIR}/G4EMLOW6.48"
 ENV G4LEVELGAMMADATA="${G4DATADIR}/PhotonEvaporation3.2"
@@ -288,7 +305,6 @@ ENV G4ABLADATA="${G4DATADIR}/G4ABLA3.0"
 ENV G4INCLDATA="${G4DATADIR}/G4INCL1.0"
 ENV G4ENSDFSTATEDATA="${G4DATADIR}/G4ENSDFSTATE1.2.3"
 ENV G4NEUTRONXSDATA="${G4DATADIR}/G4NEUTRONXS1.4"
-
 ################################################################################
 # Install Eigen headers into container
 #
@@ -311,7 +327,6 @@ RUN mkdir src &&\
         -j$NPROC \
     &&\
     rm -rf src 
-
 
 ###############################################################################
 # GENIE
@@ -346,11 +361,15 @@ RUN install-ubuntu-packages \
 
 LABEL genie.version=3.04.00
 ENV GENIE_VERSION=3_04_00
-
 ENV GENIE=/usr/local/src/GENIE/Generator
+#ENV GENIE_DOT_VERSION="$(sed 's,_,\.,g' <<< $GENIE_VERSION )"
+LABEL genie.version=${GENIE_VERSION}
+
+SHELL ["/bin/bash", "-c"]
 
 RUN mkdir -p ${GENIE} &&\
-    ${__wget} https://github.com/GENIE-MC/Generator/archive/refs/tags/R-${GENIE_VERSION}.tar.gz |\
+    export ENV GENIE_GET_VERSION="$(sed 's,\.,_,g' <<< $GENIE_VERSION )" &&\ 
+    ${__wget} https://github.com/GENIE-MC/Generator/archive/refs/tags/R-${GENIE_GET_VERSION}.tar.gz |\
       ${__untar_to} ${GENIE} &&\
     cd ${GENIE} &&\
     ./configure \
@@ -376,12 +395,15 @@ RUN mkdir -p ${GENIE_REWEIGHT} &&\
     make -j$NPROC && \
     make -j$NPROC install
 
+SHELL ["/bin/sh", "-c"]
+
 ###############################################################################
 # Catch2
 ###############################################################################
-LABEL catch2.version=3.3.1
+ENV CATCH2_VERSION="3.3.1"
+LABEL catch2.version=${CATCH2_VERSION}
 RUN mkdir -p src &&\
-    ${__wget} https://github.com/catchorg/Catch2/archive/refs/tags/v3.3.1.tar.gz |\
+    ${__wget} https://github.com/catchorg/Catch2/archive/refs/tags/v${CATCH2_VERSION}.tar.gz |\
       ${__untar} &&\
     cmake -B src/build -S src &&\
     cmake --build src/build --target install -- -j$NPROC &&\
@@ -399,9 +421,10 @@ RUN mkdir -p src &&\
 #  so I don't think it will be able to be used in arm architecture images.
 #  For this reason, I am omitting it until future development is done.
 ###############################################################################
-LABEL onnx.version=1.15.0
+ENV ONNX_VERSION="1.15.0"
+LABEL onnx.version=${ONNX_VERSION}
 #RUN mkdir -p src &&\
-#    ${__wget} https://github.com/microsoft/onnxruntime/archive/refs/tags/v1.15.0.tar.gz |\
+#    ${__wget} https://github.com/microsoft/onnxruntime/archive/refs/tags/v${ONNX_VERSION}.tar.gz |\
 #      ${__untar} &&\
 #    cd src &&\
 #    ./build.sh \
@@ -425,7 +448,7 @@ RUN set -x ;\
     fi &&\
     mkdir -p src &&\
     release_stub="https://github.com/microsoft/onnxruntime/releases/download" &&\
-    onnx_version="1.15.0" &&\
+    onnx_version="${ONNX_VERSION}" &&\
     ${__wget} ${release_stub}/v${onnx_version}/onnxruntime-linux-${onnx_arch}-${onnx_version}.tgz |\
       ${__untar} &&\
     install -D -m 0644 -t ${__prefix}/lib src/lib/* &&\
