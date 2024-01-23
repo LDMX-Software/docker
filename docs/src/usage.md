@@ -29,3 +29,22 @@ to change it unless they wish to do more advanced development.
 
 [^1]: See [LDMX-Software/docker Issue #38](https://github.com/LDMX-Software/docker/issues/38).
 We may change this assumption to make it clearer that other packages could be installed at this location besides ldmx-sw.
+
+## Determining an Image's Version
+Often it is helpful to determine an image's version. Sometimes, this is as easy as
+looking at the tag provided by `docker image ls` or written into the SIF file name,
+but sometimes this information is lost. Since v4 of the container image, we've been
+more generous with adding labels to the image and a standard one is included
+`org.opencontainers.image.version` which (for our purposes) stores the release that
+built the image.
+
+We can `inspect` an image to view its labels.
+```shell
+# docker inspect returns JSON with all the image manifest details
+# jq just helps us parse this JSON for the specific thing we are looking for,
+# but you could just scroll through the output of docker inspect
+docker inspect ldmx/dev:latest | jq 'map(.Config.Labels["org.opencontainers.image.version"])[]'
+# apptainer inspect (by default) returns just the list of labels
+# so we can just use grep to select the line with the label we care about
+apptainer inspect ldmx_dev_latest | grep org.opencontainers.image.version
+```
