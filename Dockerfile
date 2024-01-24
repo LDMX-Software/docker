@@ -465,6 +465,7 @@ RUN install-ubuntu-packages \
     gdb \
     libasan8 \
     lld \
+    git \
     rsync # Required for Pythia8's make install command
 
 ENV PYTHIA_VERSION="8.310"
