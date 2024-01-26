@@ -480,11 +480,10 @@ SHELL ["/bin/bash", "-c"]
 
 RUN mkdir src && \
     git clone https://gitlab.com/Pythia8/releases/ --single-branch --branch pythia8310 pythia8 && \
-    cd pythia8 && ./configure --cxx-common="-O3 -g -std=c++17 -fPIC" --prefix ${__prefix} && \
+    cd pythia8 && ./configure --cxx-common="-O3 -g -std=c++17 -fPIC" --prefix=${__prefix} && \
     make -j${NPROC} && \
     make install && \
     cd ../ && rm -rf src
-
 # add any ssl certificates to the container to trust
 COPY ./certs/ /usr/local/share/ca-certificates
 RUN update-ca-certificates

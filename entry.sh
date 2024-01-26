@@ -26,7 +26,7 @@ set -e
 if [ -z "${LDMX_SW_INSTALL}" ]; then
   export LDMX_SW_INSTALL=$LDMX_BASE/ldmx-sw/install
 fi
-export LD_LIBRARY_PATH=$LDMX_SW_INSTALL/lib:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=$LDMX_SW_INSTALL/lib:$LD_LIBRARY_PATH:/usr/local/lib
 export PYTHONPATH=$LDMX_SW_INSTALL/python:$LDMX_SW_INSTALL/lib:$PYTHONPATH
 export PATH=$LDMX_SW_INSTALL/bin:$PATH
 
