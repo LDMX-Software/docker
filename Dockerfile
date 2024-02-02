@@ -470,7 +470,7 @@ RUN install-ubuntu-packages \
 
 ENV PYTHIA_VERSION="8.310"
 ENV PYTHIA_MAJOR_VERSION=8
-LABEL pythia8.version=${PYTHIA8_VERSION}
+LABEL pythia8.version=${PYTHIA8_VERSION}-dev
 #"6.428"
 # Pythia uses an un-dotted version file naming convention. To deal with that
 # we need some string manipulation and exports that work best with bash
@@ -478,12 +478,21 @@ SHELL ["/bin/bash", "-c"]
 #ENV PYTHIA_MAJOR_VERSION=$(awk '{print int($1) }' <<< ${PYTHIA_VERSION} )
 #    export PYTHIA_MAJOR_VERSION=$(awk '{print int($1) }' <<< ${PYTHIA_VERSION} )  &&\
 
+
+COPY ./pythia8-dev  /pythia8-dev
 RUN mkdir src && \
-    git clone https://gitlab.com/Pythia8/releases/ --single-branch --branch pythia8310 pythia8 && \
-    cd pythia8 && ./configure --cxx-common="-O3 -g -std=c++17 -fPIC" --prefix=${__prefix} && \
-    make -j${NPROC} && \
-    make install && \
-    cd ../ && rm -rf src
+    cp -Rv /pythia8-dev src/ && \
+     cd pythia8-dev && ./configure --cxx-common="-O3 -g -std=c++17 -fPIC" --prefix=${__prefix} && \
+     make -j${NPROC} && \
+     make install && \
+     cd ../ && rm -rf src
+
+# RUN mkdir src && \
+#     git clone https://gitlab.com/Pythia8/releases/ --single-branch --branch pythia8310 pythia8 && \
+#     cd pythia8 && ./configure --cxx-common="-O3 -g -std=c++17 -fPIC" --prefix=${__prefix} && \
+#     make -j${NPROC} && \
+#     make install && \
+#     cd ../ && rm -rf src
 # add any ssl certificates to the container to trust
 COPY ./certs/ /usr/local/share/ca-certificates
 RUN update-ca-certificates
