@@ -147,6 +147,39 @@ RUN mkdir src && \
 
 SHELL ["/bin/sh", "-c"] 
 ###############################################################################
+# LHAPDF
+#
+# Needed for GENIE
+#
+# - We disable the python subpackage because it is based on Python2 whose
+#   executable has been removed from Ubuntu 22.04.
+###############################################################################
+LABEL lhapdf.version="6.5.4"
+RUN mkdir src &&\
+    ${__wget} https://lhapdf.hepforge.org/downloads/?f=LHAPDF-6.5.4.tar.gz |\
+      ${__untar} &&\
+    cd src &&\
+    ./configure --disable-python --prefix=${__prefix} &&\
+    make -j$NPROC install &&\
+    cd ../ &&\
+    rm -rf src
+
+###############################################################################
+# PYTHIA8
+###############################################################################
+RUN install-ubuntu-packages \
+    rsync
+
+LABEL pythia.version="8.310"
+RUN mkdir src && \
+    ${__wget} https://pythia.org/download/pythia83/pythia8310.tgz | ${__untar} &&\
+    cd src &&\
+    ./configure --with-lhapdf6 --prefix=${__prefix} &&\
+    make -j$NPROC install &&\
+    cd ../ &&\
+    rm -rf src
+
+###############################################################################
 # CERN's ROOT
 #  Needed for GENIE and serialization within the Framework
 #
@@ -214,6 +247,7 @@ RUN mkdir src &&\
       -Dxrootd=OFF \
       -Dgsl_shared=ON \ 
       -Dmathmore=ON \   
+      -Dpythia8=ON \    
       -Dpythia6=ON \    
       -DPYTHIA6_LIBRARY=${__prefix}/pythia6/libPythia6.so \
       -B build \
@@ -295,25 +329,6 @@ RUN mkdir src &&\
     rm -rf src 
 
 ###############################################################################
-# LHAPDF
-#
-# Needed for GENIE
-#
-# - We disable the python subpackage because it is based on Python2 whose
-#   executable has been removed from Ubuntu 22.04.
-###############################################################################
-ENV LHAPDF_VERSION="6.5.3"
-LABEL lhapdf.version=${LHAPDF_VERSION}
-RUN mkdir src &&\
-    ${__wget} https://lhapdf.hepforge.org/downloads/?f=LHAPDF-${LHAPDF_VERSION}.tar.gz |\
-      ${__untar} &&\
-    cd src &&\
-    ./configure --disable-python --prefix=${__prefix} &&\
-    make -j$NPROC install &&\
-    cd ../ &&\
-    rm -rf src
-
-###############################################################################
 # GENIE
 #
 # Needed for ... GENIE :)
@@ -344,9 +359,8 @@ RUN install-ubuntu-packages \
     liblog4cpp5-dev \
     libtool
 
-
-ENV GENIE_VERSION=3.02.00
-#ENV GENIE_REWEIGHT_VERSION=1_02_00
+LABEL genie.version=3.04.00
+ENV GENIE_VERSION=3_04_00
 ENV GENIE=/usr/local/src/GENIE/Generator
 #ENV GENIE_DOT_VERSION="$(sed 's,_,\.,g' <<< $GENIE_VERSION )"
 LABEL genie.version=${GENIE_VERSION}
@@ -363,10 +377,21 @@ RUN mkdir -p ${GENIE} &&\
       --disable-lhapdf5 \
       --enable-gfortran \
       --with-gfortran-lib=/usr/x86_64-linux-gnu/ \
-      --disable-pythia8 \
-      --with-pythia6-lib=${__prefix}/pythia6 \
+      --enable-pythia8 \
+      --with-pythia8-lib=${__prefix}/lib \
       --enable-test \
     && \
+    make -j$NPROC && \
+    make -j$NPROC install
+
+#Unfortunately ... need to use the master branch of GENIE reweight...
+#ENV GENIE_REWEIGHT_VERSION=1_02_02
+ENV GENIE_REWEIGHT=/usr/local/src/GENIE/Reweight
+RUN mkdir -p ${GENIE_REWEIGHT} &&\
+    #${__wget} https://github.com/GENIE-MC/Reweight/archive/refs/tags/R-${GENIE_REWEIGHT_VERSION}.tar.gz |\
+    ${__wget} https://github.com/GENIE-MC/Reweight/tarball/master |\
+    ${__untar_to} ${GENIE_REWEIGHT} &&\
+    cd ${GENIE_REWEIGHT} &&\
     make -j$NPROC && \
     make -j$NPROC install
 
