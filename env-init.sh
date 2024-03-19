@@ -11,21 +11,21 @@
 # LDMX_SW_INSTALL is defined when building the production image or users
 # can use it to specify a non-normal install location
 if [ -z "${LDMX_SW_INSTALL}" ]; then
-  export LDMX_SW_INSTALL=$LDMX_BASE/ldmx-sw/install
+  export LDMX_SW_INSTALL="${LDMX_BASE}/ldmx-sw/install"
 fi
-export LD_LIBRARY_PATH=$LDMX_SW_INSTALL/lib:$LD_LIBRARY_PATH
-export PYTHONPATH=$LDMX_SW_INSTALL/python:$LDMX_SW_INSTALL/lib:$PYTHONPATH
-export PATH=$LDMX_SW_INSTALL/bin:$PATH
+export LD_LIBRARY_PATH="${LDMX_SW_INSTALL}/lib:${LD_LIBRARY_PATH}"
+export PYTHONPATH="${LDMX_SW_INSTALL}/python:${LDMX_SW_INSTALL}/lib:${PYTHONPATH}"
+export PATH="${LDMX_SW_INSTALL}/bin:${PATH}"
 
 #add what we need for GENIE 
-export LD_LIBRARY_PATH=$GENIE/lib:/usr/local/pythia6:$LD_LIBRARY_PATH
-export PATH=$GENIE/bin:$PATH
+export LD_LIBRARY_PATH="${GENIE}/lib:/usr/local/pythia6:${LD_LIBRARY_PATH}"
+export PATH="${GENIE}/bin:${PATH}"
 
 # add externals installed along side ldmx-sw
 # WARNING: No check to see if there is anything in this directory
-for _external_path in $LDMX_SW_INSTALL/external/*/lib
+for _external_path in "${LDMX_SW_INSTALL}/external"/*/lib
 do
-  export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$_external_path
+  export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${_external_path}"
 done
 unset _external_path
 
@@ -60,21 +60,22 @@ if [ -n "${LDMX_CUSTOM_GEANT4+x}" ]; then
     unset G4NEUTRONXSDATA
     # If explicitly requested, use a custom location for Geant4's data directories
     if [ -n "${LDMX_CUSTOM_GEANT4_DATA_DIR+x}" ]; then
-        export GEANT4_DATA_DIR=$LDMX_CUSTOM_GEANT4_DATA_DIR
+        export GEANT4_DATA_DIR="${LDMX_CUSTOM_GEANT4_DATA_DIR}"
     fi 
     # Source the custom geant's environment script
-    source $LDMX_CUSTOM_GEANT4/bin/geant4.sh
+    # shellcheck disable=SC1091
+    . "${LDMX_CUSTOM_GEANT4}/bin/geant4.sh"
     # Prioritize the cmake config in the Geant4 installation over the container location (/usr/local)
-    export CMAKE_PREFIX_PATH=$LDMX_CUSTOM_GEANT4/lib/cmake:/usr/local/:$CMAKE_PREFIX_PATH
+    export CMAKE_PREFIX_PATH="${LDMX_CUSTOM_GEANT4}/lib/cmake:/usr/local/:${CMAKE_PREFIX_PATH}"
 
     # If no directory was found by the geant4.sh script and the user didn't
     # explicitly ask for a location (e.g. for a debug build):
     #
     # Assume we are using 10.2.3 (container provided) data
-    if [ -z "$GEANT4_DATA_DIR" ]; then
-        export GEANT4_DATA_DIR=${G4DATADIR}
+    if [ -z "${GEANT4_DATA_DIR+x}" ]; then
+        export GEANT4_DATA_DIR="${G4DATADIR}"
     fi
 else
     # Tell CMake to look for configuration files in the container location by default
-    export CMAKE_PREFIX_PATH=/usr/local/:$LDMX_SW_INSTALL
+    export CMAKE_PREFIX_PATH="/usr/local/:${LDMX_SW_INSTALL}"
 fi
