@@ -8,7 +8,12 @@
 # add ldmx-sw and ldmx-analysis installs to the various paths
 # LDMX_SW_INSTALL is defined when building the production image or users
 # can use it to specify a non-normal install location
-if [ -z "${LDMX_SW_INSTALL}" ]; then
+if [ -z "${LDMX_SW_INSTALL+x}" ]; then
+  if [ -z "${LDMX_BASE+x}" ]; then
+    printf "[ldmx-env-init.sh] WARNING: %s\n" \
+      "Neither LDMX_BASE nor LDMX_SW_INSTALL is defined." \
+      "At least one needs to be defined to ensure a working installation."
+  fi
   export LDMX_SW_INSTALL="${LDMX_BASE}/ldmx-sw/install"
 fi
 export LD_LIBRARY_PATH="${LDMX_SW_INSTALL}/lib:${LD_LIBRARY_PATH}"
