@@ -472,8 +472,8 @@ RUN update-ca-certificates
 
 # copy environment initialization script into container
 # and make sure the default profile will call it as well
-COPY ./env-init.sh /etc/
-RUN printf "\n. /etc/env-init.sh\n" >> /etc/skel/.profile
+COPY ./ldmx-env-init.sh /etc/
+RUN printf "\n. /etc/ldmx-env-init.sh\n" >> /etc/skel/.profile
 
 #run environment setup when docker container is launched and decide what to do from there
 #   will require the environment variable LDMX_BASE defined
