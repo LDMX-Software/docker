@@ -1,5 +1,3 @@
-#!/bin/bash 
-
 ###############################################################################
 # Environment initialization for LDMX SW container images
 #   Assumptions:
@@ -20,14 +18,6 @@ export PATH="${LDMX_SW_INSTALL}/bin:${PATH}"
 #add what we need for GENIE 
 export LD_LIBRARY_PATH="${GENIE}/lib:/usr/local/pythia6:${LD_LIBRARY_PATH}"
 export PATH="${GENIE}/bin:${PATH}"
-
-# add externals installed along side ldmx-sw
-# WARNING: No check to see if there is anything in this directory
-for _external_path in "${LDMX_SW_INSTALL}/external"/*/lib
-do
-  export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${_external_path}"
-done
-unset _external_path
 
 # Developer option: If a custom geant4 install is to be used, source the
 # environment script from that install
