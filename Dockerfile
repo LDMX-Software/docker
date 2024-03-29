@@ -473,7 +473,13 @@ RUN update-ca-certificates
 # copy environment initialization script into container
 # and make sure the default profile will call it as well
 COPY ./ldmx-env-init.sh /etc/
-RUN printf "\n. /etc/ldmx-env-init.sh\n" >> /etc/skel/.profile
+RUN printf "%s\n" \
+      "# make sure LDMX_BASE is defined for ldmx-env-init.sh" \
+      "if [ -z \"\${LDMX_BASE+x}\" ]; then" \
+      "  export LDMX_BASE=\"\${HOME}\"" \
+      "fi" \
+      ". /etc/ldmx-env-init.sh" \
+    >> /etc/skel/.profile
 
 #run environment setup when docker container is launched and decide what to do from there
 #   will require the environment variable LDMX_BASE defined
