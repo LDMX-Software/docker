@@ -42,7 +42,7 @@ jobs:
           cargo install --version ${MDBOOK_ADMONISH_VERSION} --locked mdbook-admonish
       - name: Setup Pages
         id: pages
-        uses: actions/configure-pages@v4
+        uses: actions/configure-pages@v5
       - name: Build with mdBook
         run: mdbook build
         working-directory: docs
