@@ -1,5 +1,5 @@
 
-FROM ubuntu:22.04
+FROM ubuntu:24.04
 LABEL ubuntu.version="22.04"
 MAINTAINER Tom Eichlersmith <eichl008@umn.edu>
 
