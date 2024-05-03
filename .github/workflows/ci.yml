@@ -137,7 +137,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ldmx_sw_branch: [ trunk, v3.0.0, v3.0.2, v3.1.13, v3.2.4, v3.2.12, v3.3.0 ]
+        ldmx_sw_branch: [ trunk, v3.0.0, v3.0.2, v3.1.13, v3.2.4, v3.2.12, v3.3.0, v3.4.0, v4.0.0 ]
     defaults:
       run:
         shell: bash
