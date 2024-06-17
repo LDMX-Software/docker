@@ -24,11 +24,12 @@ A description of this setup process is given for both [docker](docs/use_with_doc
 
 ## Current Container Configuration
 
-Direct Dependecy of ldmx-sw | Version | Construction Process
+Software Package | Version | Construction Process
 ---|---|---
 [Ubuntu Server](https://ubuntu.com/) | 22.04 | Base Image
 [Python](https://www.python.org/) | 3.10.6 | From Ubuntu Repos
 [cmake](https://cmake.org/) | 3.22.1 | From Ubuntu Repos
+[Boost](https://www.boost.org/doc/libs/1_74_0/) | 1.74.0 | From Ubuntu Repos
 [XercesC](http://xerces.apache.org/xerces-c/) | 3.2.4 | Built from source
 [Pythia6](https://pythia.org/pythia6/) | 6.428 | Built from source
 [ROOT](https://root.cern.ch/) | 6.22/08 | Built from source
