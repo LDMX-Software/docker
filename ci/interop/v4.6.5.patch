@@ -1,25 +1,28 @@
-Submodule Conditions contains modified content
-diff --git a/Conditions/include/Conditions/SimpleTableCondition.h b/Conditions/include/Conditions/SimpleTableCondition.h
-index e418c42..79ed3a3 100644
---- a/Conditions/include/Conditions/SimpleTableCondition.h
-+++ b/Conditions/include/Conditions/SimpleTableCondition.h
-@@ -7,6 +7,7 @@
- #define FRAMEWORK_SIMPLETABLECONDITION_H_
-
- #include <vector>
-+#include <cstdint>
-
- #include "Framework/ConditionsObject.h"
- #include "Framework/Exception/Exception.h"
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -61,10 +61,10 @@
+ 
+ find_package(GENIE)
+ 
++cmake_policy(SET CMP0167 NEW)
+ find_package(
+   Boost REQUIRED
+-  COMPONENTS system
+-             log
++  COMPONENTS log
+              filesystem
+              thread
+              chrono
 diff --git a/DetDescr/CMakeLists.txt b/DetDescr/CMakeLists.txt
 --- a/DetDescr/CMakeLists.txt
 +++ b/DetDescr/CMakeLists.txt
-@@ -17,32 +17,27 @@
+@@ -12,32 +12,27 @@
  option(BUILD_DETECTORID_BINDINGS "Build the python bindings for the the DetDescr/DetectorID components" ON)
  if(BUILD_DETECTORID_BINDINGS)
 +  cmake_policy(SET CMP0167 NEW)
    find_package(Python COMPONENTS Development)
-
+ 
 -  message("Looking for libboost_python${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}")
 -  find_package(Boost QUIET COMPONENTS python${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR})
 +  message("Looking for libboost_python${Python_VERSION_MAJOR}${Python_VERSION_MINOR}")
@@ -31,7 +34,7 @@ diff --git a/DetDescr/CMakeLists.txt b/DetDescr/CMakeLists.txt
 +      message("Looking for libboost_python${Python_VERSION_MAJOR}")
 +      find_package(Boost QUIET COMPONENTS python${Python_VERSION_MAJOR})
    endif()
-
+ 
 -  # libboost_python style libraries
 -  if (NOT Boost_FOUND)
 -      message("Looking for libboost_python")
@@ -45,7 +48,7 @@ diff --git a/DetDescr/CMakeLists.txt b/DetDescr/CMakeLists.txt
 +      message("Looking for libboost_python-py${Python_VERSION_MAJOR}${Python_VERSION_MINOR}")
 +      find_package(Boost QUIET COMPONENTS python-py${Python_VERSION_MAJOR}${Python_VERSION_MINOR})
    endif()
-
+ 
    # libboost_python3-py36 style libraries
    if (NOT Boost_FOUND)
 -      message("Looking for libboost_python3-py${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}")
@@ -53,6 +56,17 @@ diff --git a/DetDescr/CMakeLists.txt b/DetDescr/CMakeLists.txt
 +      message("Looking for libboost_python3-py${Python_VERSION_MAJOR}${Python_VERSION_MINOR}")
 +      find_package(Boost QUIET COMPONENTS python3-py${Python_VERSION_MAJOR}${Python_VERSION_MINOR})
    endif()
-
+ 
    # Nothing worked
    if (NOT Boost_FOUND)
+diff --git a/Hcal/src/Hcal/HcalClusterProducer.cxx b/Hcal/src/Hcal/HcalClusterProducer.cxx
+--- a/Hcal/src/Hcal/HcalClusterProducer.cxx
++++ b/Hcal/src/Hcal/HcalClusterProducer.cxx
+@@ -2,6 +2,7 @@
+ 
+ #include <exception>
+ #include <iostream>
++#include <list>
+ 
+ #include "Hcal/MyClusterWeight.h"
+ #include "Recon/TemplatedClusterFinder.h"
