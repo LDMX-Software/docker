@@ -55,6 +55,23 @@ diff --git a/DetDescr/CMakeLists.txt b/DetDescr/CMakeLists.txt
  
    # Nothing worked
    if (NOT Boost_FOUND)
+diff --git a/Framework/CMakeLists.txt b/Framework/CMakeLists.txt
+--- a/Framework/CMakeLists.txt
++++ b/Framework/CMakeLists.txt
+@@ -23,11 +23,11 @@
+ # Search for the Python3 library
+ find_package(Python3 COMPONENTS Interpreter Development)
+
++cmake_policy(SET CMP0167 NEW)
+ # Search for Boost
+ find_package(
+   Boost REQUIRED
+-  COMPONENTS system
+-             log
++  COMPONENTS log
+              filesystem
+              thread
+              chrono
 diff --git a/Hcal/src/Hcal/HcalClusterProducer.cxx b/Hcal/src/Hcal/HcalClusterProducer.cxx
 --- a/Hcal/src/Hcal/HcalClusterProducer.cxx
 +++ b/Hcal/src/Hcal/HcalClusterProducer.cxx
