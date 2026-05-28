@@ -37,16 +37,16 @@ which provides support for Docker, Podman, and Apptainer.
 
 Software Package | Version | Construction Process
 ---|---|---
-[Ubuntu Server](https://ubuntu.com/) | 24.04 | Base Image
-[GCC](https://gcc.gnu.org/) | 13.3.0 | From Ubuntu Repos
-[Python](https://www.python.org/) | 3.12.3 | From Ubuntu Repos
-[cmake](https://cmake.org/) | 3.28.3 | From Ubuntu Repos
-[Boost](https://www.boost.org/doc/libs/1_83_0/) | 1.83.0 | From Ubuntu Repos
+[Ubuntu Server](https://ubuntu.com/) | 26.04 | Base Image
+[GCC](https://gcc.gnu.org/) | 15.2.0 | From Ubuntu Repos
+[Python](https://www.python.org/) | 3.14.4 | From Ubuntu Repos
+[cmake](https://cmake.org/) | 4.3.2 | From Ubuntu Repos
+[Boost](https://www.boost.org/doc/libs/1_90_0/) | 1.9.0 | From Ubuntu Repos
 [XercesC](http://xerces.apache.org/xerces-c/) | 3.3.0 | Built from source
 [LHAPDF](https://www.lhapdf.org/) | 6.5.5 | Built from source
 [Pythia8](https://pythia.org/) | 8.313 | Built from source
 [nlohmann/json](https://json.nlohmann.me/) | 3.11.3 | From Ubuntu Repos
-[ROOT](https://root.cern.ch/) | 6.34.10 | Built from source
+[ROOT](https://root.cern.ch/) | 6.38.04 | Built from source
 [Geant4](https://geant4.web.cern.ch/) | [LDMX.10.2.3\_v0.6](https://github.com/LDMX-Software/geant4/tree/LDMX.10.2.3_v0.6) | Built from source
 [Eigen](https://eigen.tuxfamily.org) | 3.4.0 | Built from source
 [HEPMC3](https://hepmc.web.cern.ch) | 3.3.0 | Built from source
@@ -55,7 +55,7 @@ Software Package | Version | Construction Process
 [Catch2](https://github.com/catchorg/Catch2) | 3.8.0 | Built from source
 [Acts](https://acts.readthedocs.io/en/v36.0.0/) | 36.0.0 | Built from source
 [ONNX Runtime](https://github.com/microsoft/onnxruntime) | 1.15.0 | Download pre-built binaries
-[Clang](https://clang.llvm.org/) | 18.1.3 | From Ubuntu Repos
+[Clang](https://clang.llvm.org/) | 21.1.8 | From Ubuntu Repos
 
 More detailed documentation of the available software is online.
 - [Ubuntu Packages](https://ldmx-software.github.io/dev-build-context/ubuntu-packages.html)

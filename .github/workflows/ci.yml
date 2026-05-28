@@ -64,8 +64,6 @@ jobs:
         uses: docker/build-push-action@v7
         with:
           context: .
-          cache-from: type=registry,ref=ldmx/dev:build-cache-${{ matrix.platform }}
-          cache-to: type=registry,ref=ldmx/dev:build-cache-${{ matrix.platform }},mode=max
           platforms: linux/${{ matrix.platform }}
           labels: ${{ steps.meta.outputs.labels }}
           outputs: type=image,name=${{ env.REGISTRY_IMAGE }},push-by-digest=true,name-canonical=true,push=true

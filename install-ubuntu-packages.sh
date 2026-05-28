@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 #
 # Installs any dependencies from the ubuntu repos that are passed in as
 # arguments.

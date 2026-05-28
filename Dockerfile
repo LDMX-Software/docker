@@ -1,6 +1,6 @@
-FROM ubuntu:24.04
+FROM ubuntu:26.04
 LABEL maintainer="Tom Eichlersmith <eichl008@umn.edu>, Tamas Almos Vami <Tamas.Almos.Vami@cern.ch>"
-LABEL ubuntu.version="24.04"
+LABEL ubuntu.version="26.04"
 
 ARG NPROC=1
 
@@ -22,6 +22,7 @@ RUN install-ubuntu-packages \
     ccache \
     cmake \
     gcc g++ gfortran \
+    gcc-13 g++-13 \
     libcurl4-openssl-dev \
     locales \
     make \
@@ -119,7 +120,6 @@ RUN mkdir src && \
 
 RUN install-ubuntu-packages \
     fonts-freefont-ttf \
-    libafterimage-dev \
     libfftw3-dev \
     libfreetype6-dev \
     libftgl-dev \
@@ -141,17 +141,17 @@ RUN install-ubuntu-packages \
     libz-dev \
     libzstd-dev \
     nlohmann-json3-dev \
-    srm-ifce-dev \
-    libgsl-dev
+    libgsl-dev \
+    libcrypt-dev
 
-ENV ROOT_VERSION="6.34.10"
+ENV ROOT_VERSION="6.38.04"
 LABEL root.version=${ROOT_VERSION}
 RUN mkdir src &&\
     ${__wget} https://root.cern/download/root_v${ROOT_VERSION}.source.tar.gz |\
      ${__untar} &&\
     cmake \
       -DCMAKE_BUILD_TYPE=Release \
-      -DCMAKE_CXX_STANDARD=20 \
+      -DCMAKE_CXX_STANDARD=23 \
       -DCMAKE_INSTALL_PREFIX=${__prefix} \
       -DCMAKE_INSTALL_LIBDIR=lib \
       -Dgnuinstall=ON \
@@ -162,8 +162,8 @@ RUN mkdir src &&\
       -Dopengl=ON \
       -Dpyroot=ON \
       -Dxrootd=OFF \
-      -Dmathmore=ON \   
-      -Dpythia8=ON \    
+      -Dmathmore=ON \
+      -Dpythia8=ON \
       -B build \
       -S src \
     && cmake --build build --target install -j$NPROC &&\
@@ -199,7 +199,11 @@ RUN __owner="geant4" &&\
         -DGEANT4_USE_GDML=ON \
         -DGEANT4_INSTALL_EXAMPLES=OFF \
         -DGEANT4_USE_OPENGL_X11=ON \
+        -DGEANT4_USE_SYSTEM_ZLIB=ON \
         -DCMAKE_INSTALL_PREFIX=${__prefix} \
+        -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
+        -DCMAKE_C_COMPILER=gcc-13 \
+        -DCMAKE_CXX_COMPILER=g++-13 \
         -B src/build \
         -S src \
         &&\
@@ -259,7 +263,8 @@ RUN mkdir src &&\
       -DHEPMC3_BUILD_STATIC_LIBS:BOOL=ON \
       -DHEPMC3_BUILD_DOCS:BOOL=OFF \
       -DHEPMC3_ENABLE_PYTHON:BOOL=ON \
-      -DHEPMC3_PYTHON_VERSIONS=3.10 \
+      -DHEPMC3_PYTHON_VERSIONS=3.14 \
+      -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
       -B src/build \
       -S src \
     &&\
@@ -399,6 +404,7 @@ RUN install-ubuntu-packages \
     ca-certificates \
     clang-format \
     libboost-all-dev \
+    libcurl4-openssl-dev \
     libssl-dev
 
 ###############################################################################
