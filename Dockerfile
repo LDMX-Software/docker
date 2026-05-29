@@ -76,7 +76,7 @@ RUN mkdir src &&\
     ${__wget} https://lhapdf.hepforge.org/downloads/?f=LHAPDF-6.5.5.tar.gz |\
       ${__untar} &&\
     cd src &&\
-    ./configure --disable-python --prefix=${__prefix} &&\
+    CC=gcc-13 CXX=g++-13 ./configure --disable-python --prefix=${__prefix} &&\
     make -j$NPROC install &&\
     cd ../ &&\
     rm -rf src
