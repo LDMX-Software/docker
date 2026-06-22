@@ -34,7 +34,7 @@ jobs:
     steps:
       -
         name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       -
         name: Docker meta
         id: meta
@@ -137,7 +137,7 @@ jobs:
     outputs:
       matrix: ${{steps.read_json.outputs.matrix}}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - id: read_json
         run: echo "matrix=$(jq -c . ci/ldmx-sw-to-test.json)" >> $GITHUB_OUTPUT
           
@@ -155,7 +155,7 @@ jobs:
     steps:
     -
       name: Download Build Context for Test Script
-      uses: actions/checkout@v6
+      uses: actions/checkout@v7
     -
       name: Install just
       uses: extractions/setup-just@v4
