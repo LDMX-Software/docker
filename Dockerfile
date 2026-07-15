@@ -89,7 +89,7 @@ RUN install-ubuntu-packages \
 
 LABEL pythia.version="8.313"
 RUN mkdir src && \
-    ${__wget} https://pythia.org/download/pythia83/pythia8313.tgz | ${__untar} &&\
+    ${__wget} https://pythia.org/releases/pythia83/pythia8313.tgz | ${__untar} &&\
     cd src &&\
     ./configure --with-lhapdf6 --prefix=${__prefix} &&\
     make -j$NPROC install &&\
