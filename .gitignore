@@ -4,3 +4,6 @@ temp/**
 
 # test python script generated compilation
 *.pyc
+
+# Mac files
+.DS_Store
