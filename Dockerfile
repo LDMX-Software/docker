@@ -410,7 +410,7 @@ RUN install-ubuntu-packages \
 ###############################################################################
 # Acts
 ###############################################################################
-ENV ACTS_VERSION="36.0.0"
+ENV ACTS_VERSION="47.2.0"
 LABEL acts.version=${ACTS_VERSION}
 RUN mkdir -p src &&\
     ${__wget} https://github.com/acts-project/acts/archive/refs/tags/v${ACTS_VERSION}.tar.gz |\
