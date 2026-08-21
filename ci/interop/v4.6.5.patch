@@ -70,3 +70,15 @@ diff --git a/Hcal/src/Hcal/HcalClusterProducer.cxx b/Hcal/src/Hcal/HcalClusterPr
  
  #include "Hcal/MyClusterWeight.h"
  #include "Recon/TemplatedClusterFinder.h"
+diff --git i/Tracking/CMakeLists.txt w/Tracking/CMakeLists.txt
+index 47671220..ae443194 100644
+--- i/Tracking/CMakeLists.txt
++++ w/Tracking/CMakeLists.txt
+@@ -62,7 +62,6 @@ find_package(Eigen3 CONFIG REQUIRED)
+ # if you want to try an alternate Acts, you can
+ # 1. comment out the stuff here and replace with add_subdirectory(acts)
+ # 2. git clone acts into this directory and choose your version
+-find_package(Acts QUIET)
+ if (NOT Acts_FOUND)
+   message(STATUS "Did not find Acts, downloading and compiling it here")
+   include(FetchContent)
