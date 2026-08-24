@@ -1,73 +1,96 @@
-diff --git a/DetDescr/CMakeLists.txt b/DetDescr/CMakeLists.txt
---- a/DetDescr/CMakeLists.txt
-+++ b/DetDescr/CMakeLists.txt
-@@ -17,32 +17,27 @@
- option(BUILD_DETECTORID_BINDINGS "Build the python bindings for the the DetDescr/DetectorID components" ON)
- if(BUILD_DETECTORID_BINDINGS)
-+  cmake_policy(SET CMP0167 NEW)
-   find_package(Python COMPONENTS Development)
- 
--  message("Looking for libboost_python${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}")
--  find_package(Boost QUIET COMPONENTS python${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR})
-+  message("Looking for libboost_python${Python_VERSION_MAJOR}${Python_VERSION_MINOR}")
-+  find_package(Boost QUIET COMPONENTS python${Python_VERSION_MAJOR}${Python_VERSION_MINOR})
-   # libboost_python3 style libraries
-   if (NOT Boost_FOUND)
--      message("Looking for libboost_python${PYTHON_VERSION_MAJOR}")
--      find_package(Boost QUIET COMPONENTS python${PYTHON_VERSION_MAJOR})
-+      message("Looking for libboost_python${Python_VERSION_MAJOR}")
-+      find_package(Boost QUIET COMPONENTS python${Python_VERSION_MAJOR})
-   endif()
- 
--  # libboost_python style libraries
--  if (NOT Boost_FOUND)
--      message("Looking for libboost_python")
--      find_package(Boost QUIET COMPONENTS system thread python)
--  endif()
--
-   # libboost_python-py36 style libraries
-   if (NOT Boost_FOUND)
--      message("Looking for libboost_python-py${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}")
--      find_package(Boost QUIET COMPONENTS python-py${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR})
-+      message("Looking for libboost_python-py${Python_VERSION_MAJOR}${Python_VERSION_MINOR}")
-+      find_package(Boost QUIET COMPONENTS python-py${Python_VERSION_MAJOR}${Python_VERSION_MINOR})
-   endif()
- 
-   # libboost_python3-py36 style libraries
-   if (NOT Boost_FOUND)
--      message("Looking for libboost_python3-py${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}")
--      find_package(Boost QUIET COMPONENTS python3-py${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR})
-+      message("Looking for libboost_python3-py${Python_VERSION_MAJOR}${Python_VERSION_MINOR}")
-+      find_package(Boost QUIET COMPONENTS python3-py${Python_VERSION_MAJOR}${Python_VERSION_MINOR})
-   endif()
- 
-   # Nothing worked
-   if (NOT Boost_FOUND)
-diff --git a/Framework/CMakeLists.txt b/Framework/CMakeLists.txt
---- a/Framework/CMakeLists.txt
-+++ b/Framework/CMakeLists.txt
-@@ -23,11 +23,11 @@
- # Search for the Python3 library
- find_package(Python3 COMPONENTS Interpreter Development)
-
-+cmake_policy(SET CMP0167 NEW)
- # Search for Boost
- find_package(
-   Boost REQUIRED
--  COMPONENTS system
--             log
-+  COMPONENTS log
-              filesystem
-              thread
-              chrono
-diff --git a/Hcal/src/Hcal/HcalClusterProducer.cxx b/Hcal/src/Hcal/HcalClusterProducer.cxx
---- a/Hcal/src/Hcal/HcalClusterProducer.cxx
-+++ b/Hcal/src/Hcal/HcalClusterProducer.cxx
-@@ -2,6 +2,7 @@
- 
- #include <exception>
- #include <iostream>
-+#include <list>
- 
- #include "Hcal/MyClusterWeight.h"
- #include "Hcal/TemplatedClusterFinder.h"
+[1mdiff --git a/DetDescr/CMakeLists.txt b/DetDescr/CMakeLists.txt[m
+[1mindex 753eb497..238529bd 100644[m
+[1m--- a/DetDescr/CMakeLists.txt[m
+[1m+++ b/DetDescr/CMakeLists.txt[m
+[36m@@ -16,32 +16,27 @@[m [msetup_test(dependencies DetDescr::DetDescr)[m
+ [m
+ option(BUILD_DETECTORID_BINDINGS "Build the python bindings for the the DetDescr/DetectorID components" ON)[m
+ if(BUILD_DETECTORID_BINDINGS)[m
+[32m+[m[32m  cmake_policy(SET CMP0167 NEW)[m
+   find_package(Python COMPONENTS Development)[m
+ [m
+[31m-  message("Looking for libboost_python${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}")[m
+[31m-  find_package(Boost QUIET COMPONENTS python${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR})[m
+[32m+[m[32m  message("Looking for libboost_python${Python_VERSION_MAJOR}${Python_VERSION_MINOR}")[m
+[32m+[m[32m  find_package(Boost QUIET COMPONENTS python${Python_VERSION_MAJOR}${Python_VERSION_MINOR})[m
+   # libboost_python3 style libraries[m
+   if (NOT Boost_FOUND)[m
+[31m-      message("Looking for libboost_python${PYTHON_VERSION_MAJOR}")[m
+[31m-      find_package(Boost QUIET COMPONENTS python${PYTHON_VERSION_MAJOR})[m
+[31m-  endif()[m
+[31m-[m
+[31m-  # libboost_python style libraries[m
+[31m-  if (NOT Boost_FOUND)[m
+[31m-      message("Looking for libboost_python")[m
+[31m-      find_package(Boost QUIET COMPONENTS system thread python)[m
+[32m+[m[32m      message("Looking for libboost_python${Python_VERSION_MAJOR}")[m
+[32m+[m[32m      find_package(Boost QUIET COMPONENTS python${Python_VERSION_MAJOR})[m
+   endif()[m
+ [m
+   # libboost_python-py36 style libraries[m
+   if (NOT Boost_FOUND)[m
+[31m-      message("Looking for libboost_python-py${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}")[m
+[31m-      find_package(Boost QUIET COMPONENTS python-py${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR})[m
+[32m+[m[32m      message("Looking for libboost_python-py${Python_VERSION_MAJOR}${Python_VERSION_MINOR}")[m
+[32m+[m[32m      find_package(Boost QUIET COMPONENTS python-py${Python_VERSION_MAJOR}${Python_VERSION_MINOR})[m
+   endif()[m
+ [m
+   # libboost_python3-py36 style libraries[m
+   if (NOT Boost_FOUND)[m
+[31m-      message("Looking for libboost_python3-py${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}")[m
+[31m-      find_package(Boost QUIET COMPONENTS python3-py${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR})[m
+[32m+[m[32m      message("Looking for libboost_python3-py${Python_VERSION_MAJOR}${Python_VERSION_MINOR}")[m
+[32m+[m[32m      find_package(Boost QUIET COMPONENTS python3-py${Python_VERSION_MAJOR}${Python_VERSION_MINOR})[m
+   endif()[m
+ [m
+   # Nothing worked[m
+[1mdiff --git a/Framework/CMakeLists.txt b/Framework/CMakeLists.txt[m
+[1mindex 8627fad6..8bbb2843 100644[m
+[1m--- a/Framework/CMakeLists.txt[m
+[1m+++ b/Framework/CMakeLists.txt[m
+[36m@@ -23,11 +23,11 @@[m [msetup_library(module Framework name Configure dependencies Python3::Python)[m
+ # Search for the Python3 library[m
+ find_package(Python3 COMPONENTS Interpreter Development)[m
+ [m
+[32m+[m[32mcmake_policy(SET CMP0167 NEW)[m
+ # Search for Boost[m
+ find_package([m
+   Boost REQUIRED[m
+[31m-  COMPONENTS system[m
+[31m-             log[m
+[32m+[m[32m  COMPONENTS log[m
+              filesystem[m
+              thread[m
+              chrono[m
+[1mdiff --git a/Hcal/src/Hcal/HcalClusterProducer.cxx b/Hcal/src/Hcal/HcalClusterProducer.cxx[m
+[1mindex 7c976f4f..01804ea7 100644[m
+[1m--- a/Hcal/src/Hcal/HcalClusterProducer.cxx[m
+[1m+++ b/Hcal/src/Hcal/HcalClusterProducer.cxx[m
+[36m@@ -2,6 +2,7 @@[m
+ [m
+ #include <exception>[m
+ #include <iostream>[m
+[32m+[m[32m#include <list>[m
+ [m
+ #include "Hcal/MyClusterWeight.h"[m
+ #include "Hcal/TemplatedClusterFinder.h"[m
+[1mdiff --git a/Tracking/CMakeLists.txt b/Tracking/CMakeLists.txt[m
+[1mindex 2f3b4163..24e7d050 100644[m
+[1m--- a/Tracking/CMakeLists.txt[m
+[1m+++ b/Tracking/CMakeLists.txt[m
+[36m@@ -62,7 +62,6 @@[m [mfind_package(Eigen3 CONFIG REQUIRED)[m
+ # if you want to try an alternate Acts, you can[m
+ # 1. comment out the stuff here and replace with add_subdirectory(acts)[m
+ # 2. git clone acts into this directory and choose your version[m
+[31m-find_package(Acts QUIET)[m
+ if (NOT Acts_FOUND)[m
+   message(STATUS "Did not find Acts, downloading and compiling it here")[m
+   include(FetchContent)[m
+[36m@@ -94,6 +93,7 @@[m [msetup_library(module Tracking[m
+               dependencies Framework::Configure [m
+                            Framework::Framework [m
+                            ActsCore[m
+[32m+[m[32m                           Eigen3::Eigen[m
+                            Geant4::Interface[m
+                            ROOT::Physics[m
+                            Tracking::Event[m
