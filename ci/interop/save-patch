@@ -57,7 +57,7 @@ fi
 
 # inside ldmx-sw
 version=$(git describe --tags)
-diff_cmd="git diff"
+diff_cmd="git -c color.diff=never diff -p"
 if [[ "${version}" =~ ^v3 ]]; then
   diff_cmd="${diff_cmd} --submodule=diff"
 fi
